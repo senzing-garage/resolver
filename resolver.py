@@ -11,8 +11,26 @@ import linecache
 import logging
 import os
 import signal
+import string
 import sys
 import time
+
+# Import Senzing libraries.
+
+try:
+    from G2Config import G2Config
+    from G2ConfigMgr import G2ConfigMgr
+    from G2Database import G2Database
+    from G2Engine import G2Engine
+    import G2Exception
+except ImportError:
+    pass
+
+from flask import Flask, json, Response, url_for
+from flask import request as flask_request
+from flask_api import status
+
+app = Flask(__name__)
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
@@ -28,14 +46,36 @@ KILOBYTES = 1024
 MEGABYTES = 1024 * KILOBYTES
 GIGABYTES = 1024 * MEGABYTES
 
+# Lists from https://www.ietf.org/rfc/rfc1738.txt
+
+safe_character_list = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"' ] + list(string.ascii_letters)
+unsafe_character_list = [ '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
+reserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
+
 # The "configuration_locator" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
 
+config = {}
 configuration_locator = {
+    "config_path": {
+        "default": "/opt/senzing/g2/data",
+        "env": "SENZING_CONFIG_PATH",
+        "cli": "config-path"
+    },
     "debug": {
         "default": False,
         "env": "SENZING_DEBUG",
         "cli": "debug"
+    },
+    "g2_database_url_generic": {
+        "default": "sqlite3://na:na@/opt/senzing/g2/sqldb/G2C.db",
+        "env": "SENZING_DATABASE_URL",
+        "cli": "database-url"
+    },
+    "host": {
+        "default": "0.0.0.0",
+        "env": "SENZING_HOST",
+        "cli": "host"
     },
     "input_file": {
         "default": None,
@@ -46,6 +86,11 @@ configuration_locator = {
         "default": "resolver-output.json",
         "env": "SENZING_OUTPUT_FILE",
         "cli": "output-file"
+    },
+    "port": {
+        "default": 5000,
+        "env": "SENZING_PORT",
+        "cli": "port"
     },
     "senzing_dir": {
         "default": "/opt/senzing",
@@ -60,13 +105,28 @@ configuration_locator = {
     "subcommand": {
         "default": None,
         "env": "SENZING_SUBCOMMAND",
+    },
+    "support_path": {
+        "default": "/opt/senzing/g2/data",
+        "env": "SENZING_SUPPORT_PATH",
+        "cli": "support-path"
     }
 }
 
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
 
 keys_to_redact = [
+#     "g2_database_url_generic",
+#     "g2_database_url_specific",
     ]
+
+# Global cached objects
+
+g2_config_singleton = None
+g2_configuration_manager_singleton = None
+g2_diagnostic_singleton = None
+g2_engine_singleton = None
+g2_product_singleton = None
 
 # -----------------------------------------------------------------------------
 # Define argument parser
@@ -84,6 +144,15 @@ def get_parser():
     subparser_1.add_argument("--input-file", dest="input_file", metavar="SENZING_INPUT_FILE", help="File of JSON lines to be read. Default: None")
     subparser_1.add_argument("--output-file", dest="output_file", metavar="SENZING_OUTPUT_FILE", help="File of JSON lines to be read. Default: resolver-output.json")
     subparser_1.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
+
+    subparser_2 = subparsers.add_parser('service', help='Receive HTTP requests.')
+    subparser_2.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
+    subparser_2.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
+    subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_2.add_argument("--host", dest="host", metavar="SENZING_HOST", help="Host to listen on. Default: 0.0.0.0")
+    subparser_2.add_argument("--port", dest="port", metavar="SENZING_PORT", help="Port to listen on. Default: 8080")
+    subparser_2.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
+    subparser_2.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
 
     subparser_8 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
     subparser_8.add_argument("--sleep-time-in-seconds", dest="sleep_time_in_seconds", metavar="SENZING_SLEEP_TIME_IN_SECONDS", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
@@ -359,18 +428,159 @@ def exit_silently():
     sys.exit(1)
 
 # -----------------------------------------------------------------------------
+# Senzing services.
+# -----------------------------------------------------------------------------
+
+
+def get_g2_configuration_dictionary(config):
+    result = {
+        "PIPELINE": {
+            "SUPPORTPATH": config.get("support_path"),
+            "CONFIGPATH": config.get("config_path")
+        },
+        "SQL": {
+            "CONNECTION": config.get("g2_database_url_specific"),
+        }
+    }
+    return result
+
+
+def get_g2_configuration_json(config):
+    return json.dumps(get_g2_configuration_dictionary(config))
+
+
+def get_g2_config(config, g2_config_name="loader-G2-config"):
+    '''Get the G2Config resource.'''
+    global g2_config_singleton
+
+    if g2_config_singleton:
+        return g2_config_singleton
+
+    try:
+        g2_configuration_json = get_g2_configuration_json(config)
+        result = G2Config()
+        result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
+    except G2Exception.G2ModuleException as err:
+        exit_error(897, g2_configuration_json, err)
+
+    g2_config_singleton = result
+    return result
+
+
+def get_g2_configuration_manager(config, g2_configuration_manager_name="loader-G2-configuration-manager"):
+    '''Get the G2Config resource.'''
+    global g2_configuration_manager_singleton
+
+    if g2_configuration_manager_singleton:
+        return g2_configuration_manager_singleton
+
+    try:
+        g2_configuration_json = get_g2_configuration_json(config)
+        result = G2ConfigMgr()
+        result.initV2(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
+    except G2Exception.G2ModuleException as err:
+        exit_error(896, g2_configuration_json, err)
+
+    g2_configuration_manager_singleton = result
+    return result
+
+
+def get_g2_diagnostic(config, g2_diagnostic_name="loader-G2-diagnostic"):
+    '''Get the G2Diagnostic resource.'''
+    global g2_diagnostic_singleton
+
+    if g2_diagnostic_singleton:
+        return g2_diagnostic_singleton
+
+    try:
+        g2_configuration_json = get_g2_configuration_json(config)
+        result = G2Diagnostic()
+        result.initV2(g2_diagnostic_name, g2_configuration_json, config.get('debug', False))
+    except G2Exception.G2ModuleException as err:
+        exit_error(894, g2_configuration_json, err)
+
+    g2_diagnostic_singleton = result
+    return result
+
+
+def get_g2_engine(config, g2_engine_name="loader-G2-engine"):
+    '''Get the G2Engine resource.'''
+    global g2_engine_singleton
+
+    if g2_engine_singleton:
+        return g2_engine_singleton
+
+    try:
+        g2_configuration_json = get_g2_configuration_json(config)
+        result = G2Engine()
+        result.initV2(g2_engine_name, g2_configuration_json, config.get('debug', False))
+        config['last_configuration_check'] = time.time()
+    except G2Exception.G2ModuleException as err:
+        exit_error(898, g2_configuration_json, err)
+
+    g2_engine_singleton = result
+    return result
+
+
+def get_g2_product(config, g2_product_name="loader-G2-product"):
+    '''Get the G2Product resource.'''
+    global g2_product_singleton
+
+    if g2_product_singleton:
+        return g2_product_singleton
+
+    try:
+        g2_configuration_json = get_g2_configuration_json(config)
+        result = G2Product()
+        result.initV2(g2_product_name, g2_configuration_json, config.get('debug'))
+    except G2Exception.G2ModuleException as err:
+        exit_error(892, config.get('g2project_ini'), err)
+
+    g2_product_singleton = result
+    return result
+
+# -----------------------------------------------------------------------------
 # Worker functions
 # -----------------------------------------------------------------------------
 
 
+def common_prolog(config):
+    '''Common steps for most do_* functions.'''
+    validate_configuration(config)
+    logging.info(entry_template(config))
+
+
 def get_resolved_entities():
-    result = {}
+    result = {
+        "name": "bob",
+        "address": "main street"
+    }
     return result
 
 
 def ingest(iterator):
     for item in iterator:
         print(item)
+
+# -----------------------------------------------------------------------------
+# Flask @app.routes
+# -----------------------------------------------------------------------------
+
+
+@app.route("/resolve", methods=['POST'])
+def http_post_resolve():
+
+    # Send input to Senzing.
+
+    payload = flask_request.get_data(as_text=True)
+    ingest(payload.splitlines())
+
+    # Get results from Senzing.
+
+    response = json.dumps(get_resolved_entities(), sort_keys=True)
+    response_status = status.HTTP_200_OK
+    mimetype = 'application/json'
+    return Response(response=response, status=response_status, mimetype=mimetype)
 
 # -----------------------------------------------------------------------------
 # do_* functions
@@ -400,6 +610,7 @@ def do_file_input(args):
     # Get context from CLI, environment variables, and ini files.
 
     config = get_configuration(args)
+    common_prolog(config)
 
     # Prolog.
 
@@ -422,20 +633,18 @@ def do_file_input(args):
 
 
 def do_service(args):
-    ''' Do a task. Print the complete config object'''
+    '''Read from URL-addressable file.'''
 
     # Get context from CLI, environment variables, and ini files.
 
     config = get_configuration(args)
 
-    # Prolog.
+    common_prolog(config)
+    host = config.get('host')
+    port = config.get('port')
+    debug = config.get('debug')
 
-    logging.info(entry_template(config))
-
-    # Do work.
-
-    config_json = json.dumps(config, sort_keys=True, indent=4)
-    print(config_json)
+    app.run(host=host, port=port, debug=debug)
 
     # Epilog.
 
@@ -529,6 +738,10 @@ if __name__ == "__main__":
     signal_handler = create_signal_handler_function(args)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+
+    # Set global config for use by Flask.
+
+    config = get_configuration(args)
 
     # Transform subcommand from CLI parameter to function name string.
 
