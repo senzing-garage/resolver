@@ -135,15 +135,12 @@ configuration_locator = {
 keys_to_redact = [
     "g2_database_url_generic",
     "g2_database_url_specific",
-    ]
+]
 
 # Global cached objects
 
-g2_config_singleton = None
 g2_configuration_manager_singleton = None
-g2_diagnostic_singleton = None
 g2_engine_singleton = None
-g2_product_singleton = None
 
 # -----------------------------------------------------------------------------
 # Define argument parser
@@ -612,17 +609,34 @@ class G2Writer:
 
         logging.debug(message_debug(904, "", jsonline))
 
-    def purge_g2_engine(self):
-        # FIXME: implement.
-        pass
+    def purge_repository(self):
+        try:
+            self.g2_engine.purgeRepository()
+        except G2Exception.TranslateG2ModuleException as err:
+            logging.error(message_error(887, err, ""))
+        except G2Exception.G2ModuleNotInitialized as err:
+            exit_error(888, err, "")
+        except Exception as err:
+            logging.error(message_error(890, err, ""))
 
     def get_resolved_entities(self):
-        # FIXME: implement
 
-        result = {
-            "name": "bob",
-            "address": "main street"
-        }
+        # Prime the pump.
+
+        result = []
+        flags = G2Engine.G2_EXPORT_DEFAULT_FLAGS
+        export_handle = self.g2_engine.exportJSONEntityReport(flags)
+
+        # Loop through results.
+
+        response_bytearray = bytearray()
+        self.g2_engine.fetchNext(export_handle, response_bytearray)
+        while response_bytearray:
+            response_dictionary = json.loads(response_bytearray.decode())
+            result.append(response_dictionary)
+            response_bytearray = bytearray()
+            self.g2_engine.fetchNext(export_handle, response_bytearray)
+
         return result
 
 # -----------------------------------------------------------------------------
@@ -705,25 +719,7 @@ def get_g2_configuration_json(config):
     return json.dumps(get_g2_configuration_dictionary(config))
 
 
-def get_g2_config(config, g2_config_name="loader-G2-config"):
-    '''Get the G2Config resource.'''
-    global g2_config_singleton
-
-    if g2_config_singleton:
-        return g2_config_singleton
-
-    try:
-        g2_configuration_json = get_g2_configuration_json(config)
-        result = G2Config()
-        result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
-    except G2Exception.G2ModuleException as err:
-        exit_error(897, g2_configuration_json, err)
-
-    g2_config_singleton = result
-    return result
-
-
-def get_g2_configuration_manager(config, g2_configuration_manager_name="loader-G2-configuration-manager"):
+def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver-G2-configuration-manager"):
     '''Get the G2Config resource.'''
     global g2_configuration_manager_singleton
 
@@ -741,25 +737,7 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="loader-G
     return result
 
 
-def get_g2_diagnostic(config, g2_diagnostic_name="loader-G2-diagnostic"):
-    '''Get the G2Diagnostic resource.'''
-    global g2_diagnostic_singleton
-
-    if g2_diagnostic_singleton:
-        return g2_diagnostic_singleton
-
-    try:
-        g2_configuration_json = get_g2_configuration_json(config)
-        result = G2Diagnostic()
-        result.initV2(g2_diagnostic_name, g2_configuration_json, config.get('debug', False))
-    except G2Exception.G2ModuleException as err:
-        exit_error(894, g2_configuration_json, err)
-
-    g2_diagnostic_singleton = result
-    return result
-
-
-def get_g2_engine(config, g2_engine_name="loader-G2-engine"):
+def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
     '''Get the G2Engine resource.'''
     global g2_engine_singleton
 
@@ -775,24 +753,6 @@ def get_g2_engine(config, g2_engine_name="loader-G2-engine"):
         exit_error(898, g2_configuration_json, err)
 
     g2_engine_singleton = result
-    return result
-
-
-def get_g2_product(config, g2_product_name="loader-G2-product"):
-    '''Get the G2Product resource.'''
-    global g2_product_singleton
-
-    if g2_product_singleton:
-        return g2_product_singleton
-
-    try:
-        g2_configuration_json = get_g2_configuration_json(config)
-        result = G2Product()
-        result.initV2(g2_product_name, g2_configuration_json, config.get('debug'))
-    except G2Exception.G2ModuleException as err:
-        exit_error(892, config.get('g2project_ini'), err)
-
-    g2_product_singleton = result
     return result
 
 # -----------------------------------------------------------------------------
@@ -815,6 +775,8 @@ def handle_post_resolver(iterator):
     Return: Dictionary of resolved entities.
     '''
 
+    # Create g2_writer object.
+
     config = get_config()
     g2_engine = get_g2_engine(config)
     g2_configuration_manager = get_g2_configuration_manager(config)
@@ -822,7 +784,7 @@ def handle_post_resolver(iterator):
 
     # Purge database.
 
-    g2_writer.purge_g2_engine()
+    g2_writer.purge_repository()
 
     # Populate Senzing.
 
@@ -833,9 +795,10 @@ def handle_post_resolver(iterator):
 
     result = g2_writer.get_resolved_entities()
 
-    # FIXME: Purge database.
+    # Purge database.
+    # FIXME: Uncomment after debugging.
 
-    g2_writer.purge_g2_engine()
+#   g2_writer.purge_repository()
 
     return result
 
@@ -916,7 +879,7 @@ def do_service(args):
     port = config.get('port')
     debug = config.get('debug')
 
-    app.run(host=host, port=port, debug=debug)
+    app.run(host=host, port=port, debug=debug, threaded=False)
 
     # Epilog.
 
