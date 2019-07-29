@@ -1,20 +1,7 @@
 #! /usr/bin/env python3
 
 # -----------------------------------------------------------------------------
-# python-template.py Example python skeleton.
-# Can be used as a boiler-plate to build new python scripts.
-# This skeleton implements the following features:
-#   1) "command subcommand" command line.
-#   2) A structured command line parser and "-help"
-#   3) Configuration via:
-#      3.1) Command line options
-#      3.2) Environment variables
-#      3.3) Configuration file
-#      3.4) Default
-#   4) Messages dictionary
-#   5) Logging and Log Level support.
-#   6) Entry / Exit log messages.
-#   7) Docker support.
+# resolver.py
 # -----------------------------------------------------------------------------
 
 from glob import glob
@@ -30,9 +17,9 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-07-21'
+__updated__ = '2019-07-29'
 
-SENZING_PRODUCT_ID = "5xxx"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
+SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
 
 # Working with bytes.
@@ -50,10 +37,15 @@ configuration_locator = {
         "env": "SENZING_DEBUG",
         "cli": "debug"
     },
-    "password": {
+    "input_file": {
         "default": None,
-        "env": "SENZING_PASSWORD",
-        "cli": "password"
+        "env": "SENZING_INPUT_FILE",
+        "cli": "input-file"
+    },
+    "output_file": {
+        "default": "resolver-output.json",
+        "env": "SENZING_OUTPUT_FILE",
+        "cli": "output-file"
     },
     "senzing_dir": {
         "default": "/opt/senzing",
@@ -74,7 +66,6 @@ configuration_locator = {
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
 
 keys_to_redact = [
-    "password",
     ]
 
 # -----------------------------------------------------------------------------
@@ -85,18 +76,14 @@ keys_to_redact = [
 def get_parser():
     ''' Parse commandline arguments. '''
 
-    parser = argparse.ArgumentParser(prog="python-template.py", description="Example python skeleton. For more information, see https://github.com/Senzing/python-template")
+    parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
-    subparser_1 = subparsers.add_parser('task1', help='Example task #1.')
+    subparser_1 = subparsers.add_parser('file-input', help='File based input / output.')
     subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
-    subparser_1.add_argument("--password", dest="password", metavar="SENZING_PASSWORD", help="Example of information redacted in the log. Default: None")
+    subparser_1.add_argument("--input-file", dest="input_file", metavar="SENZING_INPUT_FILE", help="File of JSON lines to be read. Default: None")
+    subparser_1.add_argument("--output-file", dest="output_file", metavar="SENZING_OUTPUT_FILE", help="File of JSON lines to be read. Default: resolver-output.json")
     subparser_1.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
-
-    subparser_2 = subparsers.add_parser('task2', help='Example task #2.')
-    subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
-    subparser_2.add_argument("--password", dest="password", metavar="SENZING_PASSWORD", help="Example of information redacted in the log. Default: None")
-    subparser_2.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
 
     subparser_8 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
     subparser_8.add_argument("--sleep-time-in-seconds", dest="sleep_time_in_seconds", metavar="SENZING_SLEEP_TIME_IN_SECONDS", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
@@ -372,6 +359,20 @@ def exit_silently():
     sys.exit(1)
 
 # -----------------------------------------------------------------------------
+# Worker functions
+# -----------------------------------------------------------------------------
+
+
+def get_resolved_entities():
+    result = {}
+    return result
+
+
+def ingest(iterator):
+    for item in iterator:
+        print(item)
+
+# -----------------------------------------------------------------------------
 # do_* functions
 #   Common function signature: do_XXX(args)
 # -----------------------------------------------------------------------------
@@ -393,7 +394,7 @@ def do_docker_acceptance_test(args):
     logging.info(exit_template(config))
 
 
-def do_task1(args):
+def do_file_input(args):
     ''' Do a task. '''
 
     # Get context from CLI, environment variables, and ini files.
@@ -404,16 +405,23 @@ def do_task1(args):
 
     logging.info(entry_template(config))
 
-    # Do work.
+    # Create iterator over JSON Lines and ingest data.
 
-    print("senzing-dir: {senzing_dir}; debug: {debug}".format(**config))
+    with open(config.get('input_file')) as input_iterator:
+        ingest(input_iterator)
+
+    # Create output.
+
+    result = get_resolved_entities()
+    with open(config.get('output_file'), "w") as output_file:
+        json.dump(result, output_file, sort_keys=True, indent=4)
 
     # Epilog.
 
     logging.info(exit_template(config))
 
 
-def do_task2(args):
+def do_service(args):
     ''' Do a task. Print the complete config object'''
 
     # Get context from CLI, environment variables, and ini files.
