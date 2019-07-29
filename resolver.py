@@ -5,6 +5,8 @@
 # -----------------------------------------------------------------------------
 
 from glob import glob
+from urllib.parse import urlparse, urlunparse
+from urllib.request import urlopen
 import argparse
 import json
 import linecache
@@ -57,15 +59,30 @@ reserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
 
 config = {}
 configuration_locator = {
+    "configuration_check_frequency_in_seconds": {
+        "default": 60,
+        "env": "SENZING_CONFIGURATION_CHECK_FREQUENCY",
+        "cli": "configuration-check-frequency"
+    },
     "config_path": {
         "default": "/opt/senzing/g2/data",
         "env": "SENZING_CONFIG_PATH",
         "cli": "config-path"
     },
+    "data_source": {
+        "default": "TEST",
+        "env": "SENZING_DATA_SOURCE",
+        "cli": "data-source"
+    },
     "debug": {
         "default": False,
         "env": "SENZING_DEBUG",
         "cli": "debug"
+    },
+    "entity_type": {
+        "default": None,
+        "env": "SENZING_ENTITY_TYPE",
+        "cli": "entity-type"
     },
     "g2_database_url_generic": {
         "default": "sqlite3://na:na@/opt/senzing/g2/sqldb/G2C.db",
@@ -116,8 +133,8 @@ configuration_locator = {
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
 
 keys_to_redact = [
-#     "g2_database_url_generic",
-#     "g2_database_url_specific",
+    "g2_database_url_generic",
+    "g2_database_url_specific",
     ]
 
 # Global cached objects
@@ -140,13 +157,18 @@ def get_parser():
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
     subparser_1 = subparsers.add_parser('file-input', help='File based input / output.')
+    subparser_1.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
+    subparser_1.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
+    subparser_1.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
     subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
     subparser_1.add_argument("--input-file", dest="input_file", metavar="SENZING_INPUT_FILE", help="File of JSON lines to be read. Default: None")
     subparser_1.add_argument("--output-file", dest="output_file", metavar="SENZING_OUTPUT_FILE", help="File of JSON lines to be read. Default: resolver-output.json")
     subparser_1.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
+    subparser_1.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
 
     subparser_2 = subparsers.add_parser('service', help='Receive HTTP requests.')
     subparser_2.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
+    subparser_2.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
     subparser_2.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
     subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
     subparser_2.add_argument("--host", dest="host", metavar="SENZING_HOST", help="Host to listen on. Default: 0.0.0.0")
@@ -261,8 +283,126 @@ def get_exception():
     }
 
 # -----------------------------------------------------------------------------
+# Database URL parsing
+# -----------------------------------------------------------------------------
+
+
+def translate(map, astring):
+    new_string = str(astring)
+    for key, value in map.items():
+        new_string = new_string.replace(key, value)
+    return new_string
+
+
+def get_unsafe_characters(astring):
+    result = []
+    for unsafe_character in unsafe_character_list:
+        if unsafe_character in astring:
+            result.append(unsafe_character)
+    return result
+
+
+def get_safe_characters(astring):
+    result = []
+    for safe_character in safe_character_list:
+        if safe_character not in astring:
+            result.append(safe_character)
+    return result
+
+
+def parse_database_url(original_senzing_database_url):
+
+    result = {}
+
+    # Get the value of SENZING_DATABASE_URL environment variable.
+
+    senzing_database_url = original_senzing_database_url
+
+    # Create lists of safe and unsafe characters.
+
+    unsafe_characters = get_unsafe_characters(senzing_database_url)
+    safe_characters = get_safe_characters(senzing_database_url)
+
+    # Detect an error condition where there are not enough safe characters.
+
+    if len(unsafe_characters) > len(safe_characters):
+        logging.error(message_error(730, unsafe_characters, safe_characters))
+        return result
+
+    # Perform translation.
+    # This makes a map of safe character mapping to unsafe characters.
+    # "senzing_database_url" is modified to have only safe characters.
+
+    translation_map = {}
+    safe_characters_index = 0
+    for unsafe_character in unsafe_characters:
+        safe_character = safe_characters[safe_characters_index]
+        safe_characters_index += 1
+        translation_map[safe_character] = unsafe_character
+        senzing_database_url = senzing_database_url.replace(unsafe_character, safe_character)
+
+    # Parse "translated" URL.
+
+    parsed = urlparse(senzing_database_url)
+    schema = parsed.path.strip('/')
+
+    # Construct result.
+
+    result = {
+        'scheme': translate(translation_map, parsed.scheme),
+        'netloc': translate(translation_map, parsed.netloc),
+        'path': translate(translation_map, parsed.path),
+        'params': translate(translation_map, parsed.params),
+        'query': translate(translation_map, parsed.query),
+        'fragment': translate(translation_map, parsed.fragment),
+        'username': translate(translation_map, parsed.username),
+        'password': translate(translation_map, parsed.password),
+        'hostname': translate(translation_map, parsed.hostname),
+        'port': translate(translation_map, parsed.port),
+        'schema': translate(translation_map, schema),
+    }
+
+    # For safety, compare original URL with reconstructed URL.
+
+    url_parts = [
+        result.get('scheme'),
+        result.get('netloc'),
+        result.get('path'),
+        result.get('params'),
+        result.get('query'),
+        result.get('fragment'),
+    ]
+    test_senzing_database_url = urlunparse(url_parts)
+    if test_senzing_database_url != original_senzing_database_url:
+        logging.warning(message_warning(891, original_senzing_database_url, test_senzing_database_url))
+
+    # Return result.
+
+    return result
+
+# -----------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------
+
+
+def get_g2_database_url_specific(generic_database_url):
+    result = ""
+
+    parsed_database_url = parse_database_url(generic_database_url)
+    scheme = parsed_database_url.get('scheme')
+
+    if scheme in ['mysql']:
+        result = "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}".format(**parsed_database_url)
+    elif scheme in ['postgresql']:
+        result = "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/".format(**parsed_database_url)
+    elif scheme in ['db2']:
+        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
+    elif scheme in ['sqlite3']:
+        result = "{scheme}://{netloc}{path}".format(**parsed_database_url)
+    else:
+        logging.error(message_error(695, scheme, generic_database_url))
+
+    return result
 
 
 def get_configuration(args):
@@ -323,6 +463,10 @@ def get_configuration(args):
         integer_string = result.get(integer)
         result[integer] = int(integer_string)
 
+    # Special case:  Tailored database URL
+
+    result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
+
     return result
 
 
@@ -368,6 +512,118 @@ def redact_configuration(config):
     for key in keys_to_redact:
         result.pop(key)
     return result
+
+# -----------------------------------------------------------------------------
+# Class: G2Writer
+# -----------------------------------------------------------------------------
+
+
+class G2Writer:
+
+    def __init__(self, config, g2_engine, g2_configuration_manager):
+        self.config = config
+        self.g2_engine = g2_engine
+        self.g2_configuration_manager = g2_configuration_manager
+
+    def add_record_to_failure_queue(self, jsonline):
+        # FIXME: add functionality.
+        logging.info(message_info(121, jsonline))
+
+    def is_time_to_check_g2_configuration(self):
+        now = time.time()
+        next_check_time = self.config.get('last_configuration_check', time.time()) + self.config.get('configuration_check_frequency_in_seconds')
+        return now > next_check_time
+
+    def is_g2_default_configuration_changed(self):
+
+        # Update early to avoid "thundering heard problem".
+
+        self.config['last_configuration_check'] = time.time()
+
+        # Get active Configuration ID being used by g2_engine.
+
+        active_config_id = bytearray()
+        self.g2_engine.getActiveConfigID(active_config_id)
+
+        # Get most current Configuration ID from G2 database.
+
+        default_config_id = bytearray()
+        self.g2_configuration_manager.getDefaultConfigID(default_config_id)
+
+        # Determine if configuration has changed.
+
+        result = active_config_id != default_config_id
+        if result:
+            logging.info(message_info(292, active_config_id.decode(), default_config_id.decode()))
+
+        return result
+
+    def update_active_g2_configuration(self):
+
+        # Get most current Configuration ID from G2 database.
+
+        default_config_id = bytearray()
+        self.g2_configuration_manager.getDefaultConfigID(default_config_id)
+
+        # Apply new configuration to g2_engine.
+
+        self.g2_engine.reinitV2(default_config_id)
+
+    def add_record(self, jsonline):
+        json_dictionary = json.loads(jsonline)
+        data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
+        record_id = str(json_dictionary.get('RECORD_ID'))
+        try:
+            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+        except Exception as err:
+            if self.is_g2_default_configuration_changed():
+                self.update_active_g2_configuration()
+                return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+            else:
+                raise err
+        return return_code
+
+    def send_jsonline_to_g2_engine(self, jsonline):
+        '''Send the JSONline to G2 engine.'''
+
+        # Periodically, check for configuration update.
+
+        if self.is_time_to_check_g2_configuration():
+            if self.is_g2_default_configuration_changed():
+                self.update_active_g2_configuration()
+
+        # Add Record to Senzing G2.
+
+        try:
+            return_code = self.add_record(jsonline)
+        except G2Exception.TranslateG2ModuleException as err:
+            logging.error(message_error(887, err, jsonline))
+            self.add_record_to_failure_queue(jsonline)
+        except G2Exception.G2ModuleNotInitialized as err:
+            exit_error(888, err, jsonline)
+        except G2Exception.G2ModuleGenericException as err:
+            logging.error(message_error(889, err, jsonline))
+            self.add_record_to_failure_queue(jsonline)
+        except Exception as err:
+            logging.error(message_error(890, err, jsonline))
+            self.add_record_to_failure_queue(jsonline)
+        if return_code != 0:
+            exit_error(886, return_code, method, parameters)
+
+        logging.debug(message_debug(904, "", jsonline))
+
+    def purge_g2_engine(self):
+        # FIXME: implement.
+        pass
+
+    def get_resolved_entities(self):
+        # FIXME: implement
+
+        result = {
+            "name": "bob",
+            "address": "main street"
+        }
+        return result
 
 # -----------------------------------------------------------------------------
 # Utility functions
@@ -544,23 +800,44 @@ def get_g2_product(config, g2_product_name="loader-G2-product"):
 # -----------------------------------------------------------------------------
 
 
+def get_config():
+    return config
+
+
 def common_prolog(config):
     '''Common steps for most do_* functions.'''
     validate_configuration(config)
     logging.info(entry_template(config))
 
 
-def get_resolved_entities():
-    result = {
-        "name": "bob",
-        "address": "main street"
-    }
+def handle_post_resolver(iterator):
+    '''
+    Return: Dictionary of resolved entities.
+    '''
+
+    config = get_config()
+    g2_engine = get_g2_engine(config)
+    g2_configuration_manager = get_g2_configuration_manager(config)
+    g2_writer = G2Writer(config, g2_engine, g2_configuration_manager)
+
+    # Purge database.
+
+    g2_writer.purge_g2_engine()
+
+    # Populate Senzing.
+
+    for jsonline in iterator:
+        g2_writer.send_jsonline_to_g2_engine(jsonline)
+
+    # Get results from Senzing.
+
+    result = g2_writer.get_resolved_entities()
+
+    # FIXME: Purge database.
+
+    g2_writer.purge_g2_engine()
+
     return result
-
-
-def ingest(iterator):
-    for item in iterator:
-        print(item)
 
 # -----------------------------------------------------------------------------
 # Flask @app.routes
@@ -570,17 +847,17 @@ def ingest(iterator):
 @app.route("/resolve", methods=['POST'])
 def http_post_resolve():
 
-    # Send input to Senzing.
+    # Interact with Senzing.
 
     payload = flask_request.get_data(as_text=True)
-    ingest(payload.splitlines())
+    response = handle_post_resolver(payload.splitlines())
 
-    # Get results from Senzing.
+    # Craft the HTTP response.
 
-    response = json.dumps(get_resolved_entities(), sort_keys=True)
+    response_pretty = json.dumps(response, sort_keys=True)
     response_status = status.HTTP_200_OK
     mimetype = 'application/json'
-    return Response(response=response, status=response_status, mimetype=mimetype)
+    return Response(response=response_pretty, status=response_status, mimetype=mimetype)
 
 # -----------------------------------------------------------------------------
 # do_* functions
@@ -612,18 +889,13 @@ def do_file_input(args):
     config = get_configuration(args)
     common_prolog(config)
 
-    # Prolog.
-
-    logging.info(entry_template(config))
-
     # Create iterator over JSON Lines and ingest data.
 
     with open(config.get('input_file')) as input_iterator:
-        ingest(input_iterator)
+        result = handle_post_resolver(input_iterator)
 
     # Create output.
 
-    result = get_resolved_entities()
     with open(config.get('output_file'), "w") as output_file:
         json.dump(result, output_file, sort_keys=True, indent=4)
 
@@ -638,8 +910,8 @@ def do_service(args):
     # Get context from CLI, environment variables, and ini files.
 
     config = get_configuration(args)
-
     common_prolog(config)
+
     host = config.get('host')
     port = config.get('port')
     debug = config.get('debug')
