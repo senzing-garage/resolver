@@ -16,6 +16,7 @@ import shutil
 import signal
 import string
 import sys
+import threading
 import time
 
 # Import Senzing libraries.
@@ -60,11 +61,6 @@ reserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
 
 config = {}
 configuration_locator = {
-    "configuration_check_frequency_in_seconds": {
-        "default": 60,
-        "env": "SENZING_CONFIGURATION_CHECK_FREQUENCY",
-        "cli": "configuration-check-frequency"
-    },
     "config_path": {
         "default": "/opt/senzing/g2/data",
         "env": "SENZING_CONFIG_PATH",
@@ -139,14 +135,15 @@ configuration_locator = {
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
 
 keys_to_redact = [
-#     "g2_database_url_generic",
-#     "g2_database_url_specific",
+    "g2_database_url_generic",
+    "g2_database_url_specific",
 ]
 
 # Global cached objects
 
 g2_configuration_manager_singleton = None
 g2_engine_singleton = None
+g2_config_singleton = None
 
 # -----------------------------------------------------------------------------
 # Define argument parser
@@ -208,6 +205,7 @@ message_dictionary = {
     "101": "Adding datasource '{0}'",
     "102": "Adding entity type '{0}'",
     "103": "Processed {0} input records which resolved to {1} entities.",
+    "104": "Adding datasources: {0}",
     "292": "Configuration change detected.  Old: {0} New: {1}",
     "293": "For information on warnings and errors, see https://github.com/Senzing/resolver#errors",
     "294": "Version: {0}  Updated: {1}",
@@ -487,11 +485,6 @@ def get_configuration(args):
     else:
         result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
 
-    # Initialize lists.
-
-    result['data_sources'] = []
-    result['entity_types'] = []
-
     return result
 
 
@@ -535,115 +528,151 @@ def redact_configuration(config):
     ''' Return a shallow copy of config with certain keys removed. '''
     result = config.copy()
     for key in keys_to_redact:
-        result.pop(key)
+        try:
+            result.pop(key)
+        except:
+            pass
     return result
 
 # -----------------------------------------------------------------------------
-# Class: G2Writer
+# Class: G2Client
 # -----------------------------------------------------------------------------
 
 
-class G2Writer:
+class G2Client:
 
-    def __init__(self, config, g2_engine, g2_configuration_manager):
+    def __init__(self, config, g2_engine, g2_configuration_manager, g2_config):
         self.config = config
-        self.g2_engine = g2_engine
+        self.g2_config = g2_config
         self.g2_configuration_manager = g2_configuration_manager
+        self.g2_engine = g2_engine
+
+    def add_metadata(self, iterator):
+        ''' Perform Senzing G2 administrative functions. '''
+
+        # Determine if a default configuration exists.
+
+        config_id_bytearray = bytearray()
+        return_code = self.g2_configuration_manager.getDefaultConfigID(config_id_bytearray)
+
+        # Find the "config_handle" of the configuration,  creating a new configuration if needed.
+
+        if  config_id_bytearray:
+            config_id_int = int(config_id_bytearray)
+            configuration_bytearray = bytearray()
+            self.g2_configuration_manager.getConfig(config_id_int, configuration_bytearray)
+            configuration_json = configuration_bytearray.decode()
+            config_handle = self.g2_config.load(configuration_json)
+        else:
+            config_handle = self.g2_config.create()
+
+        # Get list of existing datasources.
+
+        datasources_bytearray = bytearray()
+        return_code = self.g2_config.listDataSources(config_handle, datasources_bytearray)
+        datasources_dictionary = json.loads(datasources_bytearray.decode())
+        existing_data_sources = datasources_dictionary.get('DSRC_CODE', [])
+
+        # Determine all requested data sources.
+
+        requested_data_sources = []
+        for jsonline in iterator:
+            json_dictionary = json.loads(jsonline)
+
+            # Determine if DATA_SOURCE needs to be added to request.
+
+            data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
+            if data_source not in requested_data_sources:
+                requested_data_sources.append(data_source)
+
+            # Hack:  Since G2Config.addDataSource() creates a DATA_SOURCE and ENTITY_TYPE,
+            # We'll make DATA_SOURCEs out of needed ENTITY_TYPEs.
+
+            entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
+            if entity_type not in requested_data_sources:
+                requested_data_sources.append(entity_type)
+
+        # Determine data sources that are not already defined.
+
+        new_data_sources = [item for item in requested_data_sources if item not in existing_data_sources]
+
+        # If no new datasources are needed, exit.
+
+        if len(new_data_sources) == 0:
+            return
+
+        # Add data sources to configuration.
+
+        for new_data_source in new_data_sources:
+            self.g2_config.addDataSource(config_handle, new_data_source)
+        logging.info(message_info(104, json.dumps(new_data_sources, sort_keys=True)))
+
+        # Get JSON string with new datasource added.
+
+        new_configration_bytearray = bytearray()
+        return_code = self.g2_config.save(config_handle, new_configration_bytearray)
+        new_configuration_json = new_configration_bytearray.decode()
+
+        # Add configuration to G2 database SYS_CFG table.
+
+        new_configuration_comments = "Add {0} datasources".format(json.dumps(new_data_sources, sort_keys=True))
+        new_configuration_id_bytearray = bytearray()
+        self.g2_configuration_manager.addConfig(new_configuration_json, new_configuration_comments, new_configuration_id_bytearray)
+
+        # Set Default configuration.
+
+        self.g2_configuration_manager.setDefaultConfigID(new_configuration_id_bytearray)
+
+        # Re-initialize G2 engine.
+
+        self.g2_engine.reinitV2(new_configuration_id_bytearray)
+
+    def add_record(self, jsonline):
+        ''' Add record to Senzing. '''
+        json_dictionary = json.loads(jsonline)
+        data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
+        record_id = str(json_dictionary.get('RECORD_ID'))
+        try:
+            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+        except Exception as err:
+            raise err
+        return return_code
 
     def add_record_to_failure_queue(self, jsonline):
         # FIXME: add functionality.
         logging.info(message_info(121, jsonline))
 
-    def is_time_to_check_g2_configuration(self):
-        now = time.time()
-        next_check_time = self.config.get('last_configuration_check', time.time()) + self.config.get('configuration_check_frequency_in_seconds')
-        return now > next_check_time
+    def get_resolved_entities(self):
 
-    def is_g2_default_configuration_changed(self):
+        # Prime the pump.
 
-        # Update early to avoid "thundering heard problem".
+        result = []
+        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_MINIMAL_FORMAT
+        export_handle = self.g2_engine.exportJSONEntityReport(flags)
 
-        self.config['last_configuration_check'] = time.time()
+        # Loop through results.
 
-        # Get active Configuration ID being used by g2_engine.
-
-        active_config_id = bytearray()
-        self.g2_engine.getActiveConfigID(active_config_id)
-
-        # Get most current Configuration ID from G2 database.
-
-        default_config_id = bytearray()
-        self.g2_configuration_manager.getDefaultConfigID(default_config_id)
-
-        # Determine if configuration has changed.
-
-        result = active_config_id != default_config_id
-        if result:
-            logging.info(message_info(292, active_config_id.decode(), default_config_id.decode()))
+        response_bytearray = bytearray()
+        self.g2_engine.fetchNext(export_handle, response_bytearray)
+        while response_bytearray:
+            response_dictionary = json.loads(response_bytearray.decode())
+            result.append(response_dictionary)
+            self.g2_engine.fetchNext(export_handle, response_bytearray)
 
         return result
 
-    def update_active_g2_configuration(self):
-
-        # Get most current Configuration ID from G2 database.
-
-        default_config_id = bytearray()
-        self.g2_configuration_manager.getDefaultConfigID(default_config_id)
-
-        # Apply new configuration to g2_engine.
-
-        self.g2_engine.reinitV2(default_config_id)
-
-    def add_data_source(self, data_source):
-        # FIXME: implement.
-        logging.info(message_info(101, data_source))
-
-    def add_entity_type(self, entity_type):
-        # FIXME: implement.
-        logging.info(message_info(102, entity_type))
-
-    def add_record(self, jsonline):
-        ''' Add record to Senzing. '''
-        json_dictionary = json.loads(jsonline)
-
-        # Determine if datasource needs to be defined to Senzing.
-
-        data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
-        data_sources = self.config.get("data_sources")
-        if data_source not in data_sources:
-            self.add_data_source(data_source)
-            data_sources.append(data_source)
-
-        # Determine if entity type needs to be defined to Senzing.
-
-        entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
-        entity_types = self.config.get("entity_types")
-        if entity_type not in entity_types:
-            self.add_entity_type(entity_type)
-            entity_types.append(entity_type)
-
-        # Add record to Senzing.
-
-        record_id = str(json_dictionary.get('RECORD_ID'))
+    def purge_repository(self):
         try:
-            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+            self.g2_engine.purgeRepository()
+        except G2Exception.TranslateG2ModuleException as err:
+            logging.error(message_error(887, err, ""))
+        except G2Exception.G2ModuleNotInitialized as err:
+            exit_error(888, err, "")
         except Exception as err:
-            if self.is_g2_default_configuration_changed():
-                self.update_active_g2_configuration()
-                return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
-            else:
-                raise err
-        return return_code
+            logging.error(message_error(890, err, ""))
 
     def send_jsonline_to_g2_engine(self, jsonline):
         '''Send the JSONline to G2 engine.'''
-
-        # Periodically, check for configuration update.
-        # FIXME: Does this need to be done?
-
-#         if self.is_time_to_check_g2_configuration():
-#             if self.is_g2_default_configuration_changed():
-#                 self.update_active_g2_configuration()
 
         # Add Record to Senzing G2.
 
@@ -664,35 +693,6 @@ class G2Writer:
             exit_error(886, return_code, method, parameters)
 
         logging.debug(message_debug(904, "", jsonline))
-
-    def purge_repository(self):
-        try:
-            self.g2_engine.purgeRepository()
-        except G2Exception.TranslateG2ModuleException as err:
-            logging.error(message_error(887, err, ""))
-        except G2Exception.G2ModuleNotInitialized as err:
-            exit_error(888, err, "")
-        except Exception as err:
-            logging.error(message_error(890, err, ""))
-
-    def get_resolved_entities(self):
-
-        # Prime the pump.
-
-        result = []
-        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_MINIMAL_FORMAT
-        export_handle = self.g2_engine.exportJSONEntityReport(flags)
-
-        # Loop through results.
-
-        response_bytearray = bytearray()
-        self.g2_engine.fetchNext(export_handle, response_bytearray)
-        while response_bytearray:
-            response_dictionary = json.loads(response_bytearray.decode())
-            result.append(response_dictionary)
-            self.g2_engine.fetchNext(export_handle, response_bytearray)
-
-        return result
 
 # -----------------------------------------------------------------------------
 # Utility functions
@@ -774,6 +774,24 @@ def get_g2_configuration_json(config):
     return json.dumps(get_g2_configuration_dictionary(config))
 
 
+def get_g2_config(config, g2_config_name="resolver-G2-config"):
+    '''Get the G2Config resource.'''
+    global g2_config_singleton
+
+    if g2_config_singleton:
+        return g2_config_singleton
+
+    try:
+        g2_configuration_json = get_g2_configuration_json(config)
+        result = G2Config()
+        result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
+    except G2Exception.G2ModuleException as err:
+        exit_error(897, g2_configuration_json, err)
+
+    g2_config_singleton = result
+    return result
+
+
 def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver-G2-configuration-manager"):
     '''Get the G2Config resource.'''
     global g2_configuration_manager_singleton
@@ -803,7 +821,6 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Engine()
         result.initV2(g2_engine_name, g2_configuration_json, config.get('debug', False))
-        config['last_configuration_check'] = time.time()
     except G2Exception.G2ModuleException as err:
         exit_error(898, g2_configuration_json, err)
 
@@ -830,32 +847,39 @@ def handle_post_resolver(iterator):
     Return: Dictionary of resolved entities.
     '''
 
-    # Create g2_writer object.
+    logging.info(message_info(999, threading.enumerate()))
+
+    # Create g2_client object.
 
     config = get_config()
-    g2_engine = get_g2_engine(config)
+    g2_config = get_g2_config(config)
     g2_configuration_manager = get_g2_configuration_manager(config)
-    g2_writer = G2Writer(config, g2_engine, g2_configuration_manager)
+    g2_engine = get_g2_engine(config)
+    g2_client = G2Client(config, g2_engine, g2_configuration_manager, g2_config)
 
     # Purge database.
 
-    g2_writer.purge_repository()
+    g2_client.purge_repository()
+
+    # Add datasources and entity types
+
+    g2_client.add_metadata(iterator)
 
     # Populate Senzing.
 
     line_count = 0
     for jsonline in iterator:
-        g2_writer.send_jsonline_to_g2_engine(jsonline)
+        g2_client.send_jsonline_to_g2_engine(jsonline)
         line_count += 1
 
     # Get results from Senzing.
 
-    result = g2_writer.get_resolved_entities()
+    result = g2_client.get_resolved_entities()
     logging.info(message_info(103, line_count, len(result)))
 
     # Purge database.
 
-    g2_writer.purge_repository()
+    g2_client.purge_repository()
 
     return result
 
