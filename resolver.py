@@ -176,7 +176,7 @@ def get_parser():
     subparser_8 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
     subparser_8.add_argument("--sleep-time-in-seconds", dest="sleep_time_in_seconds", metavar="SENZING_SLEEP_TIME_IN_SECONDS", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
 
-    subparser_9 = subparsers.add_parser('version', help='Print version of stream-loader.py.')
+    subparser_9 = subparsers.add_parser('version', help='Print version of resolver.py.')
     subparser_10 = subparsers.add_parser('docker-acceptance-test', help='For Docker acceptance testing.')
 
     return parser
@@ -199,8 +199,10 @@ MESSAGE_DEBUG = 900
 
 message_dictionary = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
+    "101": "Adding datasource '{0}'",
+    "102": "Adding entity type '{0}'",
     "292": "Configuration change detected.  Old: {0} New: {1}",
-    "293": "For information on warnings and errors, see https://github.com/Senzing/stream-loader#errors",
+    "293": "For information on warnings and errors, see https://github.com/Senzing/resolver#errors",
     "294": "Version: {0}  Updated: {1}",
     "295": "Sleeping infinitely.",
     "296": "Sleeping {0} seconds.",
@@ -521,6 +523,8 @@ class G2Writer:
         self.config = config
         self.g2_engine = g2_engine
         self.g2_configuration_manager = g2_configuration_manager
+        self.data_sources = []
+        self.entity_types = []
 
     def add_record_to_failure_queue(self, jsonline):
         # FIXME: add functionality.
@@ -566,9 +570,24 @@ class G2Writer:
 
         self.g2_engine.reinitV2(default_config_id)
 
+    def add_data_source(self, data_source):
+        # FIXME: implement.
+        logging.info(message_info(101, data_source))
+
+    def add_entity_type(self, entity_type):
+        # FIXME: implement.
+        logging.info(message_info(102, entity_type))
+
     def add_record(self, jsonline):
         json_dictionary = json.loads(jsonline)
         data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
+        if data_source not in self.data_sources:
+            self.add_data_source(data_source)
+            self.data_sources.append(data_source)
+        entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
+        if entity_type not in self.entity_types:
+            self.add_entity_type(entity_type)
+            self.entity_types.append(entity_type)
         record_id = str(json_dictionary.get('RECORD_ID'))
         try:
             return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)

@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=senzing/senzing-base:1.1.0
 FROM ${BASE_IMAGE}
 
-ENV REFRESHED_AT=2019-07-23
+ENV REFRESHED_AT=2019-07-29
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
@@ -27,4 +27,4 @@ USER 1001
 # Runtime execution.
 
 WORKDIR /app
-CMD ["/app/resolver.sh"]
+CMD ["/app/resolver.py"]
