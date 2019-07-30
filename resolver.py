@@ -680,7 +680,7 @@ class G2Writer:
         # Prime the pump.
 
         result = []
-        flags = G2Engine.G2_EXPORT_DEFAULT_FLAGS
+        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_MINIMAL_FORMAT
         export_handle = self.g2_engine.exportJSONEntityReport(flags)
 
         # Loop through results.
@@ -690,7 +690,6 @@ class G2Writer:
         while response_bytearray:
             response_dictionary = json.loads(response_bytearray.decode())
             result.append(response_dictionary)
-            response_bytearray = bytearray()
             self.g2_engine.fetchNext(export_handle, response_bytearray)
 
         return result
