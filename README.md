@@ -109,9 +109,6 @@ This repository assumes a working knowledge of:
 * **SENZING_ENTITY_TYPE** -
   Default "ENTITY_TYPE" value for incoming records.
   No default.
-* **SENZING_INPUT_URL** -
-  URL of source file.
-  No default.
 * **SENZING_LOG_LEVEL** -
   Level of logging. {notset, debug, info, warning, error, critical}.
   Default: info
@@ -130,53 +127,31 @@ This repository assumes a working knowledge of:
 
 ### Run docker container
 
-#### Demonstrate Kafka to Senzing
-
-1. :pencil2: Determine docker network.  Example:
-
-    ```console
-    sudo docker network ls
-
-    # Choose value from NAME column of docker network ls
-    export SENZING_NETWORK=nameofthe_network
-    ```
-
 1. :pencil2: Set environment variables.  Example:
 
     ```console
-    export DATABASE_PROTOCOL=mysql
-    export DATABASE_USERNAME=g2
-    export DATABASE_PASSWORD=g2
-    export DATABASE_HOST=senzing-mysql
-    export DATABASE_PORT=3306
-    export DATABASE_DATABASE=G2
-
-    export SENZING_SUBCOMMAND=kafka
-    export SENZING_DATA_SOURCE=PEOPLE
     export SENZING_DIR=/opt/senzing
-    export SENZING_KAFKA_BOOTSTRAP_SERVER=senzing-kafka:9092
-    export SENZING_KAFKA_TOPIC=senzing-kafka-topic
-    export SENZING_MONITORING_PERIOD=60
     ```
 
 1. Run the docker container.  Example:
 
     ```console
-    export SENZING_DATABASE_URL="${DATABASE_PROTOCOL}://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}"
-
     sudo docker run \
-      --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
-      --env SENZING_DATABASE_URL="${SENZING_DATABASE_URL}" \
-      --env SENZING_DATA_SOURCE="${SENZING_DATA_SOURCE}" \
-      --env SENZING_KAFKA_BOOTSTRAP_SERVER="${SENZING_KAFKA_BOOTSTRAP_SERVER}" \
-      --env SENZING_KAFKA_TOPIC="${SENZING_KAFKA_TOPIC}" \
-      --env SENZING_MONITORING_PERIOD="${SENZING_MONITORING_PERIOD}" \
       --interactive \
-      --net ${SENZING_NETWORK} \
+      --publish 5001:5000 \
       --rm \
       --tty \
       --volume ${SENZING_DIR}:/opt/senzing \
       senzing/resolver
+    ```
+
+1. Test HTTP API.  Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @test/test-data-1.json \
+      http://localhost:5001/resolve
     ```
 
 ## Develop
@@ -212,7 +187,7 @@ The following software programs need to be installed:
 1. Option #1 - Using docker command and GitHub.
 
     ```console
-    sudo docker build --tag senzing/resolver https://github.com/senzing/docker-template.git
+    sudo docker build --tag senzing/resolver https://github.com/senzing/resolver.git
     ```
 
 1. Option #2 - Using docker command and local repository.
@@ -230,11 +205,6 @@ The following software programs need to be installed:
     ```
 
 ## Examples
-
-1. Examples of use:
-    1. [docker-compose-demo](https://github.com/Senzing/docker-compose-demo)
-    1. [kubernetes-demo](https://github.com/Senzing/kubernetes-demo)
-    1. [rancher-demo](https://github.com/Senzing/rancher-demo/tree/master/docs/db2-cluster-demo.md)
 
 ## Errors
 

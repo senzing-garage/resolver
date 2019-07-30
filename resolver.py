@@ -12,6 +12,7 @@ import json
 import linecache
 import logging
 import os
+import shutil
 import signal
 import string
 import sys
@@ -37,7 +38,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-07-29'
+__updated__ = '2019-07-30'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -80,7 +81,7 @@ configuration_locator = {
         "cli": "debug"
     },
     "entity_type": {
-        "default": None,
+        "default": "TEST",
         "env": "SENZING_ENTITY_TYPE",
         "cli": "entity-type"
     },
@@ -88,6 +89,11 @@ configuration_locator = {
         "default": "sqlite3://na:na@/opt/senzing/g2/sqldb/G2C.db",
         "env": "SENZING_DATABASE_URL",
         "cli": "database-url"
+    },
+    "g2_internal_database": {
+        "default": True,
+        "env": "SENZING_INTERNAL_DATABASE",
+        "cli": "internal-database"
     },
     "host": {
         "default": "0.0.0.0",
@@ -133,8 +139,8 @@ configuration_locator = {
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
 
 keys_to_redact = [
-    "g2_database_url_generic",
-    "g2_database_url_specific",
+#     "g2_database_url_generic",
+#     "g2_database_url_specific",
 ]
 
 # Global cached objects
@@ -201,6 +207,7 @@ message_dictionary = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
     "101": "Adding datasource '{0}'",
     "102": "Adding entity type '{0}'",
+    "103": "Processed {0} input records which resolved to {1} entities.",
     "292": "Configuration change detected.  Old: {0} New: {1}",
     "293": "For information on warnings and errors, see https://github.com/Senzing/resolver#errors",
     "294": "Version: {0}  Updated: {1}",
@@ -443,7 +450,10 @@ def get_configuration(args):
 
     # Special case: Change boolean strings to booleans.
 
-    booleans = ['debug']
+    booleans = [
+        'g2_internal_database',
+        'debug'
+    ]
     for boolean in booleans:
         boolean_value = result.get(boolean)
         if isinstance(boolean_value, str):
@@ -463,8 +473,24 @@ def get_configuration(args):
         result[integer] = int(integer_string)
 
     # Special case:  Tailored database URL
+    # If requested, prepare internal database.
 
-    result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
+    if config.get('g2_internal_database'):
+        internal_directory = "/var/opt/senzing"
+        try:
+            os.makedirs(internal_directory)
+        except FileExistsError:
+            pass
+
+        shutil.copyfile("/opt/senzing/g2/data/G2C.db", "{0}/G2C.db".format(internal_directory))
+        config['g2_database_url_specific'] = "sqlite3://na:na@{0}/G2C.db".format(internal_directory)
+    else:
+        result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
+
+    # Initialize lists.
+
+    result['data_sources'] = []
+    result['entity_types'] = []
 
     return result
 
@@ -479,7 +505,7 @@ def validate_configuration(config):
 
     subcommand = config.get('subcommand')
 
-    if subcommand in ['task1', 'task2']:
+    if subcommand in ['service', 'file-input']:
 
         if not config.get('senzing_dir'):
             user_error_messages.append(message_error(414))
@@ -523,8 +549,6 @@ class G2Writer:
         self.config = config
         self.g2_engine = g2_engine
         self.g2_configuration_manager = g2_configuration_manager
-        self.data_sources = []
-        self.entity_types = []
 
     def add_record_to_failure_queue(self, jsonline):
         # FIXME: add functionality.
@@ -579,15 +603,27 @@ class G2Writer:
         logging.info(message_info(102, entity_type))
 
     def add_record(self, jsonline):
+        ''' Add record to Senzing. '''
         json_dictionary = json.loads(jsonline)
+
+        # Determine if datasource needs to be defined to Senzing.
+
         data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
-        if data_source not in self.data_sources:
+        data_sources = self.config.get("data_sources")
+        if data_source not in data_sources:
             self.add_data_source(data_source)
-            self.data_sources.append(data_source)
+            data_sources.append(data_source)
+
+        # Determine if entity type needs to be defined to Senzing.
+
         entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
-        if entity_type not in self.entity_types:
+        entity_types = self.config.get("entity_types")
+        if entity_type not in entity_types:
             self.add_entity_type(entity_type)
-            self.entity_types.append(entity_type)
+            entity_types.append(entity_type)
+
+        # Add record to Senzing.
+
         record_id = str(json_dictionary.get('RECORD_ID'))
         try:
             return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
@@ -603,10 +639,11 @@ class G2Writer:
         '''Send the JSONline to G2 engine.'''
 
         # Periodically, check for configuration update.
+        # FIXME: Does this need to be done?
 
-        if self.is_time_to_check_g2_configuration():
-            if self.is_g2_default_configuration_changed():
-                self.update_active_g2_configuration()
+#         if self.is_time_to_check_g2_configuration():
+#             if self.is_g2_default_configuration_changed():
+#                 self.update_active_g2_configuration()
 
         # Add Record to Senzing G2.
 
@@ -807,17 +844,19 @@ def handle_post_resolver(iterator):
 
     # Populate Senzing.
 
+    line_count = 0
     for jsonline in iterator:
         g2_writer.send_jsonline_to_g2_engine(jsonline)
+        line_count += 1
 
     # Get results from Senzing.
 
     result = g2_writer.get_resolved_entities()
+    logging.info(message_info(103, line_count, len(result)))
 
     # Purge database.
-    # FIXME: Uncomment after debugging.
 
-#   g2_writer.purge_repository()
+    g2_writer.purge_repository()
 
     return result
 

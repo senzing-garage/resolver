@@ -13,12 +13,25 @@ HEALTHCHECK CMD ["/app/healthcheck.sh"]
 
 USER root
 
-# Install packages via apt.
+# Install packages via PIP.
+
+RUN pip3 install \
+    Flask==1.0.2 \
+    flask_api
+
+# The port for the Flask is 5000.
+
+EXPOSE 5000
 
 # Copy files from repository.
 
 COPY ./rootfs /
 COPY ./resolver.py /app
+
+# Make directory that resolver.py can use.
+
+RUN mkdir /var/opt/senzing \
+ && chown 1001 /var/opt/senzing
 
 # Make non-root container.
 
@@ -27,4 +40,5 @@ USER 1001
 # Runtime execution.
 
 WORKDIR /app
-CMD ["/app/resolver.py"]
+ENTRYPOINT ["/app/resolver.py"]
+CMD ["service"]
