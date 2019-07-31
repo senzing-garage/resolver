@@ -16,19 +16,15 @@ import shutil
 import signal
 import string
 import sys
-import threading
 import time
 
 # Import Senzing libraries.
 
-try:
-    from G2Config import G2Config
-    from G2ConfigMgr import G2ConfigMgr
-    from G2Database import G2Database
-    from G2Engine import G2Engine
-    import G2Exception
-except ImportError:
-    pass
+from G2Config import G2Config
+from G2ConfigMgr import G2ConfigMgr
+from G2Database import G2Database
+from G2Engine import G2Engine
+import G2Exception
 
 from flask import Flask, json, Response, url_for
 from flask import request as flask_request
@@ -87,7 +83,7 @@ configuration_locator = {
         "cli": "database-url"
     },
     "g2_internal_database": {
-        "default": True,
+        "default": None,
         "env": "SENZING_INTERNAL_DATABASE",
         "cli": "internal-database"
     },
@@ -453,7 +449,6 @@ def get_configuration(args):
     # Special case: Change boolean strings to booleans.
 
     booleans = [
-        'g2_internal_database',
         'debug'
     ]
     for boolean in booleans:
@@ -478,14 +473,16 @@ def get_configuration(args):
     # If requested, prepare internal database.
 
     if config.get('g2_internal_database'):
-        internal_directory = "/var/opt/senzing"
+        g2_internal_database_path = config.get('g2_internal_database')
+        g2_internal_database_directory = os.path.dirname(g2_internal_database_path)
+
         try:
-            os.makedirs(internal_directory)
+            os.makedirs(g2_internal_database_directory)
         except FileExistsError:
             pass
 
-        shutil.copyfile("/opt/senzing/g2/data/G2C.db", "{0}/G2C.db".format(internal_directory))
-        config['g2_database_url_specific'] = "sqlite3://na:na@{0}/G2C.db".format(internal_directory)
+        shutil.copyfile("/opt/senzing/g2/data/G2C.db", g2_internal_database_path)
+        config['g2_database_url_specific'] = "sqlite3://na:na@{0}".format(g2_internal_database_path)
     else:
         result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
 
@@ -874,6 +871,9 @@ def handle_post_resolver(iterator):
     # Add datasources and entity types.
 
     g2_client.add_metadata(iterator)
+
+    # FIXME: The file based iterator is exhausted.
+    # FIXME: Figure out how to re-iterate.
 
     # Populate Senzing G2.
 

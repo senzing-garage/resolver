@@ -39,6 +39,8 @@ USER 1001
 
 # Runtime execution.
 
+ENV SENZING_INTERNAL_DATABASE=/var/opt/senzing/G2C.db
+
 WORKDIR /app
 ENTRYPOINT ["/app/resolver.py"]
 CMD ["service"]
