@@ -118,7 +118,6 @@ This repository assumes a working knowledge of:
 * **SENZING_SUBCOMMAND** -
   Identify the subcommand to be run. See `resolver.py --help` for complete list.
 
-
 1. To determine which configuration parameters are use for each `<subcommand>`, run:
 
     ```console
