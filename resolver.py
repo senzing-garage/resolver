@@ -315,6 +315,7 @@ def get_safe_characters(astring):
 
 
 def parse_database_url(original_senzing_database_url):
+    ''' Given a canonical database URL, decompose into URL components. '''
 
     result = {}
 
@@ -390,10 +391,13 @@ def parse_database_url(original_senzing_database_url):
 
 
 def get_g2_database_url_specific(generic_database_url):
-    result = ""
+    ''' Given a canonical database URL, transform to the specific URL. '''
 
+    result = ""
     parsed_database_url = parse_database_url(generic_database_url)
     scheme = parsed_database_url.get('scheme')
+
+    # Format database URL for a particular database.
 
     if scheme in ['mysql']:
         result = "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}".format(**parsed_database_url)
@@ -596,7 +600,7 @@ class G2Client:
 
         new_data_sources = [item for item in requested_data_sources if item not in existing_data_sources]
 
-        # If no new datasources are needed, exit.
+        # If no new datasources are needed, we're done here.
 
         if len(new_data_sources) == 0:
             return
@@ -628,10 +632,12 @@ class G2Client:
         self.g2_engine.reinitV2(new_configuration_id_bytearray)
 
     def add_record(self, jsonline):
-        ''' Add record to Senzing. '''
+        ''' Run G2Engine.addRecord(). '''
+
         json_dictionary = json.loads(jsonline)
         data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
         record_id = str(json_dictionary.get('RECORD_ID'))
+
         try:
             return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
         except Exception as err:
@@ -639,10 +645,13 @@ class G2Client:
         return return_code
 
     def add_record_to_failure_queue(self, jsonline):
+        ''' Handle records that fail to be inserted into Senzing. '''
+
         # FIXME: add functionality.
         logging.info(message_info(121, jsonline))
 
     def get_resolved_entities(self):
+        ''' Run G2Engine.exportJSONEngineReport(). '''
 
         # Prime the pump.
 
@@ -650,7 +659,7 @@ class G2Client:
         flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_MINIMAL_FORMAT
         export_handle = self.g2_engine.exportJSONEntityReport(flags)
 
-        # Loop through results.
+        # Loop through results and append to result.
 
         response_bytearray = bytearray()
         self.g2_engine.fetchNext(export_handle, response_bytearray)
@@ -662,6 +671,8 @@ class G2Client:
         return result
 
     def purge_repository(self):
+        ''' Run G2Engine.purgeRepository(). '''
+
         try:
             self.g2_engine.purgeRepository()
         except G2Exception.TranslateG2ModuleException as err:
@@ -672,7 +683,7 @@ class G2Client:
             logging.error(message_error(890, err, ""))
 
     def send_jsonline_to_g2_engine(self, jsonline):
-        '''Send the JSONline to G2 engine.'''
+        ''' Send the JSONline to G2 engine. '''
 
         # Add Record to Senzing G2.
 
@@ -758,6 +769,7 @@ def exit_silently():
 
 
 def get_g2_configuration_dictionary(config):
+    ''' Construct a dictionary in the form of the old ini files. '''
     result = {
         "PIPELINE": {
             "SUPPORTPATH": config.get("support_path"),
@@ -771,11 +783,12 @@ def get_g2_configuration_dictionary(config):
 
 
 def get_g2_configuration_json(config):
+    ''' Return a JSON string with Senzing configuration. '''
     return json.dumps(get_g2_configuration_dictionary(config))
 
 
 def get_g2_config(config, g2_config_name="resolver-G2-config"):
-    '''Get the G2Config resource.'''
+    ''' Get the G2Config resource. '''
     global g2_config_singleton
 
     if g2_config_singleton:
@@ -793,7 +806,7 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
 
 
 def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver-G2-configuration-manager"):
-    '''Get the G2Config resource.'''
+    ''' Get the G2ConfigMgr resource. '''
     global g2_configuration_manager_singleton
 
     if g2_configuration_manager_singleton:
@@ -811,7 +824,7 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver
 
 
 def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
-    '''Get the G2Engine resource.'''
+    ''' Get the G2Engine resource. '''
     global g2_engine_singleton
 
     if g2_engine_singleton:
@@ -833,21 +846,18 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
 
 
 def get_config():
+    ''' Singleton pattern for config. '''
     return config
 
 
 def common_prolog(config):
-    '''Common steps for most do_* functions.'''
+    ''' Common steps for most do_* functions. '''
     validate_configuration(config)
     logging.info(entry_template(config))
 
 
 def handle_post_resolver(iterator):
-    '''
-    Return: Dictionary of resolved entities.
-    '''
-
-    logging.info(message_info(999, threading.enumerate()))
+    ''' Add records to Senzing G2.  Pull resolved entities from G2. '''
 
     # Create g2_client object.
 
@@ -857,27 +867,27 @@ def handle_post_resolver(iterator):
     g2_engine = get_g2_engine(config)
     g2_client = G2Client(config, g2_engine, g2_configuration_manager, g2_config)
 
-    # Purge database.
+    # Purge G2 database.
 
     g2_client.purge_repository()
 
-    # Add datasources and entity types
+    # Add datasources and entity types.
 
     g2_client.add_metadata(iterator)
 
-    # Populate Senzing.
+    # Populate Senzing G2.
 
     line_count = 0
     for jsonline in iterator:
-        g2_client.send_jsonline_to_g2_engine(jsonline)
         line_count += 1
+        g2_client.send_jsonline_to_g2_engine(jsonline)
 
-    # Get results from Senzing.
+    # Get results from Senzing G2.
 
     result = g2_client.get_resolved_entities()
     logging.info(message_info(103, line_count, len(result)))
 
-    # Purge database.
+    # Purge G2 database.
 
     g2_client.purge_repository()
 
@@ -926,7 +936,7 @@ def do_docker_acceptance_test(args):
 
 
 def do_file_input(args):
-    ''' Do a task. '''
+    ''' Read input from a file.  Output to a file. '''
 
     # Get context from CLI, environment variables, and ini files.
 
@@ -949,7 +959,7 @@ def do_file_input(args):
 
 
 def do_service(args):
-    '''Read from URL-addressable file.'''
+    ''' Run a Flask application to handle HTTP calls. '''
 
     # Get context from CLI, environment variables, and ini files.
 
@@ -982,7 +992,7 @@ def do_sleep(args):
 
     sleep_time_in_seconds = config.get('sleep_time_in_seconds')
 
-    # Sleep
+    # Sleep.
 
     if sleep_time_in_seconds > 0:
         logging.info(message_info(296, sleep_time_in_seconds))
