@@ -35,7 +35,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-07-30'
+__updated__ = '2019-07-31'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -547,9 +547,78 @@ class G2Client:
         self.g2_config = g2_config
         self.g2_configuration_manager = g2_configuration_manager
         self.g2_engine = g2_engine
+        self.data_sources = self.get_data_sources_list()
+        self.entity_types = self.data_sources.copy()
 
-    def add_metadata(self, iterator):
-        ''' Perform Senzing G2 administrative functions. '''
+    def add_data_source(self, data_source):
+        ''' Add a data source to G2 configuration. '''
+
+        config_handle = self.get_config_handle()
+
+        # Add data sources to configuration.
+
+        self.g2_config.addDataSource(config_handle, data_source)
+        logging.info(message_info(101, data_source))
+        configuration_comment = message(101, data_source)
+
+        # Push configuration to database.
+
+        self.persist_configuration(config_handle, configuration_comment)
+
+    def add_entity_type(self, entity_type):
+        ''' Add an entity type to G2 configuration. '''
+
+        config_handle = self.get_config_handle()
+
+        # Add entity type to configuration.
+        # Hack: G2Config.addDataSource() is used to create entity type.
+
+        self.g2_config.addDataSource(config_handle, entity_type)
+        logging.info(message_info(102, entity_type))
+        configuration_comment = message(102, entity_type)
+
+        # Push configuration to database.
+
+        self.persist_configuration(config_handle, configuration_comment)
+
+    def add_record(self, jsonline):
+        ''' Run G2Engine.addRecord(). '''
+
+        json_dictionary = json.loads(jsonline)
+        data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
+        entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
+        record_id = str(json_dictionary.get('RECORD_ID'))
+
+        # Determine if it's a new data_source or entity_type.
+        # Hack.  Since G2Config.addDataSource() creates a datasource and an entity_type
+        #        of the same "name", the two lists are currently synonymous.
+
+        if data_source not in self.data_sources:
+            self.add_data_source(data_source)
+            self.data_sources.append(data_source)
+            self.entity_types.append(data_source)  # Hack.
+
+        if entity_type not in self.entity_types:
+            self.add_entity_type(entity_type)
+            self.entity_types.append(entity_type)
+            self.data_sources.append(entity_type)  # Hack.
+
+        # Run G2Engine.addRecord().
+
+        try:
+            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+        except Exception as err:
+            raise err
+        return return_code
+
+    def add_record_to_failure_queue(self, jsonline):
+        ''' Handle records that fail to be inserted into Senzing. '''
+
+        # FIXME: add functionality.
+        logging.info(message_info(121, jsonline))
+
+    def get_config_handle(self):
+        ''' Get configuration handle from new or existing "default" configuration. '''
 
         # Determine if a default configuration exists.
 
@@ -567,85 +636,19 @@ class G2Client:
         else:
             config_handle = self.g2_config.create()
 
+        return config_handle
+
+    def get_data_sources_list(self):
+        ''' Determine data_sources already defined. '''
+
+        config_handle = self.get_config_handle()
+
         # Get list of existing datasources.
 
         datasources_bytearray = bytearray()
         return_code = self.g2_config.listDataSources(config_handle, datasources_bytearray)
         datasources_dictionary = json.loads(datasources_bytearray.decode())
-        existing_data_sources = datasources_dictionary.get('DSRC_CODE', [])
-
-        # Determine all requested data sources.
-
-        requested_data_sources = []
-        for jsonline in iterator:
-            json_dictionary = json.loads(jsonline)
-
-            # Determine if DATA_SOURCE needs to be added to request.
-
-            data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
-            if data_source not in requested_data_sources:
-                requested_data_sources.append(data_source)
-
-            # Hack:  Since G2Config.addDataSource() creates a DATA_SOURCE and ENTITY_TYPE,
-            # We'll make DATA_SOURCEs out of needed ENTITY_TYPEs.
-
-            entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
-            if entity_type not in requested_data_sources:
-                requested_data_sources.append(entity_type)
-
-        # Determine data sources that are not already defined.
-
-        new_data_sources = [item for item in requested_data_sources if item not in existing_data_sources]
-
-        # If no new datasources are needed, we're done here.
-
-        if len(new_data_sources) == 0:
-            return
-
-        # Add data sources to configuration.
-
-        for new_data_source in new_data_sources:
-            self.g2_config.addDataSource(config_handle, new_data_source)
-        logging.info(message_info(104, json.dumps(new_data_sources, sort_keys=True)))
-
-        # Get JSON string with new datasource added.
-
-        new_configration_bytearray = bytearray()
-        return_code = self.g2_config.save(config_handle, new_configration_bytearray)
-        new_configuration_json = new_configration_bytearray.decode()
-
-        # Add configuration to G2 database SYS_CFG table.
-
-        new_configuration_comments = "Add {0} datasources".format(json.dumps(new_data_sources, sort_keys=True))
-        new_configuration_id_bytearray = bytearray()
-        self.g2_configuration_manager.addConfig(new_configuration_json, new_configuration_comments, new_configuration_id_bytearray)
-
-        # Set Default configuration.
-
-        self.g2_configuration_manager.setDefaultConfigID(new_configuration_id_bytearray)
-
-        # Re-initialize G2 engine.
-
-        self.g2_engine.reinitV2(new_configuration_id_bytearray)
-
-    def add_record(self, jsonline):
-        ''' Run G2Engine.addRecord(). '''
-
-        json_dictionary = json.loads(jsonline)
-        data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
-        record_id = str(json_dictionary.get('RECORD_ID'))
-
-        try:
-            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
-        except Exception as err:
-            raise err
-        return return_code
-
-    def add_record_to_failure_queue(self, jsonline):
-        ''' Handle records that fail to be inserted into Senzing. '''
-
-        # FIXME: add functionality.
-        logging.info(message_info(121, jsonline))
+        return datasources_dictionary.get('DSRC_CODE', [])
 
     def get_resolved_entities(self):
         ''' Run G2Engine.exportJSONEngineReport(). '''
@@ -666,6 +669,28 @@ class G2Client:
             self.g2_engine.fetchNext(export_handle, response_bytearray)
 
         return result
+
+    def persist_configuration(self, config_handle, configuration_comment=""):
+        ''' Save configuration to the Senzing G2 database. '''
+
+        # Get JSON string with new datasource added.
+
+        configuration_bytearray = bytearray()
+        return_code = self.g2_config.save(config_handle, configuration_bytearray)
+        configuration_json = configuration_bytearray.decode()
+
+        # Add configuration to G2 database SYS_CFG table.
+
+        configuration_id_bytearray = bytearray()
+        self.g2_configuration_manager.addConfig(configuration_json, configuration_comment, configuration_id_bytearray)
+
+        # Set Default configuration.
+
+        self.g2_configuration_manager.setDefaultConfigID(configuration_id_bytearray)
+
+        # Re-initialize G2 engine.
+
+        self.g2_engine.reinitV2(configuration_id_bytearray)
 
     def purge_repository(self):
         ''' Run G2Engine.purgeRepository(). '''
@@ -867,13 +892,6 @@ def handle_post_resolver(iterator):
     # Purge G2 database.
 
     g2_client.purge_repository()
-
-    # Add datasources and entity types.
-
-    g2_client.add_metadata(iterator)
-
-    # FIXME: The file based iterator is exhausted.
-    # FIXME: Figure out how to re-iterate.
 
     # Populate Senzing G2.
 
