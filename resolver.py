@@ -149,28 +149,129 @@ g2_config_singleton = None
 def get_parser():
     ''' Parse commandline arguments. '''
 
+    subcommands = {
+        'file-input': {
+            "help": 'File based input / output.',
+            "arguments": {
+                "--config-path": {
+                    "dest": "config_path",
+                    "metavar": "SENZING_CONFIG_PATH",
+                    "help": "Location of Senzing's configuration template. Default: /opt/senzing/g2/data"
+                },
+                "--data-source": {
+                    "dest": "data_source",
+                    "metavar": "SENZING_DATA_SOURCE",
+                    "help": "Data Source."
+                },
+                "--database-url": {
+                    "dest": "g2_database_url_generic",
+                    "metavar": "SENZING_DATABASE_URL",
+                    "help": "Information for connecting to database."
+                },
+                "--debug": {
+                    "dest": "debug",
+                    "action": "store_true",
+                    "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+                },
+                "--input-file": {
+                    "dest": "input_file",
+                    "metavar": "SENZING_INPUT_FILE",
+                    "help": "File of JSON lines to be read. Default: None"
+                },
+                "--output-file": {
+                    "dest": "output_file",
+                    "metavar": "SENZING_OUTPUT_FILE",
+                    "help": "File of JSON lines to be read. Default: resolver-output.json"
+                },
+                "--senzing-dir": {
+                    "dest": "senzing_dir",
+                    "metavar": "SENZING_DIR",
+                    "help": "Location of Senzing. Default: /opt/senzing"
+                },
+                "--support-path": {
+                    "dest": "support_path",
+                    "metavar": "SENZING_SUPPORT_PATH",
+                    "help": "Location of Senzing's support. Default: /opt/senzing/g2/data"
+                },
+            },
+        },
+#         'XXXX': {
+#             "help": 'File based input / output.',
+#             "arguments": {
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#                 "XXX": {
+#                     "dest": "",
+#                     "metavar": "",
+#                     "help": ""
+#                 },
+#             },
+#         },
+    }
+
     parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
-    subparser_1 = subparsers.add_parser('file-input', help='File based input / output.')
-    subparser_1.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
-    subparser_1.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
-    subparser_1.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
-    subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
-    subparser_1.add_argument("--input-file", dest="input_file", metavar="SENZING_INPUT_FILE", help="File of JSON lines to be read. Default: None")
-    subparser_1.add_argument("--output-file", dest="output_file", metavar="SENZING_OUTPUT_FILE", help="File of JSON lines to be read. Default: resolver-output.json")
-    subparser_1.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
-    subparser_1.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
+    for subcommand_key, subcommand_values in subcommands.items():
+        subcommand_help = subcommand_values.get('help', "")
+        subcommand_arguments = subcommand_values.get('arguments', [])
+        subparser = subparsers.add_parser(subcommand_key, help=subcommand_help)
+        for argument_key, argument_values in subcommand_arguments.items():
+            subparser.add_argument(argument_key, **argument_values)
 
-    subparser_2 = subparsers.add_parser('service', help='Receive HTTP requests.')
-    subparser_2.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
-    subparser_2.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
-    subparser_2.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
-    subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
-    subparser_2.add_argument("--host", dest="host", metavar="SENZING_HOST", help="Host to listen on. Default: 0.0.0.0")
-    subparser_2.add_argument("--port", dest="port", metavar="SENZING_PORT", help="Port to listen on. Default: 8080")
-    subparser_2.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
-    subparser_2.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
+
+#     subparser_1 = subparsers.add_parser('file-input', help='File based input / output.')
+#     subparser_1.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
+#     subparser_1.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
+#     subparser_1.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
+#     subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+#     subparser_1.add_argument("--input-file", dest="input_file", metavar="SENZING_INPUT_FILE", help="File of JSON lines to be read. Default: None")
+#     subparser_1.add_argument("--output-file", dest="output_file", metavar="SENZING_OUTPUT_FILE", help="File of JSON lines to be read. Default: resolver-output.json")
+#     subparser_1.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
+#     subparser_1.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
+#
+#     subparser_2 = subparsers.add_parser('service', help='Receive HTTP requests.')
+#     subparser_2.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
+#     subparser_2.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
+#     subparser_2.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
+#     subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+#     subparser_2.add_argument("--host", dest="host", metavar="SENZING_HOST", help="Host to listen on. Default: 0.0.0.0")
+#     subparser_2.add_argument("--port", dest="port", metavar="SENZING_PORT", help="Port to listen on. Default: 8080")
+#     subparser_2.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
+#     subparser_2.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
 
     subparser_8 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
     subparser_8.add_argument("--sleep-time-in-seconds", dest="sleep_time_in_seconds", metavar="SENZING_SLEEP_TIME_IN_SECONDS", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
@@ -219,6 +320,7 @@ message_dictionary = {
     "698": "Program terminated with error.",
     "699": "{0}",
     "700": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
+    "701": "Error '{0}' caused by {1} error '{2}'",
     "886": "G2Engine.addRecord() bad return code: {0}; JSON: {1}",
     "887": "G2Engine.addRecord() TranslateG2ModuleException: {0}; JSON: {1}",
     "888": "G2Engine.addRecord() G2ModuleNotInitialized: {0}; JSON: {1}",
@@ -464,10 +566,23 @@ def get_configuration(args):
 
     integers = [
         'sleep_time_in_seconds'
-        ]
+    ]
     for integer in integers:
         integer_string = result.get(integer)
         result[integer] = int(integer_string)
+
+    # Special case: Determine absolute paths.
+
+    paths = [
+        'config_path',
+        'input_file',
+        'output_file',
+        'support_path',
+    ]
+    for path in paths:
+        relative_path = result.get(path)
+        if relative_path:
+            result[path] = os.path.abspath(relative_path)
 
     # Special case:  Tailored database URL
     # If requested, prepare internal database.
@@ -728,6 +843,68 @@ class G2Client:
         logging.debug(message_debug(904, "", jsonline))
 
 # -----------------------------------------------------------------------------
+# Class: G2Client
+# -----------------------------------------------------------------------------
+
+
+class G2Initializer:
+
+    def __init__(self, g2_configuration_manager, g2_config):
+        self.g2_config = g2_config
+        self.g2_configuration_manager = g2_configuration_manager
+
+    def initialize(self):
+        ''' Initialize the G2 database. '''
+
+        # Determine of a default/initial G2 configuration already exists.
+
+        default_config_id_bytearray = bytearray()
+        try:
+            return_code = self.g2_configuration_manager.getDefaultConfigID(default_config_id_bytearray)
+        except Exception as err:
+            raise Exception("G2ConfigMgr.getDefaultConfigID({0}) failed".format(default_config_id_bytearray)) from err
+        if return_code != 0:
+            raise Exception("G2ConfigMgr.getDefaultConfigID({0}) return code {1}".format(default_config_id_bytearray, return_code)) from err
+
+        # If a default configuration exists, there is nothing more to do.
+
+        if default_config_id_bytearray:
+            return
+
+        # If there is no default configuration, create one in the 'configuration_bytearray' variable.
+
+        config_handle = self.g2_config.create()
+        configuration_bytearray = bytearray()
+        try:
+            return_code = self.g2_config.save(config_handle, configuration_bytearray)
+        except Exception as err:
+            raise Exception("G2Confg.save({0}, {1}) failed".format(config_handle, configuration_bytearray)) from err
+        if return_code != 0:
+            raise Exception("G2Confg.save({0}, {1}) return code {2}".format(config_handle, configuration_bytearray, return_code)) from err
+
+        self.g2_config.close(config_handle)
+
+        # Save configuration JSON into G2 database.
+
+        config_comment = "Initial configuration."
+        new_config_id = bytearray()
+        try:
+            return_code = self.g2_configuration_manager.addConfig(configuration_bytearray.decode(), config_comment, new_config_id)
+        except Exception as err:
+            raise Exception("G2ConfigMgr.addConfig({0}, {1}, {2}) failed".format(configuration_bytearray.decode(), config_comment, new_config_id)) from err
+        if return_code != 0:
+            raise Exception("G2ConfigMgr.addConfig({0}, {1}, {2}) return code {3}".format(configuration_bytearray.decode(), config_comment, new_config_id, return_code)) from err
+
+        # Set the default configuration ID.
+
+        try:
+            return_code = self.g2_configuration_manager.setDefaultConfigID(new_config_id)
+        except Exception as err:
+            raise Exception("G2ConfigMgr.setDefaultConfigID({0}) failed".format(new_config_id)) from err
+        if return_code != 0:
+            raise Exception("G2ConfigMgr.setDefaultConfigID({0}) return code {1}".format(new_config_id, return_code)) from err
+
+# -----------------------------------------------------------------------------
 # Utility functions
 # -----------------------------------------------------------------------------
 
@@ -881,12 +1058,26 @@ def common_prolog(config):
 def handle_post_resolver(iterator):
     ''' Add records to Senzing G2.  Pull resolved entities from G2. '''
 
-    # Create g2_client object.
+    # Create G2 configuration objects.
 
     config = get_config()
     g2_config = get_g2_config(config)
     g2_configuration_manager = get_g2_configuration_manager(config)
+
+    # Initialize G2 database.
+
+    g2_initializer = G2Initializer(g2_configuration_manager, g2_config)
+    try:
+        g2_initializer.initialize()
+    except Exception as err:
+        logging.error(message_error(701, err, type(err.__cause__), err.__cause__))
+
+    # Create G2 engine object.
+
     g2_engine = get_g2_engine(config)
+
+    # Create g2_client object.
+
     g2_client = G2Client(config, g2_engine, g2_configuration_manager, g2_config)
 
     # Purge G2 database.
