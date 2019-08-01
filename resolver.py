@@ -20,11 +20,13 @@ import time
 
 # Import Senzing libraries.
 
-from G2Config import G2Config
-from G2ConfigMgr import G2ConfigMgr
-from G2Database import G2Database
-from G2Engine import G2Engine
-import G2Exception
+try:
+    from G2Config import G2Config
+    from G2ConfigMgr import G2ConfigMgr
+    from G2Engine import G2Engine
+    import G2Exception
+except ImportError:
+    pass
 
 from flask import Flask, json, Response, url_for
 from flask import request as flask_request
