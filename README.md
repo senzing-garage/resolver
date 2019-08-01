@@ -125,7 +125,7 @@ This repository assumes a working knowledge of:
 * **SENZING_SUBCOMMAND** -
   Identify the subcommand to be run. See `resolver.py --help` for complete list.
 
-1. To determine which configuration parameters are use for each `<subcommand>`, run:
+1. To determine which configuration parameters are used for each `<subcommand>`, run:
 
     ```console
     ./resolver.py <subcommand> --help
@@ -154,9 +154,10 @@ This repository assumes a working knowledge of:
 1. Test HTTP API.  Example:
 
     ```console
+    cd ${GIT_REPOSITORY_DIR}
     curl -X POST \
       --header "Content-Type: text/plain" \
-      --data-binary @test/test-data-1.json \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
       http://localhost:5001/resolve
     ```
 
