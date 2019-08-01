@@ -69,7 +69,7 @@ The following software programs need to be installed:
 1. Run:
 
     ```console
-    sudo pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
+    pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
     ```
 
 ### Create SENZING_DIR
