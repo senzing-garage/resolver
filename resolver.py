@@ -195,51 +195,67 @@ def get_parser():
                 },
             },
         },
-#         'XXXX': {
-#             "help": 'File based input / output.',
-#             "arguments": {
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#                 "XXX": {
-#                     "dest": "",
-#                     "metavar": "",
-#                     "help": ""
-#                 },
-#             },
-#         },
+        'service': {
+            "help": 'Receive HTTP requests.',
+            "arguments": {
+                "--config-path": {
+                    "dest": "config_path",
+                    "metavar": "SENZING_CONFIG_PATH",
+                    "help": "Location of Senzing's configuration template. Default: /opt/senzing/g2/data"
+                },
+                "--data-source": {
+                    "dest": "data_source",
+                    "metavar": "SENZING_DATA_SOURCE",
+                    "help": "Data Source."
+                },
+                "--database-url": {
+                    "dest": "g2_database_url_generic",
+                    "metavar": "SENZING_DATABASE_URL",
+                    "help": "Information for connecting to database."
+                },
+                "--debug": {
+                    "dest": "debug",
+                    "action": "store_true",
+                    "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+                },
+                "--host": {
+                    "dest": "host",
+                    "metavar": "SENZING_HOST",
+                    "help": "Host to listen on. Default: 0.0.0.0"
+                },
+                "--port": {
+                    "dest": "port",
+                    "metavar": "SENZING_PORT",
+                    "help": "Port to listen on. Default: 8080"
+                },
+                "--senzing-dir": {
+                    "dest": "senzing_dir",
+                    "metavar": "SENZING_DIR",
+                    "help": "Location of Senzing. Default: /opt/senzing"
+                },
+                "--support-path": {
+                    "dest": "support_path",
+                    "metavar": "SENZING_SUPPORT_PATH",
+                    "help": "Location of Senzing's support. Default: /opt/senzing/g2/data"
+                },
+            },
+        },
+        'sleep': {
+            "help": 'Do nothing but sleep. For Docker testing.',
+            "arguments": {
+                "--sleep-time-in-seconds": {
+                    "dest": "sleep_time_in_seconds",
+                    "metavar": "SENZING_SLEEP_TIME_IN_SECONDS",
+                    "help": "Sleep time in seconds. DEFAULT: 0 (infinite)"
+                },
+            },
+        },
+        'version': {
+            "help": 'Print version of resolver.py.',
+        },
+        'docker-acceptance-test': {
+            "help": 'For Docker acceptance testing.',
+        },
     }
 
     parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
@@ -247,37 +263,10 @@ def get_parser():
 
     for subcommand_key, subcommand_values in subcommands.items():
         subcommand_help = subcommand_values.get('help', "")
-        subcommand_arguments = subcommand_values.get('arguments', [])
+        subcommand_arguments = subcommand_values.get('arguments', {})
         subparser = subparsers.add_parser(subcommand_key, help=subcommand_help)
         for argument_key, argument_values in subcommand_arguments.items():
             subparser.add_argument(argument_key, **argument_values)
-
-
-#     subparser_1 = subparsers.add_parser('file-input', help='File based input / output.')
-#     subparser_1.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
-#     subparser_1.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
-#     subparser_1.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
-#     subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
-#     subparser_1.add_argument("--input-file", dest="input_file", metavar="SENZING_INPUT_FILE", help="File of JSON lines to be read. Default: None")
-#     subparser_1.add_argument("--output-file", dest="output_file", metavar="SENZING_OUTPUT_FILE", help="File of JSON lines to be read. Default: resolver-output.json")
-#     subparser_1.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
-#     subparser_1.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
-#
-#     subparser_2 = subparsers.add_parser('service', help='Receive HTTP requests.')
-#     subparser_2.add_argument("--config-path", dest="config_path", metavar="SENZING_CONFIG_PATH", help="Location of Senzing's configuration template. Default: /opt/senzing/g2/data")
-#     subparser_2.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Data Source.")
-#     subparser_2.add_argument("--database-url", dest="g2_database_url_generic", metavar="SENZING_DATABASE_URL", help="Information for connecting to database.")
-#     subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
-#     subparser_2.add_argument("--host", dest="host", metavar="SENZING_HOST", help="Host to listen on. Default: 0.0.0.0")
-#     subparser_2.add_argument("--port", dest="port", metavar="SENZING_PORT", help="Port to listen on. Default: 8080")
-#     subparser_2.add_argument("--senzing-dir", dest="senzing_dir", metavar="SENZING_DIR", help="Location of Senzing. Default: /opt/senzing")
-#     subparser_2.add_argument("--support-path", dest="support_path", metavar="SENZING_SUPPORT_PATH", help="Location of Senzing's support. Default: /opt/senzing/g2/data")
-
-    subparser_8 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
-    subparser_8.add_argument("--sleep-time-in-seconds", dest="sleep_time_in_seconds", metavar="SENZING_SLEEP_TIME_IN_SECONDS", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
-
-    subparser_9 = subparsers.add_parser('version', help='Print version of resolver.py.')
-    subparser_10 = subparsers.add_parser('docker-acceptance-test', help='For Docker acceptance testing.')
 
     return parser
 
