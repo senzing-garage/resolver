@@ -81,7 +81,9 @@ This repository assumes a working knowledge of:
 
 ### Run command
 
-1. Run command.  Example:
+1. Run command.
+   Note: **GIT_REPOSITORY_DIR** needs to be set.
+   Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -151,10 +153,11 @@ This repository assumes a working knowledge of:
       senzing/resolver
     ```
 
-1. Test HTTP API.  Example:
+1. Test HTTP API.
+   Note: **GIT_REPOSITORY_DIR** needs to be set.
+   Example:
 
     ```console
-    cd ${GIT_REPOSITORY_DIR}
     curl -X POST \
       --header "Content-Type: text/plain" \
       --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
