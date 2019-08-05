@@ -135,13 +135,19 @@ This repository assumes a working knowledge of:
 
 ### Run docker container
 
-1. :pencil2: Set environment variables.  Example:
+#### Variation #1
+
+This variation starts a micro-service supporting HTTP requests.
+
+1. :pencil2: Set environment variables.
+   Example:
 
     ```console
     export SENZING_DIR=/opt/senzing
     ```
 
-1. Run the docker container.  Example:
+1. Run the docker container.
+   Example:
 
     ```console
     sudo docker run \
@@ -163,6 +169,33 @@ This repository assumes a working knowledge of:
       --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
       http://localhost:5001/resolve
     ```
+
+#### Variation #2
+
+This variation uses file input and output.
+
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export SENZING_DIR=/opt/senzing
+    export DATA_DIR=${GIT_REPOSITORY_DIR}/test
+    ```
+
+1. Run the docker container.
+   Example:
+
+    ```console
+    sudo docker run \
+      --rm \
+      --volume ${SENZING_DIR}:/opt/senzing \
+      --volume ${DATA_DIR}:/data \
+      senzing/resolver file-input \
+        --input-file  /data/test-data-1.json \
+        --output-file /data/my-output.json
+    ```
+
+    Output will be on workstation at ${DATA_DIR}/my-output.json
 
 ## Develop
 
