@@ -289,8 +289,8 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
-    export DEMO_PREFIX=my
-    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
+    export DOCKER_REGISTRY_SECRET=my-registry-secret
+    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
     ```
 
 1. Option #1. Quick method using `envsubst`.
@@ -325,8 +325,8 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
-    export DOCKER_REGISTRY_SECRET=my-registry-secret
-    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
+    export DEMO_PREFIX=my
+    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
     ```
 
 1. Option #1. Quick method using `envsubst`.
