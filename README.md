@@ -290,7 +290,8 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DEMO_PREFIX=my
-    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace    ```
+    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
+    ```
 
 1. Option #1. Quick method using `envsubst`.
    Example:
@@ -462,6 +463,30 @@ This deployment launches the resolver.
       --namespace ${DEMO_NAMESPACE} \
       --values ${HELM_VALUES_DIR}/resolver.yaml \
       senzing/resolver
+    ```
+
+### Cleanup
+
+#### Delete everything in project
+
+1. Example:
+
+    ```console
+    helm delete --purge ${DEMO_PREFIX}-resolver
+    helm delete --purge ${DEMO_PREFIX}-senzing-package
+    helm repo remove senzing
+    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-opt-senzing.yaml
+    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-opt-senzing.yaml
+    kubectl delete -f ${KUBERNETES_DIR}/namespace.yaml
+    ```
+
+#### Delete minikube cluster
+
+1. Example:
+
+    ```console
+    minikube stop
+    minikube delete
     ```
 
 ## Develop
