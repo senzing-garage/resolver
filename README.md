@@ -146,9 +146,9 @@ This repository assumes a working knowledge of:
 
 ### Run docker container
 
-#### Variation #1
+#### Option #1
 
-This variation starts a micro-service supporting HTTP requests.
+This Option starts a micro-service supporting HTTP requests.
 
 1. :pencil2: Set environment variables.
    Example:
@@ -181,9 +181,9 @@ This variation starts a micro-service supporting HTTP requests.
       http://localhost:5001/resolve
     ```
 
-#### Variation #2
+#### Option #2
 
-This variation uses file input and output.
+This Option uses file input and output.
 
 1. :pencil2: Set environment variables.
    Example:
@@ -308,7 +308,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     export DEMO_PREFIX=my
     export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace    ```
 
-1. Variation #1. Quick method using `envsubst`.
+1. Option #1. Quick method using `envsubst`.
    Example:
 
     ```console
@@ -321,7 +321,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     done
     ```
 
-1. Variation #2. Copy and modify method.
+1. Option #2. Copy and modify method.
 
     ```console
     export HELM_VALUES_DIR=${GIT_REPOSITORY_DIR}/helm-values
@@ -344,7 +344,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
     ```
 
-1. Variation #1. Quick method using `envsubst`.
+1. Option #1. Quick method using `envsubst`.
    Example:
 
     ```console
@@ -357,7 +357,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     done
     ```
 
-1. Variation #2. Copy and modify method.
+1. Option #2. Copy and modify method.
 
     ```console
     export KUBERNETES_DIR=${GIT_REPOSITORY_DIR}/kubernetes
