@@ -1,0 +1,6 @@
+image:
+  registry: ${DOCKER_REGISTRY_URL}
+  repository: senzing/resolver
+
+imagePullSecrets:
+  - name: ${DOCKER_REGISTRY_SECRET}

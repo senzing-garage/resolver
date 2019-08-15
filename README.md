@@ -197,6 +197,279 @@ This variation uses file input and output.
 
     Output will be on workstation at ${DATA_DIR}/my-output.json
 
+## Demonstrate using Helm
+
+### Prerequisite software
+
+#### kubectl
+
+1. [Install kubectl](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-kubectl.md).
+
+#### minikube cluster
+
+1. [Install minikube](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-minikube.md).
+1. [Start cluster](https://docs.bitnami.com/kubernetes/get-started-kubernetes/#overview)
+
+    ```console
+    minikube start --cpus 4 --memory 8192
+    ```
+
+    Alternative:
+
+    ```console
+    minikube start --cpus 4 --memory 8192 --vm-driver kvm2
+    ```
+
+#### Helm/Tiller
+
+1. [Install Helm](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-helm.md) on your local workstation.
+1. [Install Tiller](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-tiller.md) in the minikube cluster.
+
+### Clone repository
+
+The Git repository has files that will be used in the `helm install --values` parameter.
+
+1. Using these environment variable values:
+
+    ```console
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=resolver
+    ```
+
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+
+1. After the Git repository has been cloned, be sure the following environment variables are set:
+
+    ```console
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+    ```
+
+### Docker images
+
+#### Senzing docker images
+
+1. Accept End User License Agreement (EULA) for `store/senzing/senzing-package` docker image.
+    1. Visit [HOWTO - Accept EULA](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/accept-eula.md#storesenzingsenzing-package-docker-image).
+
+1. Pull images from DockerHub.
+   Example:
+
+    ```console
+    sudo docker pull store/senzing/senzing-package:1.10.19198
+    sudo docker pull senzing/resolver:1.0.0
+    ```
+
+#### Docker registry
+
+1. If you need to create a private docker registry, see
+       [HOWTO - Install docker registry server](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker-registry-server.md).
+
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
+    ```
+
+1. Add Senzing docker images to private docker registry.  Example:
+
+    ```console
+    export DOCKER_IMAGE_NAMES=( \
+      "store/senzing/senzing-package:1.10.19198" \
+      "senzing/resolver:1.0.0" \
+    )
+
+    for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
+    do \
+      sudo docker tag  ${DOCKER_IMAGE_NAME} ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
+      sudo docker push ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
+      sudo docker rmi  ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
+    done
+    ```
+
+### Create custom helm values files
+
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export DEMO_PREFIX=my
+    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace    ```
+
+1. Variation #1. Quick method using `envsubst`.
+   Example:
+
+    ```console
+    export HELM_VALUES_DIR=${GIT_REPOSITORY_DIR}/helm-values
+    mkdir -p ${HELM_VALUES_DIR}
+
+    for file in ${GIT_REPOSITORY_DIR}/helm-values-templates/*.yaml; \
+    do \
+      envsubst < "${file}" > "${HELM_VALUES_DIR}/$(basename ${file})";
+    done
+    ```
+
+1. Variation #2. Copy and modify method.
+
+    ```console
+    export HELM_VALUES_DIR=${GIT_REPOSITORY_DIR}/helm-values
+    mkdir -p ${HELM_VALUES_DIR}
+
+    cp ${GIT_REPOSITORY_DIR}/helm-values-templates/* ${HELM_VALUES_DIR}
+    ```
+
+    :pencil2: Edit files in ${HELM_VALUES_DIR} replacing the following variables with actual values.
+
+    1. `${DEMO_NAMESPACE}`
+
+### Create custom kubernetes configuration files
+
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export DOCKER_REGISTRY_SECRET=my-registry-secret
+    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
+    ```
+
+1. Variation #1. Quick method using `envsubst`.
+   Example:
+
+    ```console
+    export KUBERNETES_DIR=${GIT_REPOSITORY_DIR}/kubernetes
+    mkdir -p ${KUBERNETES_DIR}
+
+    for file in ${GIT_REPOSITORY_DIR}/kubernetes-templates/*; \
+    do \
+      envsubst < "${file}" > "${KUBERNETES_DIR}/$(basename ${file})";
+    done
+    ```
+
+1. Variation #2. Copy and modify method.
+
+    ```console
+    export KUBERNETES_DIR=${GIT_REPOSITORY_DIR}/kubernetes
+    mkdir -p ${KUBERNETES_DIR}
+
+    cp ${GIT_REPOSITORY_DIR}/kubernetes-templates/* ${KUBERNETES_DIR}
+    ```
+
+    :pencil2: Edit files in ${KUBERNETES_DIR} replacing the following variables with actual values.
+
+    1. `${DOCKER_REGISTRY_SECRET}`
+    1. `${DOCKER_REGISTRY_URL}`
+
+### Create namespace
+
+1. Create namespace.
+
+    ```console
+    kubectl create -f ${KUBERNETES_DIR}/namespace.yaml
+    ```
+
+1. Optional: Review namespaces.
+
+    ```console
+    kubectl get namespaces
+    ```
+
+### Create persistent volume
+
+1. Create persistent volumes.
+   Example:
+
+    ```console
+    kubectl create -f ${KUBERNETES_DIR}/persistent-volume-opt-senzing.yaml
+    ```
+
+1. Create persistent volume claims.
+   Example:
+
+    ```console
+    kubectl create -f ${KUBERNETES_DIR}/persistent-volume-claim-opt-senzing.yaml
+    ```
+
+1. Optional: Review persistent volumes and claims.
+
+    ```console
+    kubectl get persistentvolumes \
+      --namespace ${DEMO_NAMESPACE}
+
+    kubectl get persistentvolumeClaims \
+      --namespace ${DEMO_NAMESPACE}
+    ```
+
+### Add helm repositories
+
+1. Add Senzing repository.
+   Example:
+
+    ```console
+    helm repo add senzing https://senzing.github.io/charts/
+    ```
+
+1. Update repositories.
+
+    ```console
+    helm repo update
+    ```
+
+1. Optional: Review repositories
+
+    ```console
+    helm repo list
+    ```
+
+1. Reference: [helm repo](https://helm.sh/docs/helm/#helm-repo)
+
+### Deploy Senzing_API.tgz package
+
+This deployment initializes the Persistent Volume with Senzing code and data.
+
+1. Install chart.
+   Example:
+
+    ```console
+    helm install \
+      --name ${DEMO_PREFIX}-senzing-package \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${HELM_VALUES_DIR}/senzing-package.yaml \
+      senzing/senzing-package
+    ```
+
+1. Wait until Job has completed.
+   Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
+
+1. Example of completion:
+
+    ```console
+    NAME                       READY   STATUS      RESTARTS   AGE
+    my-senzing-package-8n2ql   0/1     Completed   0          2m44s
+    ```
+
+### Deploy resolver
+
+This deployment launches the resolver.
+
+1. Install chart.
+   Example:
+
+    ```console
+    helm install \
+      --name ${DEMO_PREFIX}-senzing-package \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${HELM_VALUES_DIR}/resolver.yaml \
+      senzing/resolver
+    ```
+
+
 ## Develop
 
 ### Prerequisite software
