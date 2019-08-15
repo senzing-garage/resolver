@@ -465,6 +465,43 @@ This deployment launches the resolver.
       senzing/resolver
     ```
 
+1. Wait for pods to run.  Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
+
+1. In a separate terminal window, port forward to local machine.
+
+    :pencil2:  Set environment variables.  Example:
+
+    ```console
+    export DEMO_PREFIX=my
+    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
+    ```
+
+    Port forward.  Example:
+
+    ```console
+    kubectl port-forward \
+      --address 0.0.0.0 \
+      --namespace ${DEMO_NAMESPACE} \
+      svc/${DEMO_PREFIX}-resolver 5001:5000
+    ```
+
+1. Test HTTP API.
+   Note: **GIT_REPOSITORY_DIR** needs to be set.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:5001/resolve
+    ```
+
 ### Cleanup
 
 #### Delete everything in project
