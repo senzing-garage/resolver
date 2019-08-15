@@ -49,8 +49,8 @@ To see the options for a subcommand, run commands like:
     1. [Configuration](#configuration)
     1. [Run docker container](#run-docker-container)
 1. [Demonstrate using Helm](#demonstrate-using-helm)
-    1. [Prerequisite software](#prerequisite-software)
-    1. [Clone repository](#clone-repository)
+    1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
+    1. [Clone repository for Helm demonstration](#clone-repository-for-helm-demonstration)
     1. [Docker images](#docker-images)
     1. [Create custom helm values files](#create-custom-helm-values-files)
     1. [Create custom kubernetes configuration files](#create-custom-kubernetes-configuration-files)
@@ -110,33 +110,16 @@ This repository assumes a working knowledge of:
 
 ### Configuration
 
-* **SENZING_DATA_SOURCE** -
-  Default "DATA_SOURCE" value for incoming records.
-  No default.
-* **SENZING_DATABASE_URL** -
-  Database URI in the form: `${DATABASE_PROTOCOL}://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}`
-  Default:  [internal SQLite database]
-* **SENZING_DEBUG** -
-  Enable debug information. Values: 0=no debug; 1=debug.
-  Default: 0.
-* **SENZING_DIR** -
-  Path on the local system where
-  [Senzing_API.tgz](https://s3.amazonaws.com/public-read-access/SenzingComDownloads/Senzing_API.tgz)
-  has been extracted.
-  See [Create SENZING_DIR](#create-senzing_dir).
-  No default.
-  Usually set to "/opt/senzing".
-* **SENZING_ENTITY_TYPE** -
-  Default "ENTITY_TYPE" value for incoming records.
-  No default.
-* **SENZING_LOG_LEVEL** -
-  Level of logging. {notset, debug, info, warning, error, critical}.
-  Default: info
-* **SENZING_SLEEP_TIME** -
-  Amount of time to sleep, in seconds for `resolver.py sleep` subcommand.
-  Default: 600.
-* **SENZING_SUBCOMMAND** -
-  Identify the subcommand to be run. See `resolver.py --help` for complete list.
+Configuration values specified by environment variable or command line parameter.
+
+- **[SENZING_DATA_SOURCE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_data_source)**
+- **[SENZING_DATABASE_URL](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_database_url)**
+- **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_debug)**
+- **[SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_dir)**
+- **[SENZING_ENTITY_TYPE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_entity_type)**
+- **[SENZING_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_log_level)**
+- **[SENZING_SLEEP_TIME](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_sleep_time)**
+- **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_subcommand)**
 
 1. To determine which configuration parameters are used for each `<subcommand>`, run:
 
@@ -210,7 +193,7 @@ This Option uses file input and output.
 
 ## Demonstrate using Helm
 
-### Prerequisite software
+### Prerequisite software for Helm demonstration
 
 #### kubectl
 
@@ -236,7 +219,7 @@ This Option uses file input and output.
 1. [Install Helm](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-helm.md) on your local workstation.
 1. [Install Tiller](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-tiller.md) in the minikube cluster.
 
-### Clone repository
+### Clone repository for Helm demonstration
 
 The Git repository has files that will be used in the `helm install --values` parameter.
 
@@ -283,7 +266,8 @@ The Git repository has files that will be used in the `helm install --values` pa
     export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
     ```
 
-1. Add Senzing docker images to private docker registry.  Example:
+1. Add Senzing docker images to private docker registry.
+   Example:
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
@@ -479,7 +463,6 @@ This deployment launches the resolver.
       --values ${HELM_VALUES_DIR}/resolver.yaml \
       senzing/resolver
     ```
-
 
 ## Develop
 
