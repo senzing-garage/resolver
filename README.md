@@ -562,6 +562,7 @@ This deployment launches the resolver.
 
     ```console
     helm delete --purge ${DEMO_PREFIX}-resolver
+    helm delete --purge ${DEMO_PREFIX}-senzing-debug
     helm delete --purge ${DEMO_PREFIX}-senzing-package
     helm repo remove senzing
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-opt-senzing.yaml
