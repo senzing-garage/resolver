@@ -255,7 +255,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     ```console
     sudo docker pull senzing/resolver:1.0.0
     sudo docker pull senzing/senzing-debug:1.1.0
-    sudo docker pull store/senzing/senzing-package:1.10.19214
+    sudo docker pull store/senzing/senzing-package:1.10.19198
     ```
 
 #### Docker registry
@@ -277,7 +277,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     export DOCKER_IMAGE_NAMES=( \
       "senzing/resolver:1.0.0" \
       "senzing/senzing-debug:1.1.0" \
-      "store/senzing/senzing-package:1.10.19214" \
+      "store/senzing/senzing-package:1.10.19198" \
     )
 
     for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
@@ -459,8 +459,8 @@ This deployment initializes the Persistent Volume with Senzing code and data.
 
 This deployment will be used later to:
 
-* Inspect the `/opt/senzing` volume
-* Debug issues
+- Inspect the `/opt/senzing` volume
+- Debug issues
 
 1. Install chart.  Example:
 
