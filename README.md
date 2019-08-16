@@ -464,7 +464,7 @@ This deployment launches the resolver.
 
     ```console
     helm install \
-      --name ${DEMO_PREFIX}-senzing-package \
+      --name ${DEMO_PREFIX}-resolver \
       --namespace ${DEMO_NAMESPACE} \
       --values ${HELM_VALUES_DIR}/resolver.yaml \
       senzing/resolver
