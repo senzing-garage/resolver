@@ -59,8 +59,8 @@ To see the options for a subcommand, run commands like:
     1. [Create persistent volume](#create-persistent-volume)
     1. [Add helm repositories](#add-helm-repositories)
     1. [Deploy Senzing_API.tgz package](#deploy-Senzing_API.tgz-package)
-    1. [Install senzing-debug Helm chart](#install-senzing-debug-helm-chart)
     1. [Deploy resolver](#deploy-resolver)
+    1. [Install senzing-debug Helm chart](#install-senzing-debug-helm-chart)
     1. [Cleanup](#cleanup)
 1. [Develop](#develop)
     1. [Prerequisite software](#prerequisite-software)
@@ -455,53 +455,6 @@ This deployment initializes the Persistent Volume with Senzing code and data.
     my-senzing-package-8n2ql   0/1     Completed   0          2m44s
     ```
 
-### Install senzing-debug Helm chart
-
-This deployment will be used later to:
-
-- Inspect the `/opt/senzing` volume
-- Debug issues
-
-1. Install chart.  Example:
-
-    ```console
-    helm install \
-      --name ${DEMO_PREFIX}-senzing-debug \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${GIT_REPOSITORY_DIR}/helm-values/senzing-debug.yaml \
-       senzing/senzing-debug
-    ```
-
-1. Wait for pod to run.  Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. In a separate terminal window, log into debug pod.
-
-    :pencil2:  Set environment variables.  Example:
-
-    ```console
-    export DEMO_PREFIX=my
-    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
-    ```
-
-    Log into pod.  Example:
-
-    ```console
-    export DEBUG_POD_NAME=$(kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --output jsonpath="{.items[0].metadata.name}" \
-      --selector "app.kubernetes.io/name=senzing-debug, \
-                  app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-debug" \
-      )
-
-    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${DEBUG_POD_NAME} -- /bin/bash
-    ```
-
 ### Deploy resolver
 
 This deployment launches the resolver.
@@ -554,6 +507,53 @@ This deployment launches the resolver.
       http://localhost:5001/resolve
     ```
 
+### Install senzing-debug Helm chart
+
+If debugging is needed, the `senzing/senzing-debug` chart will help with:
+
+- Inspecting the `/opt/senzing` volume
+- Debugging general issues
+
+1. Install chart.  Example:
+
+    ```console
+    helm install \
+      --name ${DEMO_PREFIX}-senzing-debug \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${GIT_REPOSITORY_DIR}/helm-values/senzing-debug.yaml \
+       senzing/senzing-debug
+    ```
+
+1. Wait for pod to run.  Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
+
+1. In a separate terminal window, log into debug pod.
+
+    :pencil2:  Set environment variables.  Example:
+
+    ```console
+    export DEMO_PREFIX=my
+    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
+    ```
+
+    Log into pod.  Example:
+
+    ```console
+    export DEBUG_POD_NAME=$(kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --output jsonpath="{.items[0].metadata.name}" \
+      --selector "app.kubernetes.io/name=senzing-debug, \
+                  app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-debug" \
+      )
+
+    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${DEBUG_POD_NAME} -- /bin/bash
+    ```
+
 ### Cleanup
 
 #### Delete everything in project
@@ -561,8 +561,8 @@ This deployment launches the resolver.
 1. Example:
 
     ```console
-    helm delete --purge ${DEMO_PREFIX}-resolver
     helm delete --purge ${DEMO_PREFIX}-senzing-debug
+    helm delete --purge ${DEMO_PREFIX}-resolver
     helm delete --purge ${DEMO_PREFIX}-senzing-package
     helm repo remove senzing
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-opt-senzing.yaml
