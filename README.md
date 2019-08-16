@@ -250,7 +250,7 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
-    sudo docker pull store/senzing/senzing-package:1.10.19198
+    sudo docker pull store/senzing/senzing-package:1.10.19214
     sudo docker pull senzing/resolver:1.0.0
     ```
 
@@ -271,7 +271,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
-      "store/senzing/senzing-package:1.10.19198" \
+      "store/senzing/senzing-package:1.10.19214" \
       "senzing/resolver:1.0.0" \
     )
 
