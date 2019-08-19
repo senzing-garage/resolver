@@ -322,7 +322,8 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     :pencil2: Edit files in ${HELM_VALUES_DIR} replacing the following variables with actual values.
 
-    1. `${DEMO_NAMESPACE}`
+    1. `${DOCKER_REGISTRY_SECRET}`
+    1. `${DOCKER_REGISTRY_URL}`
 
 ### Create custom kubernetes configuration files
 
@@ -358,8 +359,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     :pencil2: Edit files in ${KUBERNETES_DIR} replacing the following variables with actual values.
 
-    1. `${DOCKER_REGISTRY_SECRET}`
-    1. `${DOCKER_REGISTRY_URL}`
+    1. `${DEMO_NAMESPACE}`
 
 ### Create namespace
 
