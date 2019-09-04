@@ -1,11 +1,11 @@
 image:
   registry: ${DOCKER_REGISTRY_URL}
-  tag: 1.0.0
+  tag: 1.2.0
 
 imagePullSecrets:
   - name: ${DOCKER_REGISTRY_SECRET}
 
 senzing:
   debug: 1
-  optSenzingClaim: opt-senzing-claim
+  persistentVolumeClaim: senzing-persistent-volume-claim
   subcommand: service

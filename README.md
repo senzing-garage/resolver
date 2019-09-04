@@ -46,8 +46,11 @@ To see the options for a subcommand, run commands like:
     1. [Install](#install)
     1. [Run command](#run-command)
 1. [Demonstrate using Docker](#demonstrate-using-docker)
-    1. [Create SENZING_DIR](#create-senzing_dir)
+    1. [Initialize Senzing](#initialize-senzing)
     1. [Configuration](#configuration)
+    1. [Volumes](#volumes)
+    1. [Docker network](#docker-network)
+    1. [Docker user](#docker-user)
     1. [Run docker container](#run-docker-container)
 1. [Demonstrate using Helm](#demonstrate-using-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
@@ -68,6 +71,7 @@ To see the options for a subcommand, run commands like:
     1. [Build docker image for development](#build-docker-image-for-development)
 1. [Examples](#examples)
 1. [Errors](#errors)
+1. [References](#references)
 
 ## Expectations
 
@@ -106,28 +110,109 @@ This repository assumes a working knowledge of:
 
 ## Demonstrate using Docker
 
-### Create SENZING_DIR
+### Initialize Senzing
 
-1. If `/opt/senzing` directory is not on local system, visit
-   [HOWTO - Create SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/create-senzing-dir.md).
+1. If Senzing has not been initialized, visit
+   [HOWTO - Initialize Senzing](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/initialize-senzing.md).
 
 ### Configuration
 
 Configuration values specified by environment variable or command line parameter.
 
 - **[SENZING_DATA_SOURCE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_data_source)**
+- **[SENZING_DATA_VERSION_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_data_version_dir)**
 - **[SENZING_DATABASE_URL](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_database_url)**
 - **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_debug)**
 - **[SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_dir)**
 - **[SENZING_ENTITY_TYPE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_entity_type)**
+- **[SENZING_ETC_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_etc_dir)**
+- **[SENZING_G2_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_g2_dir)**
 - **[SENZING_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_log_level)**
+- **[SENZING_NETWORK](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_network)**
+- **[SENZING_RUNAS_USER](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_runas_user)**
 - **[SENZING_SLEEP_TIME](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_sleep_time)**
 - **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_subcommand)**
+- **[SENZING_VAR_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_var_dir)**
 
 1. To determine which configuration parameters are used for each `<subcommand>`, run:
 
     ```console
     ./resolver.py <subcommand> --help
+    ```
+
+### Volumes
+
+The output of `yum install senzingapi` placed files in different directories.
+Create a folder for each output directory.
+
+1. :pencil2: Option #1.
+   To mimic an actual RPM installation,
+   identify directories for RPM output in this manner:
+
+    ```console
+    export SENZING_DATA_VERSION_DIR=/opt/senzing/data/1.0.0
+    export SENZING_ETC_DIR=/etc/opt/senzing
+    export SENZING_G2_DIR=/opt/senzing/g2
+    export SENZING_VAR_DIR=/var/opt/senzing
+    ```
+
+1. :pencil2: Option #2.
+   If Senzing directories were put in alternative directories,
+   set environment variables to reflect where the directories were placed.
+   Example:
+
+    ```console
+    export SENZING_VOLUME=/opt/my-senzing
+
+    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/1.0.0
+    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
+    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
+    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
+    ```
+### Docker network
+
+:thinking: **Optional:**  Use if docker container is part of a docker network.
+
+1. List docker networks.
+   Example:
+
+    ```console
+    sudo docker network ls
+    ```
+
+1. :pencil2: Specify docker network.
+   Choose value from NAME column of `docker network ls`.
+   Example:
+
+    ```console
+    export SENZING_NETWORK=*nameofthe_network*
+    ```
+
+1. Construct parameter for `docker run`.
+   Example:
+
+    ```console
+    export SENZING_NETWORK_PARAMETER="--net ${SENZING_NETWORK}"
+    ```
+
+### Docker user
+
+:thinking: **Optional:**  The docker container runs as "USER 1001".
+Use if a different userid is required.
+
+1. :pencil2: Identify user.
+   User "0" is root.
+   Example:
+
+    ```console
+    export SENZING_RUNAS_USER="0"
+    ```
+
+1. Construct parameter for `docker run`.
+   Example:
+
+    ```console
+    export SENZING_RUNAS_USER_PARAMETER="--user ${SENZING_RUNAS_USER}"
     ```
 
 ### Run docker container
@@ -136,23 +221,21 @@ Configuration values specified by environment variable or command line parameter
 
 This Option starts a micro-service supporting HTTP requests.
 
-1. :pencil2: Set environment variables.
-   Example:
-
-    ```console
-    export SENZING_DIR=/opt/senzing
-    ```
-
 1. Run the docker container.
    Example:
 
     ```console
     sudo docker run \
+      ${SENZING_RUNAS_USER_PARAMETER} \
+      ${SENZING_NETWORK_PARAMETER} \
       --interactive \
       --publish 5001:5000 \
       --rm \
       --tty \
-      --volume ${SENZING_DIR}:/opt/senzing \
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
       senzing/resolver
     ```
 
@@ -175,7 +258,6 @@ This Option uses file input and output.
    Example:
 
     ```console
-    export SENZING_DIR=/opt/senzing
     export DATA_DIR=${GIT_REPOSITORY_DIR}/test
     ```
 
@@ -184,15 +266,20 @@ This Option uses file input and output.
 
     ```console
     sudo docker run \
+      ${SENZING_RUNAS_USER_PARAMETER} \
+      ${SENZING_NETWORK_PARAMETER} \
       --rm \
-      --volume ${SENZING_DIR}:/opt/senzing \
       --volume ${DATA_DIR}:/data \
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
       senzing/resolver file-input \
         --input-file  /data/test-data-1.json \
         --output-file /data/my-output.json
     ```
 
-    Output will be on workstation at ${DATA_DIR}/my-output.json
+1. Output will be on workstation at ${DATA_DIR}/my-output.json
 
 ## Demonstrate using Helm
 
@@ -231,62 +318,11 @@ The Git repository has files that will be used in the `helm install --values` pa
     ```console
     export GIT_ACCOUNT=senzing
     export GIT_REPOSITORY=resolver
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
-
-1. After the Git repository has been cloned, be sure the following environment variables are set:
-
-    ```console
     export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
-### Docker images
-
-#### Senzing docker images
-
-1. Accept End User License Agreement (EULA) for `store/senzing/senzing-package` docker image.
-    1. Visit [HOWTO - Accept EULA](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/accept-eula.md#storesenzingsenzing-package-docker-image).
-
-1. Pull images from DockerHub.
-   Example:
-
-    ```console
-    sudo docker pull senzing/resolver:1.0.0
-    sudo docker pull senzing/senzing-debug:1.1.0
-    sudo docker pull store/senzing/senzing-package:1.10.19214
-    ```
-
-#### Docker registry
-
-1. If you need to create a private docker registry, see
-       [HOWTO - Install docker registry server](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker-registry-server.md).
-
-1. :pencil2: Set environment variables.
-   Example:
-
-    ```console
-    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
-    ```
-
-1. Add Senzing docker images to private docker registry.
-   Example:
-
-    ```console
-    export DOCKER_IMAGE_NAMES=( \
-      "senzing/resolver:1.0.0" \
-      "senzing/senzing-debug:1.1.0" \
-      "store/senzing/senzing-package:1.10.19214" \
-    )
-
-    for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
-    do \
-      sudo docker tag  ${DOCKER_IMAGE_NAME} ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
-      sudo docker push ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
-      sudo docker rmi  ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
-    done
-    ```
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Create custom helm values files
 
@@ -295,7 +331,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DOCKER_REGISTRY_SECRET=my-registry-secret
-    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
+    export DOCKER_REGISTRY_URL=docker.io
     ```
 
 1. Option #1. Quick method using `envsubst`.
@@ -591,46 +627,48 @@ The following software programs need to be installed:
 
 ### Clone repository
 
+For more information on environment variables,
+see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md).
+
 1. Set these environment variable values:
 
     ```console
     export GIT_ACCOUNT=senzing
     export GIT_REPOSITORY=resolver
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
-
-1. After the repository has been cloned, be sure the following are set:
-
-    ```console
     export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+
 ### Build docker image for development
 
-1. Option #1 - Using docker command and GitHub.
+1. Option #1 - Using `docker` command and GitHub.
 
     ```console
     sudo docker build --tag senzing/resolver https://github.com/senzing/resolver.git
     ```
 
-1. Option #2 - Using docker command and local repository.
+1. Option #2 - Using `docker` command and local repository.
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     sudo docker build --tag senzing/resolver .
     ```
 
-1. Option #3 - Using make command.
+1. Option #3 - Using `make` command.
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     sudo make docker-build
     ```
 
+    Note: `sudo make docker-build-development-cache` can be used to create cached docker layers.
+
 ## Examples
 
 ## Errors
 
 1. See [docs/errors.md](docs/errors.md).
+
+## References

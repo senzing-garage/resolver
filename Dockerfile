@@ -1,11 +1,11 @@
-ARG BASE_IMAGE=senzing/senzing-base:1.1.0
+ARG BASE_IMAGE=senzing/senzing-base:1.2.1
 FROM ${BASE_IMAGE}
 
-ENV REFRESHED_AT=2019-07-29
+ENV REFRESHED_AT=2019-09-04
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="1.1.0"
+      Version="1.2.0"
 
 HEALTHCHECK CMD ["/app/healthcheck.sh"]
 
@@ -30,8 +30,8 @@ COPY ./resolver.py /app
 
 # Make directory that resolver.py can use.
 
-RUN mkdir /var/opt/senzing \
- && chown 1001 /var/opt/senzing
+RUN mkdir /var/opt/senzing-internal \
+ && chown 1001 /var/opt/senzing-internal
 
 # Make non-root container.
 
@@ -39,7 +39,7 @@ USER 1001
 
 # Runtime execution.
 
-ENV SENZING_INTERNAL_DATABASE=/var/opt/senzing/G2C.db
+ENV SENZING_INTERNAL_DATABASE=/var/opt/senzing-internal/G2C.db
 
 WORKDIR /app
 ENTRYPOINT ["/app/resolver.py"]

@@ -37,7 +37,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-07-31'
+__updated__ = '2019-09-04'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -587,7 +587,7 @@ def get_configuration(args):
         except FileExistsError:
             pass
 
-        shutil.copyfile("/opt/senzing/g2/data/G2C.db", g2_internal_database_path)
+        shutil.copyfile("/var/opt/senzing/g2/data/G2C.db", g2_internal_database_path)
         config['g2_database_url_specific'] = "sqlite3://na:na@{0}".format(g2_internal_database_path)
     else:
         result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
