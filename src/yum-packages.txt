@@ -1,1 +1,3 @@
 curl
+openssl-devel
+python3

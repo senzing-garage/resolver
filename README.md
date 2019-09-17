@@ -54,14 +54,11 @@ To see the options for a subcommand, run commands like:
     1. [Run docker container](#run-docker-container)
 1. [Demonstrate using Helm](#demonstrate-using-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
-    1. [Clone repository for Helm demonstration](#clone-repository-for-helm-demonstration)
-    1. [Docker images](#docker-images)
     1. [Create custom helm values files](#create-custom-helm-values-files)
     1. [Create custom kubernetes configuration files](#create-custom-kubernetes-configuration-files)
     1. [Create namespace](#create-namespace)
     1. [Create persistent volume](#create-persistent-volume)
     1. [Add helm repositories](#add-helm-repositories)
-    1. [Deploy Senzing_API.tgz package](#deploy-Senzing_API.tgz-package)
     1. [Deploy resolver](#deploy-resolver)
     1. [Install senzing-debug Helm chart](#install-senzing-debug-helm-chart)
     1. [Cleanup](#cleanup)
@@ -87,7 +84,64 @@ Budget 40 minutes to get the demonstration up-and-running, depending on CPU and 
 
 This repository assumes a working knowledge of:
 
-1. [Docker](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/docker.md)
+1. [git](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/git.md)
+1. [docker](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/docker.md)
+
+## Preparation
+
+### Prerequisite software
+
+The following software programs need to be installed:
+
+1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
+1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzingapi.md)
+
+### Volumes
+
+:thinking: The output of `yum install senzingapi` places files in different directories.
+Identify a folder for each output directory.
+
+1. :pencil2: **Example #1:**
+   To mimic an actual RPM installation,
+   identify directories for RPM output in this manner:
+
+    ```console
+    export SENZING_DATA_DIR=/opt/senzing/data
+    export SENZING_DATA_VERSION_DIR=${SENZING_DATA_DIR}/1.0.0
+    export SENZING_ETC_DIR=/etc/opt/senzing
+    export SENZING_G2_DIR=/opt/senzing/g2
+    export SENZING_VAR_DIR=/var/opt/senzing
+    ```
+
+1. :pencil2: **Example #2:**
+   Senzing directories can be put in alternative directories.
+   Example:
+
+    ```console
+    export SENZING_VOLUME=/opt/my-senzing
+
+    export SENZING_DATA_DIR=${SENZING_VOLUME}/data
+    export SENZING_DATA_VERSION_DIR=${SENZING_DATA_DIR}/1.0.0
+    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
+    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
+    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
+    ```
+
+### Clone repository
+
+For more information on environment variables,
+see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md).
+
+1. Set these environment variable values:
+
+    ```console
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=resolver
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+    ```
+
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
 ## Demonstrate using Command Line
 
@@ -140,35 +194,6 @@ Configuration values specified by environment variable or command line parameter
     ./resolver.py <subcommand> --help
     ```
 
-### Volumes
-
-The output of `yum install senzingapi` placed files in different directories.
-Create a folder for each output directory.
-
-1. :pencil2: Option #1.
-   To mimic an actual RPM installation,
-   identify directories for RPM output in this manner:
-
-    ```console
-    export SENZING_DATA_VERSION_DIR=/opt/senzing/data/1.0.0
-    export SENZING_ETC_DIR=/etc/opt/senzing
-    export SENZING_G2_DIR=/opt/senzing/g2
-    export SENZING_VAR_DIR=/var/opt/senzing
-    ```
-
-1. :pencil2: Option #2.
-   If Senzing directories were put in alternative directories,
-   set environment variables to reflect where the directories were placed.
-   Example:
-
-    ```console
-    export SENZING_VOLUME=/opt/my-senzing
-
-    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/1.0.0
-    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-    ```
 ### Docker network
 
 :thinking: **Optional:**  Use if docker container is part of a docker network.
@@ -308,21 +333,6 @@ This Option uses file input and output.
 
 1. [Install Helm](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-helm.md) on your local workstation.
 1. [Install Tiller](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-tiller.md) in the minikube cluster.
-
-### Clone repository for Helm demonstration
-
-The Git repository has files that will be used in the `helm install --values` parameter.
-
-1. Using these environment variable values:
-
-    ```console
-    export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=resolver
-    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
-    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Create custom helm values files
 
