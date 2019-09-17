@@ -26,8 +26,8 @@ docker-build: docker-rmi-for-build
 		--tag $(DOCKER_IMAGE_NAME):$(GIT_VERSION) \
 		.
 
-.PHONY: docker-build-base
-docker-build-base: docker-rmi-for-build-base
+.PHONY: docker-build-development-cache
+docker-build-development-cache: docker-rmi-for-build-development-cache
 	docker build \
 		--tag $(DOCKER_IMAGE_TAG) \
 		.
@@ -42,8 +42,8 @@ docker-rmi-for-build:
 		$(DOCKER_IMAGE_NAME):$(GIT_VERSION) \
 		$(DOCKER_IMAGE_NAME)
 
-.PHONY: docker-rmi-for-build-base
-docker-rmi-for-build-base:
+.PHONY: docker-rmi-for-build-development-cache
+docker-rmi-for-build-development-cache:
 	-docker rmi --force $(DOCKER_IMAGE_TAG)
 
 .PHONY: clean
