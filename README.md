@@ -94,7 +94,7 @@ This repository assumes a working knowledge of:
 The following software programs need to be installed:
 
 1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
-1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzingapi.md)
+1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md)
 
 ### Volumes
 
