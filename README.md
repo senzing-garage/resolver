@@ -231,16 +231,11 @@ The Git repository has files that will be used in the `helm install --values` pa
     ```console
     export GIT_ACCOUNT=senzing
     export GIT_REPOSITORY=resolver
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
-
-1. After the Git repository has been cloned, be sure the following environment variables are set:
-
-    ```console
     export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
+
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Docker images
 
@@ -253,7 +248,7 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
-    sudo docker pull senzing/resolver:1.0.0
+    sudo docker pull senzing/resolver:1.0.1
     sudo docker pull senzing/senzing-debug:1.1.0
     sudo docker pull store/senzing/senzing-package:1.10.19214
     ```
@@ -275,7 +270,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
-      "senzing/resolver:1.0.0" \
+      "senzing/resolver:1.0.1" \
       "senzing/senzing-debug:1.1.0" \
       "store/senzing/senzing-package:1.10.19214" \
     )
@@ -591,46 +586,48 @@ The following software programs need to be installed:
 
 ### Clone repository
 
+For more information on environment variables,
+see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md).
+
 1. Set these environment variable values:
 
     ```console
     export GIT_ACCOUNT=senzing
     export GIT_REPOSITORY=resolver
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
-
-1. After the repository has been cloned, be sure the following are set:
-
-    ```console
     export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+
 ### Build docker image for development
 
-1. Option #1 - Using docker command and GitHub.
+1. Option #1 - Using `docker` command and GitHub.
 
     ```console
     sudo docker build --tag senzing/resolver https://github.com/senzing/resolver.git
     ```
 
-1. Option #2 - Using docker command and local repository.
+1. Option #2 - Using `docker` command and local repository.
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     sudo docker build --tag senzing/resolver .
     ```
 
-1. Option #3 - Using make command.
+1. Option #3 - Using `make` command.
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     sudo make docker-build
     ```
 
+    Note: `sudo make docker-build-development-cache` can be used to create cached docker layers.
+
 ## Examples
 
 ## Errors
 
 1. See [docs/errors.md](docs/errors.md).
+
+## References
