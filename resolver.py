@@ -37,7 +37,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-09-23'
+__updated__ = '2019-10-01'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1163,6 +1163,14 @@ def do_service(args):
     host = config.get('host')
     port = config.get('port')
     debug = config.get('debug')
+
+    # Prime the pump.
+
+    handle_post_resolver([])
+    g2_engine = get_g2_engine(config)
+    return_code = g2_engine.primeEngine()
+
+    # Run the service application.
 
     app.run(host=host, port=port, debug=debug, threaded=False)
 

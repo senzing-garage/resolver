@@ -334,6 +334,67 @@ This Option uses file input and output.
 1. [Install Helm](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-helm.md) on your local workstation.
 1. [Install Tiller](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-tiller.md) in the minikube cluster.
 
+### Clone repository for Helm demonstration
+
+The Git repository has files that will be used in the `helm install --values` parameter.
+
+1. Using these environment variable values:
+
+    ```console
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=resolver
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+    ```
+
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+
+### Docker images
+
+#### Senzing docker images
+
+1. Accept End User License Agreement (EULA) for `store/senzing/senzing-package` docker image.
+    1. Visit [HOWTO - Accept EULA](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/accept-eula.md#storesenzingsenzing-package-docker-image).
+
+1. Pull images from DockerHub.
+   Example:
+
+    ```console
+    sudo docker pull senzing/resolver:1.0.1
+    sudo docker pull senzing/senzing-debug:1.1.0
+    sudo docker pull store/senzing/senzing-package:1.10.19214
+    ```
+
+#### Docker registry
+
+1. If you need to create a private docker registry, see
+       [HOWTO - Install docker registry server](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker-registry-server.md).
+
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
+    ```
+
+1. Add Senzing docker images to private docker registry.
+   Example:
+
+    ```console
+    export DOCKER_IMAGE_NAMES=( \
+      "senzing/resolver:1.0.1" \
+      "senzing/senzing-debug:1.1.0" \
+      "store/senzing/senzing-package:1.10.19214" \
+    )
+
+    for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
+    do \
+      sudo docker tag  ${DOCKER_IMAGE_NAME} ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
+      sudo docker push ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
+      sudo docker rmi  ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
+    done
+    ```
+
 ### Create custom helm values files
 
 1. :pencil2: Set environment variables.
