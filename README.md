@@ -36,6 +36,11 @@ To see the options for a subcommand, run commands like:
 ./resolver.py service --help
 ```
 
+### Related artifacts
+
+1. [DockerHub](https://hub.docker.com/r/senzing/resolver)
+1. [Helm Chart](https://github.com/Senzing/charts/tree/master/charts/resolver)
+
 ### Contents
 
 1. [Expectations](#expectations)
