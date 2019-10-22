@@ -701,7 +701,7 @@ If debugging is needed, the `senzing/senzing-debug` chart will help with:
 
 ## Develop
 
-### Prerequisite software
+### Prerequisite software for development
 
 The following software programs need to be installed:
 
@@ -709,7 +709,7 @@ The following software programs need to be installed:
 1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md)
 1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
 
-### Clone repository
+### Clone repository for development
 
 For more information on environment variables,
 see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md).

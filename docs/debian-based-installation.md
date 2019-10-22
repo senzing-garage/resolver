@@ -38,15 +38,14 @@ The following software programs need to be installed:
 1. :pencil2: Set environment variables.
 
     ```console
-    export SENZING_DIR=/opt/senzing
+    export SENZING_G2_DIR=/opt/senzing/g2
     ```
 
 1. Synthesize environment variables.
 
     ```console
-    export GIT_REPOSITORY_URL="https://github.com/${GIT_ACCOUNT}/${GIT_REPOSITORY}.git"
-    export LD_LIBRARY_PATH=${SENZING_DIR}/g2/lib:${SENZING_DIR}/g2/lib/debian:$LD_LIBRARY_PATH
-    export PYTHONPATH=${SENZING_DIR}/g2/python
+    export LD_LIBRARY_PATH=${SENZING_DIR}/lib:${SENZING_DIR}/lib/debian:$LD_LIBRARY_PATH
+    export PYTHONPATH=${SENZING_DIR}/python
     ```
 
 ## Install
