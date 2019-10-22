@@ -147,10 +147,10 @@ The following software programs need to be installed:
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py \
-      --data-dir /opt/senzing/data \
-      --etc-dir /etc/opt/senzing \
-      --g2-dir /opt/senzing/g2 \
-      --var-dir /var/opt/senzing \
+      --data-dir ${SENZING_DATA_DIR} /opt/senzing/data \
+      --etc-dir ${SENZING_ETC_DIR} /etc/opt/senzing \
+      --g2-dir ${SENZING_G2_DIR} /opt/senzing/g2 \
+      --var-dir ${SENZING_VAR_DIR} /var/opt/senzing \
       --input-file test/test-data-1.json
       file-input
     ```
