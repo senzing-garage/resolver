@@ -98,6 +98,14 @@ This repository assumes a working knowledge of:
 
 ## Demonstrate using Command Line
 
+### Prerequisite software
+
+The following software programs need to be installed:
+
+1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
+1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-data.md)
+1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md)
+
 ### Clone repository
 
 1. Set these environment variable values:
@@ -111,29 +119,55 @@ This repository assumes a working knowledge of:
 
 1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
+1. Identify paths.
+   Example:
+
+    ```console
+    export SENZING_VOLUME=/opt/my-senzing
+
+    export SENZING_DATA_DIR=${SENZING_VOLUME}/data/1.0.0
+    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
+    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
+    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
+    ```
+
 ### Install
 
 1. Install prerequisites:
     1. [Debian-based installation](docs/debian-based-installation.md) - For Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
     1. [RPM-based installation](docs/rpm-based-installation.md) - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
 
-### Prerequisite software
 
-The following software programs need to be installed:
+### Run commands
 
-1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
-1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-data.md)
-1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md)
-
-### Run command
-
-1. Run command.
+1. :pencil2: Run command.
    Note: **GIT_REPOSITORY_DIR** needs to be set.
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
-    ./resolver.py file-input --input-file test/test-data-1.json
+    ./resolver.py \
+      --data-dir /opt/senzing/data \
+      --etc-dir /etc/opt/senzing \
+      --g2-dir /opt/senzing/g2 \
+      --var-dir /var/opt/senzing \
+      --input-file test/test-data-1.json
+      file-input
+    ```
+
+### Run command
+
+1. :pencil2: Run command.
+   Note: **GIT_REPOSITORY_DIR** needs to be set.
+   Example:
+
+    ```console
+    cd ${GIT_REPOSITORY_DIR}
+    ./resolver.py service \
+      --data-dir /opt/senzing/data \
+      --etc-dir /etc/opt/senzing \
+      --g2-dir /opt/senzing/g2 \
+      --var-dir /var/opt/senzing
     ```
 
 ## Demonstrate using Docker
@@ -267,7 +301,7 @@ This Option starts a micro-service supporting HTTP requests.
       ${SENZING_RUNAS_USER_PARAMETER} \
       ${SENZING_NETWORK_PARAMETER} \
       --interactive \
-      --publish 5001:5000 \
+      --publish 8252:8252 \
       --rm \
       --tty \
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
@@ -285,7 +319,7 @@ This Option starts a micro-service supporting HTTP requests.
     curl -X POST \
       --header "Content-Type: text/plain" \
       --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:5001/resolve
+      http://localhost:8252/resolve
     ```
 
 #### Option #2

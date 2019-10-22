@@ -9,33 +9,13 @@ image.
 
 ## Overview
 
-1. [Prerequisite software](#prerequisite-software)
-1. [Clone repository](#clone-repository)
 1. [Set environment variables](#set-environment-variables)
 1. [Install](#install)
-
-## Prerequisite software
-
-The following software programs need to be installed:
-
-1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
-
-## Clone repository
-
-1. Set these environment variable values:
-
-    ```console
-    export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=resolver
-    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
-    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
 ## Set Environment variables
 
 1. :pencil2: Set environment variables.
+   Example:
 
     ```console
     export SENZING_G2_DIR=/opt/senzing/g2
@@ -44,8 +24,13 @@ The following software programs need to be installed:
 1. Synthesize environment variables.
 
     ```console
-    export LD_LIBRARY_PATH=${SENZING_DIR}/lib:${SENZING_DIR}/lib/debian:$LD_LIBRARY_PATH
-    export PYTHONPATH=${SENZING_DIR}/python
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=resolver
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+
+    export LD_LIBRARY_PATH=${SENZING_G2_DIR}/lib:${SENZING_G2_DIR}/lib/debian:$LD_LIBRARY_PATH
+    export PYTHONPATH=${SENZING_G2_DIR}/python
     ```
 
 ## Install
@@ -65,8 +50,3 @@ The following software programs need to be installed:
     ```console
     pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
     ```
-
-### Create SENZING_DIR
-
-If you do not already have an `/opt/senzing` directory on your local system, visit
-[HOWTO - Create SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/create-senzing-dir.md).
