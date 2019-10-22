@@ -163,10 +163,10 @@ The following software programs need to be installed:
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py service \
-      --data-dir ${SENZING_DATA_DIR} /opt/senzing/data \
-      --etc-dir ${SENZING_ETC_DIR} /etc/opt/senzing \
-      --g2-dir ${SENZING_G2_DIR} /opt/senzing/g2 \
-      --var-dir ${SENZING_VAR_DIR} /var/opt/senzing
+      --data-dir ${SENZING_DATA_DIR} \
+      --etc-dir ${SENZING_ETC_DIR} \
+      --g2-dir ${SENZING_G2_DIR} \
+      --var-dir ${SENZING_VAR_DIR}
     ```
 
 ## Demonstrate using Docker
