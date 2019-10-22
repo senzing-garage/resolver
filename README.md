@@ -180,8 +180,7 @@ The following examples show how to identify each output directory.
    identify directories for RPM output in this manner:
 
     ```console
-    export SENZING_DATA_DIR=/opt/senzing/data
-    export SENZING_DATA_VERSION_DIR=${SENZING_DATA_DIR}/1.0.0
+    export SENZING_DATA_VERSION_DIR=/opt/senzing/data/1.0.0
     export SENZING_ETC_DIR=/etc/opt/senzing
     export SENZING_G2_DIR=/opt/senzing/g2
     export SENZING_VAR_DIR=/var/opt/senzing
@@ -195,11 +194,17 @@ The following examples show how to identify each output directory.
     ```console
     export SENZING_VOLUME=/opt/my-senzing
 
-    export SENZING_DATA_DIR=${SENZING_VOLUME}/data
-    export SENZING_DATA_VERSION_DIR=${SENZING_DATA_DIR}/1.0.0
+    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/1.0.0
     export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
     export SENZING_G2_DIR=${SENZING_VOLUME}/g2
     export SENZING_VAR_DIR=${SENZING_VOLUME}/var
+    ```
+
+1. :thinking: If internal database is used, permissions may need to be changed in `/var/opt/senzing`.
+   Example:
+
+    ```console
+    sudo chmod -R 777 ${SENZING_VAR_DIR}
     ```
 
 ### Docker network
