@@ -125,6 +125,45 @@ The following software programs need to be installed:
     1. [Debian-based installation](docs/debian-based-installation.md) - For Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
     1. [RPM-based installation](docs/rpm-based-installation.md) - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
 
+### Configure
+
+1. Get configuration...
+   Example:
+
+    ```console
+    curl -X GET \
+      --output ~/init-container.py \
+      https://raw.githubusercontent.com/Senzing/docker-init-container/master/init-container.py
+    ```
+
+1. XXX
+   Example:
+
+    ```console
+    chmod +x ~/init-container.py
+    ```
+
+1. XXX
+   Example:
+
+    ```console
+    sudo mkdir /var/opt/senzing
+    sudo chown $(id -u):$(id -g) /var/opt/senzing
+
+    sudo mkdir /etc/opt/senzing
+    sudo chown $(id -u):$(id -g) /etc/opt/senzing
+    ```
+
+1. XXX
+   Example:
+
+    ```console
+    sudo \
+      LD_LIBRARY_PATH=/opt/senzing/g2/lib:$LD_LIBRARY_PATH \
+      PYTHONPATH=/opt/senzing/g2/python \
+      ~/init-container.py initialize
+    ```
+
 
 ### Run commands
 
