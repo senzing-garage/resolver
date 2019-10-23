@@ -136,25 +136,14 @@ The following software programs need to be installed:
       https://raw.githubusercontent.com/Senzing/docker-init-container/master/init-container.py
     ```
 
-1. XXX
+1. Make `init-container.py` executable.
    Example:
 
     ```console
     chmod +x ~/init-container.py
     ```
 
-1. XXX
-   Example:
-
-    ```console
-    sudo mkdir /var/opt/senzing
-    sudo chown $(id -u):$(id -g) /var/opt/senzing
-
-    sudo mkdir /etc/opt/senzing
-    sudo chown $(id -u):$(id -g) /etc/opt/senzing
-    ```
-
-1. XXX
+1. Configure Senzing for use.
    Example:
 
     ```console
@@ -164,7 +153,7 @@ The following software programs need to be installed:
       ~/init-container.py initialize
     ```
 
-1. XXX
+1. Permit `/var/opt/senzing` for use by current user.
    Example:
 
     ```console

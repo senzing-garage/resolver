@@ -14,18 +14,11 @@ image.
 
 ## Set Environment variables
 
-1. :pencil2: Set environment variables.
-   Example:
-
-    ```console
-    export SENZING_G2_DIR=/opt/senzing/g2
-    ```
-
 1. Synthesize environment variables.
 
     ```console
-    export LD_LIBRARY_PATH=${SENZING_G2_DIR}/lib:${SENZING_G2_DIR}/lib/debian:$LD_LIBRARY_PATH
-    export PYTHONPATH=${SENZING_G2_DIR}/python
+    export LD_LIBRARY_PATH=/opt/senzing/g2/lib:/opt/senzing/g2/lib/debian:$LD_LIBRARY_PATH
+    export PYTHONPATH=/opt/senzing/g2/python
     ```
 
 ## Install
