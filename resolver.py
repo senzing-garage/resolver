@@ -593,6 +593,12 @@ def get_configuration(args):
         if relative_path:
             result[path] = os.path.abspath(relative_path)
 
+    # Special case: /opt/senzing/data/1.0.0
+
+    test_data_dir_path = "{0}/1.0.0".format(result.get('data_dir'))
+    if os.path.exists(test_data_dir_path):
+        result['data_dir'] = test_data_dir_path
+
     # Special case:  Tailored database URL
     # If requested, prepare internal database.
 
