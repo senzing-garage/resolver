@@ -38,3 +38,38 @@ image.
     ```console
     sudo pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
     ```
+
+## Configure
+
+1. Get configuration tool.
+   Example:
+
+    ```console
+    curl -X GET \
+      --output ~/init-container.py \
+      https://raw.githubusercontent.com/Senzing/docker-init-container/master/init-container.py
+    ```
+
+1. Make `init-container.py` executable.
+   Example:
+
+    ```console
+    chmod +x ~/init-container.py
+    ```
+
+1. Configure Senzing for use.
+   Example:
+
+    ```console
+    sudo \
+      LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
+      PYTHONPATH=${PYTHONPATH} \
+      ~/init-container.py initialize
+    ```
+
+1. Permit `/var/opt/senzing` for use by current user.
+   Example:
+
+    ```console
+    sudo chown $(id -u):$(id -g) -R /var/opt/senzing
+    ```

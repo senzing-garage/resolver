@@ -125,41 +125,6 @@ The following software programs need to be installed:
     1. [Debian-based installation](docs/debian-based-installation.md) - For Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
     1. [RPM-based installation](docs/rpm-based-installation.md) - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
 
-### Configure
-
-1. Get configuration...
-   Example:
-
-    ```console
-    curl -X GET \
-      --output ~/init-container.py \
-      https://raw.githubusercontent.com/Senzing/docker-init-container/master/init-container.py
-    ```
-
-1. Make `init-container.py` executable.
-   Example:
-
-    ```console
-    chmod +x ~/init-container.py
-    ```
-
-1. Configure Senzing for use.
-   Example:
-
-    ```console
-    sudo \
-      LD_LIBRARY_PATH=/opt/senzing/g2/lib:$LD_LIBRARY_PATH \
-      PYTHONPATH=/opt/senzing/g2/python \
-      ~/init-container.py initialize
-    ```
-
-1. Permit `/var/opt/senzing` for use by current user.
-   Example:
-
-    ```console
-    sudo chown $(id -u):$(id -g) -R /var/opt/senzing
-    ```
-
 ### Run commands
 
 1. :pencil2: Run command for file input/output.
