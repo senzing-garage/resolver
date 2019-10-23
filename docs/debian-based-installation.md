@@ -24,11 +24,6 @@ image.
 1. Synthesize environment variables.
 
     ```console
-    export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=resolver
-    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
-    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-
     export LD_LIBRARY_PATH=${SENZING_G2_DIR}/lib:${SENZING_G2_DIR}/lib/debian:$LD_LIBRARY_PATH
     export PYTHONPATH=${SENZING_G2_DIR}/python
     ```
@@ -48,5 +43,5 @@ image.
 1. Run:
 
     ```console
-    pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
+    sudo pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
     ```

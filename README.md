@@ -119,18 +119,6 @@ The following software programs need to be installed:
 
 1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
 
-1. Identify paths.
-   Example:
-
-    ```console
-    export SENZING_VOLUME=/opt/my-senzing
-
-    export SENZING_DATA_DIR=${SENZING_VOLUME}/data/1.0.0
-    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-    ```
-
 ### Install
 
 1. Install prerequisites:
@@ -140,35 +128,34 @@ The following software programs need to be installed:
 
 ### Run commands
 
-1. :pencil2: Run command.
+1. :pencil2: Run command for file input/output.
    Note: **GIT_REPOSITORY_DIR** needs to be set.
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py file-input \
-      --database-url "sqlite3://na:na@${SENZING_VAR_DIR}/sqlite/G2C.db" \
-      --data-dir ${SENZING_DATA_DIR} \
-      --etc-dir ${SENZING_ETC_DIR} \
-      --g2-dir ${SENZING_G2_DIR} \
-      --var-dir ${SENZING_VAR_DIR} \
       --input-file test/test-data-1.json
     ```
 
-### Run command
-
-1. :pencil2: Run command.
+1. :pencil2: Run command for starting HTTP API.
    Note: **GIT_REPOSITORY_DIR** needs to be set.
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
-    ./resolver.py service \
-      --database-url "sqlite3://na:na@${SENZING_VAR_DIR}/sqlite/G2C.db" \
-      --data-dir ${SENZING_DATA_DIR} \
-      --etc-dir ${SENZING_ETC_DIR} \
-      --g2-dir ${SENZING_G2_DIR} \
-      --var-dir ${SENZING_VAR_DIR}
+    ./resolver.py service
+    ```
+
+1. Test HTTP API.
+   Note: **GIT_REPOSITORY_DIR** needs to be set.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve
     ```
 
 ## Demonstrate using Docker

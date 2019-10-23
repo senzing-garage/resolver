@@ -14,10 +14,17 @@ image.
 
 ## Set Environment variables
 
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export SENZING_G2_DIR=/opt/senzing/g2
+    ```
+
 1. Synthesize environment variables.
 
     ```console
-    export LD_LIBRARY_PATH=${SENZING_G2_DIR}/lib:${SENZING_G2_DIR}/lib/debian:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=${SENZING_G2_DIR}/lib:$LD_LIBRARY_PATH
     export PYTHONPATH=${SENZING_G2_DIR}/python
     ```
 
@@ -36,5 +43,5 @@ image.
 1. Run:
 
     ```console
-    pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
+    sudo pip3 install -r ${GIT_REPOSITORY_DIR}/requirements.txt
     ```
