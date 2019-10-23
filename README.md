@@ -164,6 +164,12 @@ The following software programs need to be installed:
       ~/init-container.py initialize
     ```
 
+1. XXX
+   Example:
+
+    ```console
+    sudo chown $(id -u):$(id -g) -R /var/opt/senzing
+    ```
 
 ### Run commands
 
