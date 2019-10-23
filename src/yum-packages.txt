@@ -1,6 +1,4 @@
 curl
 openssl-devel
 https://centos7.iuscommunity.org/ius-release.rpm
-python36u
-python36u-devel
-python36u-pip
+python3
