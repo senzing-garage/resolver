@@ -1,9 +1,0 @@
-image:
-  registry: ${DOCKER_REGISTRY_URL}
-
-imagePullSecrets:
-  - name: ${DOCKER_REGISTRY_SECRET}
-
-senzing:
-  optSenzingClaim: opt-senzing-claim
-  subcommand: install

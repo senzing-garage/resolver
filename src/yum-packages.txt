@@ -1,1 +1,4 @@
 curl
+openssl-devel
+https://centos7.iuscommunity.org/ius-release.rpm
+python3

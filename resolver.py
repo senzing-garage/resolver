@@ -37,7 +37,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-09-30'
+__updated__ = '2019-10-23'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -59,10 +59,10 @@ reserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
 
 config = {}
 configuration_locator = {
-    "config_path": {
-        "default": "/opt/senzing/g2/data",
-        "env": "SENZING_CONFIG_PATH",
-        "cli": "config-path"
+    "data_dir": {
+        "default": "/opt/senzing/data",
+        "env": "SENZING_DATA_DIR",
+        "cli": "data-dir"
     },
     "data_source": {
         "default": "TEST",
@@ -79,10 +79,20 @@ configuration_locator = {
         "env": "SENZING_ENTITY_TYPE",
         "cli": "entity-type"
     },
+    "etc_dir": {
+        "default": "/etc/opt/senzing",
+        "env": "SENZING_ETC_DIR",
+        "cli": "etc-dir"
+    },
     "g2_database_url_generic": {
-        "default": "sqlite3://na:na@/opt/senzing/g2/sqldb/G2C.db",
+        "default": "sqlite3://na:na@/var/opt/senzing/sqlite/G2C.db",
         "env": "SENZING_DATABASE_URL",
         "cli": "database-url"
+    },
+    "g2_dir": {
+        "default": "/opt/senzing/g2",
+        "env": "SENZING_G2_DIR",
+        "cli": "g2-dir"
     },
     "g2_internal_database": {
         "default": None,
@@ -105,14 +115,9 @@ configuration_locator = {
         "cli": "output-file"
     },
     "port": {
-        "default": 5000,
+        "default": 8252,
         "env": "SENZING_PORT",
         "cli": "port"
-    },
-    "senzing_dir": {
-        "default": "/opt/senzing",
-        "env": "SENZING_DIR",
-        "cli": "senzing-dir"
     },
     "sleep_time_in_seconds": {
         "default": 0,
@@ -123,11 +128,11 @@ configuration_locator = {
         "default": None,
         "env": "SENZING_SUBCOMMAND",
     },
-    "support_path": {
-        "default": "/opt/senzing/g2/data",
-        "env": "SENZING_SUPPORT_PATH",
-        "cli": "support-path"
-    }
+    "var_dir": {
+        "default": "/var/opt/senzing",
+        "env": "SENZING_VAR_DIR",
+        "cli": "var-dir"
+    },
 }
 
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
@@ -136,6 +141,8 @@ keys_to_redact = [
     "g2_database_url_generic",
     "g2_database_url_specific",
 ]
+
+keys_to_redact = []
 
 # Global cached objects
 
@@ -155,10 +162,10 @@ def get_parser():
         'file-input': {
             "help": 'File based input / output.',
             "arguments": {
-                "--config-path": {
-                    "dest": "config_path",
-                    "metavar": "SENZING_CONFIG_PATH",
-                    "help": "Location of Senzing's configuration template. Default: /opt/senzing/g2/data"
+                "--data-dir": {
+                    "dest": "data_dir",
+                    "metavar": "SENZING_DATA_DIR",
+                    "help": "Location of Senzing's data. Default: /opt/senzing/data"
                 },
                 "--data-source": {
                     "dest": "data_source",
@@ -174,6 +181,16 @@ def get_parser():
                     "dest": "debug",
                     "action": "store_true",
                     "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+                },
+                "--etc-dir": {
+                    "dest": "etc_dir",
+                    "metavar": "SENZING_ETC_DIR",
+                    "help": "Location of Senzing configuration. Default: /etc/opt/senzing"
+                },
+                "--g2-dir": {
+                    "dest": "g2_dir",
+                    "metavar": "SENZING_G2_DIR",
+                    "help": "Location of Senzing's G2. Default: /opt/senzing/g2"
                 },
                 "--input-file": {
                     "dest": "input_file",
@@ -185,25 +202,20 @@ def get_parser():
                     "metavar": "SENZING_OUTPUT_FILE",
                     "help": "File of JSON lines to be read. Default: resolver-output.json"
                 },
-                "--senzing-dir": {
-                    "dest": "senzing_dir",
-                    "metavar": "SENZING_DIR",
-                    "help": "Location of Senzing. Default: /opt/senzing"
-                },
-                "--support-path": {
-                    "dest": "support_path",
-                    "metavar": "SENZING_SUPPORT_PATH",
-                    "help": "Location of Senzing's support. Default: /opt/senzing/g2/data"
+                "--var-dir": {
+                    "dest": "var_dir",
+                    "metavar": "SENZING_VAR_DIR",
+                    "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
                 },
             },
         },
         'service': {
             "help": 'Receive HTTP requests.',
             "arguments": {
-                "--config-path": {
-                    "dest": "config_path",
-                    "metavar": "SENZING_CONFIG_PATH",
-                    "help": "Location of Senzing's configuration template. Default: /opt/senzing/g2/data"
+                "--data-dir": {
+                    "dest": "data_dir",
+                    "metavar": "SENZING_DATA_DIR",
+                    "help": "Location of Senzing's data. Default: /opt/senzing/data"
                 },
                 "--data-source": {
                     "dest": "data_source",
@@ -220,6 +232,16 @@ def get_parser():
                     "action": "store_true",
                     "help": "Enable debugging. (SENZING_DEBUG) Default: False"
                 },
+                "--etc-dir": {
+                    "dest": "etc_dir",
+                    "metavar": "SENZING_ETC_DIR",
+                    "help": "Location of Senzing configuration. Default: /etc/opt/senzing"
+                },
+                "--g2-dir": {
+                    "dest": "g2_dir",
+                    "metavar": "SENZING_G2_DIR",
+                    "help": "Location of Senzing's G2. Default: /opt/senzing/g2"
+                },
                 "--host": {
                     "dest": "host",
                     "metavar": "SENZING_HOST",
@@ -228,17 +250,12 @@ def get_parser():
                 "--port": {
                     "dest": "port",
                     "metavar": "SENZING_PORT",
-                    "help": "Port to listen on. Default: 8080"
+                    "help": "Port to listen on. Default: 8252"
                 },
-                "--senzing-dir": {
-                    "dest": "senzing_dir",
-                    "metavar": "SENZING_DIR",
-                    "help": "Location of Senzing. Default: /opt/senzing"
-                },
-                "--support-path": {
-                    "dest": "support_path",
-                    "metavar": "SENZING_SUPPORT_PATH",
-                    "help": "Location of Senzing's support. Default: /opt/senzing/g2/data"
+                "--var-dir": {
+                    "dest": "var_dir",
+                    "metavar": "SENZING_VAR_DIR",
+                    "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
                 },
             },
         },
@@ -313,7 +330,6 @@ message_dictionary = {
     "700": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "701": "Error '{0}' caused by {1} error '{2}'",
     "886": "G2Engine.addRecord() bad return code: {0}; JSON: {1}",
-    "887": "G2Engine.addRecord() TranslateG2ModuleException: {0}; JSON: {1}",
     "888": "G2Engine.addRecord() G2ModuleNotInitialized: {0}; JSON: {1}",
     "889": "G2Engine.addRecord() G2ModuleGenericException: {0}; JSON: {1}",
     "890": "G2Engine.addRecord() Exception: {0}; JSON: {1}",
@@ -346,7 +362,7 @@ def message_info(index, *args):
     return message_generic(MESSAGE_INFO, index, *args)
 
 
-def message_warn(index, *args):
+def message_warning(index, *args):
     return message_generic(MESSAGE_WARN, index, *args)
 
 
@@ -565,15 +581,23 @@ def get_configuration(args):
     # Special case: Determine absolute paths.
 
     paths = [
-        'config_path',
+        'data_dir',
+        'etc_dir',
+        'g2_dir',
         'input_file',
         'output_file',
-        'support_path',
+        'var_dir',
     ]
     for path in paths:
         relative_path = result.get(path)
         if relative_path:
             result[path] = os.path.abspath(relative_path)
+
+    # Special case: /opt/senzing/data/1.0.0
+
+    test_data_dir_path = "{0}/1.0.0".format(result.get('data_dir'))
+    if os.path.exists(test_data_dir_path):
+        result['data_dir'] = test_data_dir_path
 
     # Special case:  Tailored database URL
     # If requested, prepare internal database.
@@ -587,11 +611,11 @@ def get_configuration(args):
         except FileExistsError:
             pass
 
-        shutil.copyfile("/opt/senzing/g2/data/G2C.db", g2_internal_database_path)
+        g2_database_path = "{0}/sqlite/G2C.db".format(config.get('var_dir'))
+        shutil.copyfile(g2_database_path, g2_internal_database_path)
         config['g2_database_url_specific'] = "sqlite3://na:na@{0}".format(g2_internal_database_path)
     else:
         result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
-
     return result
 
 
@@ -606,9 +630,7 @@ def validate_configuration(config):
     subcommand = config.get('subcommand')
 
     if subcommand in ['service', 'file-input']:
-
-        if not config.get('senzing_dir'):
-            user_error_messages.append(message_error(414))
+        pass
 
     # Log warning messages.
 
@@ -628,7 +650,7 @@ def validate_configuration(config):
     # If there are error messages, exit.
 
     if len(user_error_messages) > 0:
-        exit_error(597)
+        exit_error(697)
 
 
 def redact_configuration(config):
@@ -803,8 +825,6 @@ class G2Client:
 
         try:
             self.g2_engine.purgeRepository()
-        except G2Exception.TranslateG2ModuleException as err:
-            logging.error(message_error(887, err, ""))
         except G2Exception.G2ModuleNotInitialized as err:
             exit_error(888, err, "")
         except Exception as err:
@@ -817,9 +837,6 @@ class G2Client:
 
         try:
             return_code = self.add_record(jsonline)
-        except G2Exception.TranslateG2ModuleException as err:
-            logging.error(message_error(887, err, jsonline))
-            self.add_record_to_failure_queue(jsonline)
         except G2Exception.G2ModuleNotInitialized as err:
             exit_error(888, err, jsonline)
         except G2Exception.G2ModuleGenericException as err:
@@ -869,9 +886,9 @@ class G2Initializer:
         try:
             return_code = self.g2_config.save(config_handle, configuration_bytearray)
         except Exception as err:
-            raise Exception("G2Confg.save({0}, {1}) failed".format(config_handle, configuration_bytearray)) from err
+            raise Exception("G2Config.save({0}, {1}) failed".format(config_handle, configuration_bytearray)) from err
         if return_code != 0:
-            raise Exception("G2Confg.save({0}, {1}) return code {2}".format(config_handle, configuration_bytearray, return_code)) from err
+            raise Exception("G2Config.save({0}, {1}) return code {2}".format(config_handle, configuration_bytearray, return_code)) from err
 
         self.g2_config.close(config_handle)
 
@@ -962,8 +979,9 @@ def get_g2_configuration_dictionary(config):
     ''' Construct a dictionary in the form of the old ini files. '''
     result = {
         "PIPELINE": {
-            "SUPPORTPATH": config.get("support_path"),
-            "CONFIGPATH": config.get("config_path")
+            "CONFIGPATH": config.get("etc_dir"),
+            "RESOURCEPATH": "{0}/resources".format(config.get("g2_dir")),
+            "SUPPORTPATH": config.get("data_dir"),
         },
         "SQL": {
             "CONNECTION": config.get("g2_database_url_specific"),
