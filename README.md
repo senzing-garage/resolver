@@ -47,13 +47,11 @@ To see the options for a subcommand, run commands like:
     1. [Space](#space)
     1. [Time](#time)
     1. [Background knowledge](#background-knowledge)
-1. [Preparation](#preparation)
+1. [Demonstrate using Command Line](#demonstrate-using-command-line)
     1. [Prerequisite software](#prerequisite-software)
     1. [Clone repository](#clone-repository)
-    1. [Volumes](#volumes)
-1. [Demonstrate using Command Line](#demonstrate-using-command-line)
     1. [Install](#install)
-    1. [Run command](#run-command)
+    1. [Run commands](#run-commands)
 1. [Demonstrate using Docker](#demonstrate-using-docker)
     1. [Initialize Senzing](#initialize-senzing)
     1. [Configuration](#configuration)
@@ -61,6 +59,7 @@ To see the options for a subcommand, run commands like:
     1. [Docker network](#docker-network)
     1. [Docker user](#docker-user)
     1. [Run docker container](#run-docker-container)
+
 1. [Demonstrate using Helm](#demonstrate-using-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
     1. [Create custom helm values files](#create-custom-helm-values-files)
@@ -394,7 +393,7 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
-    sudo docker pull senzing/resolver:1.0.1
+    sudo docker pull senzing/resolver:1.1.0
     sudo docker pull senzing/senzing-debug:1.1.0
     sudo docker pull store/senzing/senzing-package:1.10.19214
     ```
@@ -416,9 +415,9 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
-      "senzing/resolver:1.0.1" \
+      "senzing/resolver:1.1.0" \
       "senzing/senzing-debug:1.1.0" \
-      "store/senzing/senzing-package:1.10.19214" \
+      "senzing/yum:1.1.1" \
     )
 
     for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
