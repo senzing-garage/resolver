@@ -564,7 +564,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
 1. Reference: [helm repo](https://helm.sh/docs/helm/#helm-repo)
 
-### Deploy Senzing_API.tgz package
+### Deploy Senzing package
 
 This deployment initializes the Persistent Volume with Senzing code and data.
 
@@ -573,10 +573,10 @@ This deployment initializes the Persistent Volume with Senzing code and data.
 
     ```console
     helm install \
-      --name ${DEMO_PREFIX}-senzing-package \
+      --name ${DEMO_PREFIX}-senzing-yum \
       --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-package.yaml \
-      senzing/senzing-package
+      --values ${HELM_VALUES_DIR}/senzing-yum.yaml \
+      senzing/senzing-yum
     ```
 
 1. Wait until Job has completed.
