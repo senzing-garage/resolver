@@ -5,7 +5,12 @@ image:
 imagePullSecrets:
   - name: ${DOCKER_REGISTRY_SECRET}
 
+securityContext:
+  enabled: true
+  runAsUser: 0
+  runAsGroup: 0
+  fsGroup: 0
+
 senzing:
-  debug: 1
+  acceptEula: ${SENZING_ACCEPT_EULA}
   persistentVolumeClaim: senzing-persistent-volume-claim
-  subcommand: service
