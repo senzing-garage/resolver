@@ -225,7 +225,7 @@ The following examples show how to identify each output directory.
    Example:
 
     ```console
-    sudo chmod -R 777 ${SENZING_VAR_DIR}
+    sudo chown $(id -u):$(id -g) -R ${SENZING_VAR_DIR}
     ```
 
 ### Docker network
