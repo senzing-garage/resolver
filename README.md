@@ -395,7 +395,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     ```console
     sudo docker pull senzing/resolver:1.1.0
     sudo docker pull senzing/senzing-debug:1.1.0
-    sudo docker pull store/senzing/senzing-package:1.10.19214
+    sudo docker pull senzing/yum:1.1.1
     ```
 
 #### Docker registry
