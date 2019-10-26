@@ -394,9 +394,6 @@ The Git repository has files that will be used in the `helm install --values` pa
 
 #### Senzing docker images
 
-1. Accept End User License Agreement (EULA) for `store/senzing/senzing-package` docker image.
-    1. Visit [HOWTO - Accept EULA](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/accept-eula.md#storesenzingsenzing-package-docker-image).
-
 1. Pull images from DockerHub.
    Example:
 
