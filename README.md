@@ -736,7 +736,7 @@ This deployment launches the resolver.
 
 ### Install senzing-debug Helm chart
 
-If debugging is needed, the `senzing/senzing-debug` chart will help with:
+:thinking: **Optional:** If debugging is needed, the `senzing/senzing-debug` chart will help with:
 
 - Inspecting the `/opt/senzing` volume
 - Debugging general issues
