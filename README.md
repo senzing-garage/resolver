@@ -659,7 +659,7 @@ This deployment launches the resolver.
     kubectl port-forward \
       --address 0.0.0.0 \
       --namespace ${DEMO_NAMESPACE} \
-      svc/${DEMO_PREFIX}-resolver 5001:5000
+      svc/${DEMO_PREFIX}-resolver 8252:8252
     ```
 
 1. Test HTTP API.
@@ -670,7 +670,7 @@ This deployment launches the resolver.
     curl -X POST \
       --header "Content-Type: text/plain" \
       --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:5001/resolve
+      http://localhost:8252/resolve
     ```
 
 ### Install senzing-debug Helm chart
