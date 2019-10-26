@@ -406,8 +406,8 @@ The Git repository has files that will be used in the `helm install --values` pa
 
 #### Docker registry
 
-:thinking: The public DockerHub (docker.io) registry or a private docker registry may be used.
-Use one of the two options to specify which docker registry to use.
+:thinking: Either the public DockerHub (docker.io) registry or a private docker registry may be used.
+By using one of the two options, specify the docker registry.
 
 ##### Public docker registry
 
