@@ -675,6 +675,13 @@ The init-container creates files from templates and initializes the G2 database.
       --watch
     ```
 
+1. Example of completion:
+
+    ```console
+    NAME                              READY   STATUS      RESTARTS   AGE
+    my-senzing-init-container-mtzqv   0/1     Completed   0          72s
+    ```
+
 ### Deploy resolver
 
 This deployment launches the resolver.
