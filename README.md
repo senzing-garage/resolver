@@ -393,6 +393,7 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
+    sudo docker pull senzing/init-container:1.3.1
     sudo docker pull senzing/resolver:1.1.0
     sudo docker pull senzing/senzing-debug:1.2.1
     sudo docker pull senzing/yum:1.1.1
@@ -415,6 +416,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
+      "senzing/init-container:1.3.1" \
       "senzing/resolver:1.1.0" \
       "senzing/senzing-debug:1.2.1" \
       "senzing/yum:1.1.1" \
