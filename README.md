@@ -406,6 +406,25 @@ The Git repository has files that will be used in the `helm install --values` pa
 
 #### Docker registry
 
+:thinking: The public DockerHub (docker.io) registry or a private docker registry may be used.
+Use one of the two options to specify which docker registry to use.
+
+##### Public docker registry
+
+**Option #1:** Use public DockerHub registry.
+
+1. :pencil2: Set environment variables.
+   Example:
+
+    ```console
+    export DOCKER_REGISTRY_URL=docker.io
+    export DOCKER_REGISTRY_SECRET=${DOCKER_REGISTRY_URL}-secret
+    ```
+
+##### Private docker registry
+
+**Option #2:** Add docker images to private docker registry.
+
 1. If you need to create a private docker registry, see
        [HOWTO - Install docker registry server](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker-registry-server.md).
 
@@ -414,6 +433,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export DOCKER_REGISTRY_URL=my.docker-registry.com:5000
+    export DOCKER_REGISTRY_SECRET=${DOCKER_REGISTRY_URL}-secret
     ```
 
 1. Add Senzing docker images to private docker registry.
@@ -434,6 +454,7 @@ The Git repository has files that will be used in the `helm install --values` pa
       sudo docker rmi  ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
     done
     ```
+
 ### EULA
 
 To use the Senzing code, you must agree to the End User License Agreement (EULA).
@@ -459,9 +480,6 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
     ```console
     export DEMO_PREFIX=my
     export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
-
-    export DOCKER_REGISTRY_URL=docker.io
-    export DOCKER_REGISTRY_SECRET=${DOCKER_REGISTRY_URL}-secret
     ```
 
 1. Set environment variables listed in "[Clone repository](#clone-repository)".
@@ -632,7 +650,6 @@ Only one method needs to be performed.
     NAME                       READY   STATUS      RESTARTS   AGE
     my-senzing-yum-8n2ql       0/1     Completed   0          2m44s
     ```
-
 
 ### Install init-container Helm chart
 
