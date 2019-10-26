@@ -727,7 +727,8 @@ If debugging is needed, the `senzing/senzing-debug` chart will help with:
     ```console
     helm delete --purge ${DEMO_PREFIX}-senzing-debug
     helm delete --purge ${DEMO_PREFIX}-resolver
-    helm delete --purge ${DEMO_PREFIX}-senzing-package
+    helm delete --purge ${DEMO_PREFIX}-senzing-init-container
+    helm delete --purge ${DEMO_PREFIX}-senzing-yum
     helm repo remove senzing
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-opt-senzing.yaml
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-opt-senzing.yaml
