@@ -595,6 +595,30 @@ This deployment initializes the Persistent Volume with Senzing code and data.
     my-senzing-package-8n2ql   0/1     Completed   0          2m44s
     ```
 
+### Install init-container Helm chart
+
+The init-container creates files from templates and initializes the G2 database.
+
+1. Install chart.
+   Example:
+
+    ```console
+    helm install \
+      --name ${DEMO_PREFIX}-senzing-init-container \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${HELM_VALUES_DIR}/init-container.yaml \
+      senzing/senzing-init-container
+    ```
+
+1. Wait for pods to run.
+   Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
+
 ### Deploy resolver
 
 This deployment launches the resolver.
