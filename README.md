@@ -78,6 +78,14 @@ To see the options for a subcommand, run commands like:
 1. [Errors](#errors)
 1. [References](#references)
 
+### Legend
+
+1. :thinking: - A "thinker" icon means that a little extra thinking may be required.
+   Perhaps you'll need to make some choices.
+   Perhaps it's an optional step.
+1. :pencil2: - A "pencil" icon means that the instructions may need modification before performing.
+1. :warning: - A "warning" icon means that something tricky is happening, so pay attention.
+
 ## Expectations
 
 ### Space
@@ -359,7 +367,7 @@ This Option uses file input and output.
     Alternative:
 
     ```console
-    minikube start --cpus 4 --memory 8192 --vm-driver kvm2
+    minikube start --cpus 4 --memory 8192 --disk-size=50g --vm-driver kvm2
     ```
 
 #### Helm/Tiller
@@ -429,18 +437,45 @@ The Git repository has files that will be used in the `helm install --values` pa
       sudo docker rmi  ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE_NAME}; \
     done
     ```
+### EULA
 
-### Create custom helm values files
+To use the Senzing code, you must agree to the End User License Agreement (EULA).
 
-1. :pencil2: Set environment variables.
+1. :warning: This step is intentionally tricky and not simply copy/paste.
+   This ensures that you make a conscious effort to accept the EULA.
+   See
+   [SENZING_ACCEPT_EULA](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_accept_eula)
+   for the correct value.
+   Replace the double-quote character in the example with the correct value.
+   The use of the double-quote character is intentional to prevent simple copy/paste.
    Example:
 
     ```console
-    export DOCKER_REGISTRY_SECRET=my-registry-secret
-    export DOCKER_REGISTRY_URL=docker.io
+    export SENZING_ACCEPT_EULA="
     ```
 
-1. Option #1. Quick method using `envsubst`.
+### Set environment variables
+
+1. :pencil2: Environment variables that need customization.
+   Example:
+
+    ```console
+    export DEMO_PREFIX=my
+    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
+
+    export DOCKER_REGISTRY_URL=docker.io
+    export DOCKER_REGISTRY_SECRET=${DOCKER_REGISTRY_URL}-secret
+    ```
+
+1. Set environment variables listed in "[Clone repository](#clone-repository)".
+
+### Create custom helm values files
+
+:thinking: In this step, Helm template files are populated with actual values.
+There are two methods of accomplishing this.
+Only one method needs to be performed.
+
+1. **Method #1:** Quick method using `envsubst`.
    Example:
 
     ```console
@@ -453,7 +488,8 @@ The Git repository has files that will be used in the `helm install --values` pa
     done
     ```
 
-1. Option #2. Copy and modify method.
+1. **Method #2:** Copy and manually modify files method.
+   Example:
 
     ```console
     export HELM_VALUES_DIR=${GIT_REPOSITORY_DIR}/helm-values
@@ -464,20 +500,18 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     :pencil2: Edit files in ${HELM_VALUES_DIR} replacing the following variables with actual values.
 
+    1. `${DEMO_PREFIX}`
     1. `${DOCKER_REGISTRY_SECRET}`
     1. `${DOCKER_REGISTRY_URL}`
+    1. `${SENZING_ACCEPT_EULA}`
 
 ### Create custom kubernetes configuration files
 
-1. :pencil2: Set environment variables.
-   Example:
+:thinking: In this step, Kubernetes template files are populated with actual values.
+There are two methods of accomplishing this.
+Only one method needs to be performed.
 
-    ```console
-    export DEMO_PREFIX=my
-    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
-    ```
-
-1. Option #1. Quick method using `envsubst`.
+1. **Method #1:** Quick method using `envsubst`.
    Example:
 
     ```console
@@ -490,7 +524,8 @@ The Git repository has files that will be used in the `helm install --values` pa
     done
     ```
 
-1. Option #2. Copy and modify method.
+1. **Method #2:** Copy and manually modify files method.
+   Example:
 
     ```console
     export KUBERNETES_DIR=${GIT_REPOSITORY_DIR}/kubernetes
@@ -506,12 +541,14 @@ The Git repository has files that will be used in the `helm install --values` pa
 ### Create namespace
 
 1. Create namespace.
+   Example:
 
     ```console
     kubectl create -f ${KUBERNETES_DIR}/namespace.yaml
     ```
 
-1. Optional: Review namespaces.
+1. :thinking: **Optional:**
+   Review namespaces.
 
     ```console
     kubectl get namespaces
@@ -533,7 +570,8 @@ The Git repository has files that will be used in the `helm install --values` pa
     kubectl create -f ${KUBERNETES_DIR}/persistent-volume-claim-senzing.yaml
     ```
 
-1. Optional: Review persistent volumes and claims.
+1. :thinking: **Optional:**
+   Review persistent volumes and claims.
 
     ```console
     kubectl get persistentvolumes \
@@ -553,12 +591,15 @@ The Git repository has files that will be used in the `helm install --values` pa
     ```
 
 1. Update repositories.
+   Example:
 
     ```console
     helm repo update
     ```
 
-1. Optional: Review repositories
+1. :thinking: **Optional:**
+   Review repositories.
+   Example:
 
     ```console
     helm repo list
@@ -566,9 +607,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
 1. Reference: [helm repo](https://helm.sh/docs/helm/#helm-repo)
 
-### Deploy Senzing package
-
-This deployment initializes the Persistent Volume with Senzing code and data.
+### Deploy Senzing RPM
 
 1. Install chart.
    Example:
@@ -594,8 +633,9 @@ This deployment initializes the Persistent Volume with Senzing code and data.
 
     ```console
     NAME                       READY   STATUS      RESTARTS   AGE
-    my-senzing-package-8n2ql   0/1     Completed   0          2m44s
+    my-senzing-yum-8n2ql       0/1     Completed   0          2m44s
     ```
+
 
 ### Install init-container Helm chart
 
