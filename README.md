@@ -71,8 +71,8 @@ To see the options for a subcommand, run commands like:
     1. [Install senzing-debug Helm chart](#install-senzing-debug-helm-chart)
     1. [Cleanup](#cleanup)
 1. [Develop](#develop)
-    1. [Prerequisite software](#prerequisite-software)
-    1. [Clone repository](#clone-repository)
+    1. [Prerequisite software for development](#prerequisite-software-for-development)
+    1. [Clone repository for development](#clone-repository-for-development)
     1. [Build docker image for development](#build-docker-image-for-development)
 1. [Examples](#examples)
 1. [Errors](#errors)
@@ -264,14 +264,21 @@ The following examples show how to identify each output directory.
 ### Docker user
 
 :thinking: **Optional:**  The docker container runs as "USER 1001".
-Use if a different userid is required.
+Use if a different userid (UID) is required.
 
-1. :pencil2: Identify user.
+1. :pencil2: Manually identify user.
    User "0" is root.
    Example:
 
     ```console
     export SENZING_RUNAS_USER="0"
+    ```
+
+   Another option, use current user.
+   Example:
+
+    ```console
+    export SENZING_RUNAS_USER=$(id -u)
     ```
 
 1. Construct parameter for `docker run`.
@@ -292,8 +299,6 @@ This Option starts a micro-service supporting HTTP requests.
 
     ```console
     sudo docker run \
-      ${SENZING_RUNAS_USER_PARAMETER} \
-      ${SENZING_NETWORK_PARAMETER} \
       --interactive \
       --publish 8252:8252 \
       --rm \
@@ -302,6 +307,8 @@ This Option starts a micro-service supporting HTTP requests.
       --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+      ${SENZING_NETWORK_PARAMETER} \
+      ${SENZING_RUNAS_USER_PARAMETER} \
       senzing/resolver
     ```
 
@@ -327,19 +334,19 @@ This Option uses file input and output.
     export DATA_DIR=${GIT_REPOSITORY_DIR}/test
     ```
 
-1. Run the docker container.
+1. Run docker container.
    Example:
 
     ```console
     sudo docker run \
-      ${SENZING_RUNAS_USER_PARAMETER} \
-      ${SENZING_NETWORK_PARAMETER} \
       --rm \
       --volume ${DATA_DIR}:/data \
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
       --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+      ${SENZING_NETWORK_PARAMETER} \
+      ${SENZING_RUNAS_USER_PARAMETER} \
       senzing/resolver file-input \
         --input-file  /data/test-data-1.json \
         --output-file /data/my-output.json
@@ -838,7 +845,9 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
 1. **Option #1:** Using `docker` command and GitHub.
 
     ```console
-    sudo docker build --tag senzing/resolver https://github.com/senzing/resolver.git
+    sudo docker build 
+      --tag senzing/resolver \
+      https://github.com/senzing/resolver.git
     ```
 
 1. **Option #2:** Using `docker` command and local repository.
