@@ -448,10 +448,10 @@ By using one of the two options, specify the docker registry.
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
-      "senzing/init-container:1.3.1" \
-      "senzing/resolver:1.1.0" \
-      "senzing/senzing-debug:1.2.1" \
-      "senzing/yum:1.1.1" \
+      "senzing/init-container:1.4.0" \
+      "senzing/resolver:1.1.1" \
+      "senzing/senzing-debug:1.2.2" \
+      "senzing/yum:1.1.2" \
     )
 
     for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
