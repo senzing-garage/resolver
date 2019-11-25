@@ -47,7 +47,7 @@ docker-rmi-for-build-development-cache:
 	-docker rmi --force $(DOCKER_IMAGE_TAG)
 
 .PHONY: clean
-clean: docker-rmi-for-build docker-rmi-for-build-base
+clean: docker-rmi-for-build docker-rmi-for-build-development-cache
 
 # -----------------------------------------------------------------------------
 # Help
