@@ -845,7 +845,7 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
 1. **Option #1:** Using `docker` command and GitHub.
 
     ```console
-    sudo docker build 
+    sudo docker build
       --tag senzing/resolver \
       https://github.com/senzing/resolver.git
     ```
