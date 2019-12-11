@@ -1,5 +1,5 @@
-# docker-template
+# resolver
 
 Placeholder for [GitHub pages](https://pages.github.com/).
 
-See [https://senzing.github.io/docker-template](https://senzing.github.io/docker-template).
+See [https://senzing.github.io/resolver](https://senzing.github.io/resolver).
