@@ -1,6 +1,6 @@
 image:
   registry: ${DOCKER_REGISTRY_URL}
-  tag: 1.4.0
+  tag: 1.4.2
 
 securityContext:
   enabled: true

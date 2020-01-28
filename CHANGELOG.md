@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2020-01-28
+
+### Changed in 1.1.3
+
+- Return HTTP 400 upon error.  HTTP response contains error message.
+- Separate `data_source` and `entity_type` processing
+
 ## [1.1.2] - 2019-12-30
 
 ### Changed in 1.1.2
