@@ -35,9 +35,9 @@ from flask_api import status
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "1.2.0"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.1.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2019-12-30'
+__updated__ = '2020-01-28'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -307,10 +307,17 @@ MESSAGE_DEBUG = 900
 
 message_dictionary = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
-    "101": "Adding datasource '{0}'",
+    "101": "Adding data source '{0}'",
     "102": "Adding entity type '{0}'",
     "103": "Processed {0} input records which resolved to {1} entities.",
-    "104": "Adding datasources: {0}",
+    "104": "Adding data sources: {0}",
+    "105": "Could not add data source '{0}'. Error: {1}",
+    "106": "Could not add entity type '{0}'. Error: {1}",
+    "109": "Initial data sources: {0}",
+    "110": "Initial entity types: {0}",
+    "111": "Adding data source '{0}'. Response: {1}",
+    "112": "Adding entity type '{0}'. Response: {1}",
+    "121": "Adding record to failure queue: {0}",
     "292": "Configuration change detected.  Old: {0} New: {1}",
     "293": "For information on warnings and errors, see https://github.com/Senzing/resolver#errors",
     "294": "Version: {0}  Updated: {1}",
@@ -343,6 +350,7 @@ message_dictionary = {
     "898": "Could not initialize G2Engine with '{0}'. Error: {1}",
     "899": "{0}",
     "900": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}D",
+    "998": "Debugging enabled.",
     "999": "{0}",
 }
 
@@ -676,37 +684,45 @@ class G2Client:
         self.g2_configuration_manager = g2_configuration_manager
         self.g2_engine = g2_engine
         self.data_sources = self.get_data_sources_list()
-        self.entity_types = self.data_sources.copy()
+        self.entity_types = self.get_entity_types_list()
 
     def add_data_source(self, data_source):
         ''' Add a data source to G2 configuration. '''
 
-        config_handle = self.get_config_handle()
-
         # Add data sources to configuration.
 
-        self.g2_config.addDataSource(config_handle, data_source)
-        logging.info(message_info(101, data_source))
-        configuration_comment = message(101, data_source)
+        config_handle = self.get_config_handle()
+        data_source_dictionary = {
+            "DSRC_CODE": data_source
+        }
+        data_source_json = json.dumps(data_source_dictionary)
+        response_bytearray = bytearray()
+        self.g2_config.addDataSourceV2(config_handle, data_source_json, response_bytearray)
+        logging.info(message_info(111, data_source, response_bytearray.decode()))
 
         # Push configuration to database.
 
+        configuration_comment = message(101, data_source)
         self.persist_configuration(config_handle, configuration_comment)
 
     def add_entity_type(self, entity_type):
         ''' Add an entity type to G2 configuration. '''
 
-        config_handle = self.get_config_handle()
-
         # Add entity type to configuration.
-        # Hack: G2Config.addDataSource() is used to create entity type.
 
-        self.g2_config.addDataSource(config_handle, entity_type)
-        logging.info(message_info(102, entity_type))
-        configuration_comment = message(102, entity_type)
+        config_handle = self.get_config_handle()
+        entity_type_dictionary = {
+            "ETYPE_CODE": entity_type,
+            "ECLASS_CODE": "ACTOR"
+        }
+        entity_type_json = json.dumps(entity_type_dictionary)
+        response_bytearray = bytearray()
+        self.g2_config.addEntityTypeV2(config_handle, entity_type_json, response_bytearray)
+        logging.info(message_info(112, entity_type, response_bytearray))
 
         # Push configuration to database.
 
+        configuration_comment = message(102, entity_type)
         self.persist_configuration(config_handle, configuration_comment)
 
     def add_record(self, jsonline):
@@ -717,19 +733,23 @@ class G2Client:
         entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
         record_id = str(json_dictionary.get('RECORD_ID'))
 
-        # Determine if it's a new data_source or entity_type.
-        # Hack.  Since G2Config.addDataSource() creates a datasource and an entity_type
-        #        of the same "name", the two lists are currently synonymous.
+        # Determine if it's a new data_source.
 
         if data_source not in self.data_sources:
-            self.add_data_source(data_source)
             self.data_sources.append(data_source)
-            self.entity_types.append(data_source)  # Hack.
+            try:
+                self.add_data_source(data_source)
+            except Exception as err:
+                logging.info(message_info(105, data_source, err))
+
+        # Determine if it's a new entity_type.
 
         if entity_type not in self.entity_types:
-            self.add_entity_type(entity_type)
             self.entity_types.append(entity_type)
-            self.data_sources.append(entity_type)  # Hack.
+            try:
+                self.add_entity_type(entity_type)
+            except Exception as err:
+                logging.info(message_info(106, entity_type, err))
 
         # Run G2Engine.addRecord().
 
@@ -769,15 +789,19 @@ class G2Client:
 
     def get_data_sources_list(self):
         ''' Determine data_sources already defined. '''
-
         config_handle = self.get_config_handle()
-
-        # Get list of existing datasources.
-
         datasources_bytearray = bytearray()
-        return_code = self.g2_config.listDataSources(config_handle, datasources_bytearray)
+        return_code = self.g2_config.listDataSourcesV2(config_handle, datasources_bytearray)
         datasources_dictionary = json.loads(datasources_bytearray.decode())
-        return datasources_dictionary.get('DSRC_CODE', [])
+        return [x.get("DSRC_CODE") for x in datasources_dictionary.get("DATA_SOURCES")]
+
+    def get_entity_types_list(self):
+        ''' Determine entity_types already defined. '''
+        config_handle = self.get_config_handle()
+        entity_types_bytearray = bytearray()
+        return_code = self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
+        entity_types_dictionary = json.loads(entity_types_bytearray.decode())
+        return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES")]
 
     def get_resolved_entities(self):
         ''' Run G2Engine.exportJSONEngineReport(). '''
@@ -1263,6 +1287,7 @@ if __name__ == "__main__":
     log_level_parameter = os.getenv("SENZING_LOG_LEVEL", "info").lower()
     log_level = log_level_map.get(log_level_parameter, logging.INFO)
     logging.basicConfig(format=log_format, level=log_level)
+    logging.debug(message_debug(998))
 
     # Trap signals temporarily until args are parsed.
 
@@ -1303,7 +1328,7 @@ if __name__ == "__main__":
     # Test to see if function exists in the code.
 
     if subcommand_function_name not in globals():
-        logging.warning(message_warning(596, subcommand))
+        logging.warning(message_warning(696, subcommand))
         parser.print_help()
         exit_silently()
 
