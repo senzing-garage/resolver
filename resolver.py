@@ -336,6 +336,16 @@ message_dictionary = {
     "699": "{0}",
     "700": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "701": "Error '{0}' caused by {1} error '{2}'",
+    "702": "G2Engine.purgeRepository() Exception: {0}",
+    "703": "G2Engine.purgeRepository() G2ModuleNotInitialized: {0}",
+    "704": "G2ConfigMgr.getDefaultConfigID({0}) return code {1}",
+    "705": "G2ConfigMgr.getDefaultConfigID({0}) failed. Error: {1}",
+    "706": "G2Config.save({0}, {1}) return code {2}",
+    "707": "G2Config.save({0}, {1}) failed. Error: {2}",
+    "708": "G2ConfigMgr.addConfig({0}, {1}, {2}) return code {3}",
+    "709": "G2ConfigMgr.addConfig({0}, {1}, {2}) failed. Error: {3}",
+    "710": "G2ConfigMgr.setDefaultConfigID({0}) return code {1}",
+    "711": "G2ConfigMgr.setDefaultConfigID({0}) failed. Error: {1}",
     "886": "G2Engine.addRecord() bad return code: {0}; JSON: {1}",
     "888": "G2Engine.addRecord() G2ModuleNotInitialized: {0}; JSON: {1}",
     "889": "G2Engine.addRecord() G2ModuleGenericException: {0}; JSON: {1}",
@@ -753,12 +763,7 @@ class G2Client:
 
         # Run G2Engine.addRecord().
 
-        return_code = 0
-        try:
-            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
-        except Exception as err:
-            raise err
-        return return_code
+        return self.g2_engine.addRecord(data_source, record_id, jsonline)
 
     def add_record_to_failure_queue(self, jsonline):
         ''' Handle records that fail to be inserted into Senzing. '''
@@ -806,7 +811,7 @@ class G2Client:
     def get_resolved_entities(self):
         ''' Run G2Engine.exportJSONEngineReport(). '''
 
-        # Prime the pump.
+        # Get the raw report.
 
         result = []
         flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_FORMAT
@@ -851,9 +856,10 @@ class G2Client:
         try:
             self.g2_engine.purgeRepository()
         except G2Exception.G2ModuleNotInitialized as err:
-            exit_error(888, err, "")
+            exit_error(703, err)
         except Exception as err:
-            logging.error(message_error(890, err, ""))
+            logging.error(message_error(702, err))
+            raise err
 
     def send_jsonline_to_g2_engine(self, jsonline):
         ''' Send the JSONline to G2 engine. '''
@@ -863,17 +869,17 @@ class G2Client:
         try:
             return_code = self.add_record(jsonline)
             if return_code != 0:
-                exit_error(886, return_code, method, parameters)
+                raise Exception(message_error(886, return_code, jsonline))
         except G2Exception.G2ModuleNotInitialized as err:
             exit_error(888, err, jsonline)
         except G2Exception.G2ModuleGenericException as err:
             logging.error(message_error(889, err, jsonline))
             self.add_record_to_failure_queue(jsonline)
+            raise err
         except Exception as err:
             logging.error(message_error(890, err, jsonline))
             self.add_record_to_failure_queue(jsonline)
-
-        logging.debug(message_debug(904, "", jsonline))
+            raise err
 
 # -----------------------------------------------------------------------------
 # Class: G2Client
@@ -895,9 +901,12 @@ class G2Initializer:
         try:
             return_code = self.g2_configuration_manager.getDefaultConfigID(default_config_id_bytearray)
             if return_code != 0:
-                raise Exception("G2ConfigMgr.getDefaultConfigID({0}) return code {1}".format(default_config_id_bytearray, return_code)) from err
+                err_message = message_error(704, default_config_id_bytearray, return_code)
+                logging.error(err_message)
+                raise Exception(err_message)
         except Exception as err:
-            raise Exception("G2ConfigMgr.getDefaultConfigID({0}) failed".format(default_config_id_bytearray)) from err
+            logging.error(message_error(705, default_config_id_bytearray, err))
+            raise err
 
         # If a default configuration exists, there is nothing more to do.
 
@@ -911,9 +920,12 @@ class G2Initializer:
         try:
             return_code = self.g2_config.save(config_handle, configuration_bytearray)
             if return_code != 0:
-                raise Exception("G2Config.save({0}, {1}) return code {2}".format(config_handle, configuration_bytearray, return_code)) from err
+                err_message = message_error(706, config_handle, configuration_bytearray, return_code)
+                logging.error(err_message)
+                raise Exception(err_message)
         except Exception as err:
-            raise Exception("G2Config.save({0}, {1}) failed".format(config_handle, configuration_bytearray)) from err
+            logging.error(message_error(707, config_handle, configuration_bytearray, err))
+            raise err
 
         self.g2_config.close(config_handle)
 
@@ -924,18 +936,24 @@ class G2Initializer:
         try:
             return_code = self.g2_configuration_manager.addConfig(configuration_bytearray.decode(), config_comment, new_config_id)
             if return_code != 0:
-                raise Exception("G2ConfigMgr.addConfig({0}, {1}, {2}) return code {3}".format(configuration_bytearray.decode(), config_comment, new_config_id, return_code)) from err
+                err_message = message_error(708, configuration_bytearray.decode(), config_comment, new_config_id, return_code)
+                logging.error(err_message)
+                raise Exception(err_message)
         except Exception as err:
-            raise Exception("G2ConfigMgr.addConfig({0}, {1}, {2}) failed".format(configuration_bytearray.decode(), config_comment, new_config_id)) from err
+            logging.error(message_error(709, configuration_bytearray.decode(), config_comment, new_config_id, err))
+            raise err
 
         # Set the default configuration ID.
 
         try:
             return_code = self.g2_configuration_manager.setDefaultConfigID(new_config_id)
             if return_code != 0:
-                raise Exception("G2ConfigMgr.setDefaultConfigID({0}) return code {1}".format(new_config_id, return_code)) from err
+                err_message = message_error(710, new_config_id, return_code)
+                logging.error(err_message)
+                raise Exception(err_message)
         except Exception as err:
-            raise Exception("G2ConfigMgr.setDefaultConfigID({0}) failed".format(new_config_id)) from err
+            logging.error(message_error(711, new_config_id, err))
+            raise err
 
 # -----------------------------------------------------------------------------
 # Utility functions
@@ -1101,10 +1119,7 @@ def handle_post_resolver(iterator):
     # Initialize G2 database.
 
     g2_initializer = G2Initializer(g2_configuration_manager, g2_config)
-    try:
-        g2_initializer.initialize()
-    except Exception as err:
-        logging.error(message_error(701, err, type(err.__cause__), err.__cause__))
+    g2_initializer.initialize()
 
     # Create G2 engine object.
 
@@ -1128,11 +1143,11 @@ def handle_post_resolver(iterator):
     # Get results from Senzing G2.
 
     result = g2_client.get_resolved_entities()
-    logging.info(message_info(103, line_count, len(result)))
 
     # Purge G2 database.
 
     g2_client.purge_repository()
+    logging.info(message_info(103, line_count, len(result)))
 
     return result
 
@@ -1144,16 +1159,29 @@ def handle_post_resolver(iterator):
 @app.route("/resolve", methods=['POST'])
 def http_post_resolve():
 
-    # Interact with Senzing.
+    # Initialize HTTP response variables.
 
-    payload = flask_request.get_data(as_text=True)
-    response = handle_post_resolver(payload.splitlines())
-
-    # Craft the HTTP response.
-
-    response_pretty = json.dumps(response, sort_keys=True)
+    response_pretty = ""
     response_status = status.HTTP_200_OK
     mimetype = 'application/json'
+
+    # Get POST payload.
+
+    payload = flask_request.get_data(as_text=True)
+
+    # Create HTTP response.
+
+    try:
+        response = handle_post_resolver(payload.splitlines())
+        response_pretty = json.dumps(response, sort_keys=True)
+    except Exception as err:
+        response_status = status.HTTP_400_BAD_REQUEST
+        response_dictionary = {
+            "status": "error",
+            "message": "{0}".format(err)
+        }
+        response_pretty = json.dumps(response_dictionary, sort_keys=True)
+
     return Response(response=response_pretty, status=response_status, mimetype=mimetype)
 
 # -----------------------------------------------------------------------------
