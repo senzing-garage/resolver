@@ -35,7 +35,7 @@ from flask_api import status
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "1.2.0"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.1.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
 __updated__ = '2020-01-28'
 
@@ -350,6 +350,7 @@ message_dictionary = {
     "898": "Could not initialize G2Engine with '{0}'. Error: {1}",
     "899": "{0}",
     "900": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}D",
+    "998": "Debugging enabled.",
     "999": "{0}",
 }
 
@@ -732,7 +733,7 @@ class G2Client:
         entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
         record_id = str(json_dictionary.get('RECORD_ID'))
 
-        # Determine if it's a new data_source or entity_type.
+        # Determine if it's a new data_source.
 
         if data_source not in self.data_sources:
             self.data_sources.append(data_source)
@@ -740,6 +741,8 @@ class G2Client:
                 self.add_data_source(data_source)
             except Exception as err:
                 logging.info(message_info(105, data_source, err))
+
+        # Determine if it's a new entity_type.
 
         if entity_type not in self.entity_types:
             self.entity_types.append(entity_type)
@@ -1284,6 +1287,7 @@ if __name__ == "__main__":
     log_level_parameter = os.getenv("SENZING_LOG_LEVEL", "info").lower()
     log_level = log_level_map.get(log_level_parameter, logging.INFO)
     logging.basicConfig(format=log_format, level=log_level)
+    logging.debug(message_debug(998))
 
     # Trap signals temporarily until args are parsed.
 
@@ -1324,7 +1328,7 @@ if __name__ == "__main__":
     # Test to see if function exists in the code.
 
     if subcommand_function_name not in globals():
-        logging.warning(message_warning(596, subcommand))
+        logging.warning(message_warning(696, subcommand))
         parser.print_help()
         exit_silently()
 
