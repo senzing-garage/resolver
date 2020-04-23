@@ -403,10 +403,10 @@ The Git repository has files that will be used in the `helm install --values` pa
    Example:
 
     ```console
-    sudo docker pull senzing/init-container:1.4.0
-    sudo docker pull senzing/resolver:1.1.1
-    sudo docker pull senzing/senzing-debug:1.2.2
-    sudo docker pull senzing/yum:1.1.2
+    sudo docker pull senzing/init-container:1.5.2
+    sudo docker pull senzing/resolver:1.2.0
+    sudo docker pull senzing/senzing-debug:1.3.0
+    sudo docker pull senzing/yum:1.1.3
     ```
 
 #### Docker registry
@@ -446,10 +446,10 @@ By using one of the two options, specify the docker registry.
 
     ```console
     export DOCKER_IMAGE_NAMES=( \
-      "senzing/init-container:1.4.0" \
-      "senzing/resolver:1.1.1" \
-      "senzing/senzing-debug:1.2.2" \
-      "senzing/yum:1.1.2" \
+      "senzing/init-container:1.5.2" \
+      "senzing/resolver:1.2.0" \
+      "senzing/senzing-debug:1.3.0" \
+      "senzing/yum:1.1.3" \
     )
 
     for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};\
