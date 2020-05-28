@@ -37,7 +37,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "1.1.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2020-01-28'
+__updated__ = '2020-05-28'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -777,7 +777,7 @@ class G2Client:
         # Determine if a default configuration exists.
 
         config_id_bytearray = bytearray()
-        return_code = self.g2_configuration_manager.getDefaultConfigID(config_id_bytearray)
+        self.g2_configuration_manager.getDefaultConfigID(config_id_bytearray)
 
         # Find the "config_handle" of the configuration,  creating a new configuration if needed.
 
@@ -796,7 +796,7 @@ class G2Client:
         ''' Determine data_sources already defined. '''
         config_handle = self.get_config_handle()
         datasources_bytearray = bytearray()
-        return_code = self.g2_config.listDataSourcesV2(config_handle, datasources_bytearray)
+        self.g2_config.listDataSourcesV2(config_handle, datasources_bytearray)
         datasources_dictionary = json.loads(datasources_bytearray.decode())
         return [x.get("DSRC_CODE") for x in datasources_dictionary.get("DATA_SOURCES")]
 
@@ -804,7 +804,7 @@ class G2Client:
         ''' Determine entity_types already defined. '''
         config_handle = self.get_config_handle()
         entity_types_bytearray = bytearray()
-        return_code = self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
+        self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
         entity_types_dictionary = json.loads(entity_types_bytearray.decode())
         return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES")]
 
@@ -834,7 +834,7 @@ class G2Client:
         # Get JSON string with new datasource added.
 
         configuration_bytearray = bytearray()
-        return_code = self.g2_config.save(config_handle, configuration_bytearray)
+        self.g2_config.save(config_handle, configuration_bytearray)
         configuration_json = configuration_bytearray.decode()
 
         # Add configuration to G2 database SYS_CFG table.
@@ -867,9 +867,7 @@ class G2Client:
         # Add Record to Senzing G2.
 
         try:
-            return_code = self.add_record(jsonline)
-            if return_code != 0:
-                raise Exception(message_error(886, return_code, jsonline))
+            self.add_record(jsonline)
         except G2Exception.G2ModuleNotInitialized as err:
             exit_error(888, err, jsonline)
         except G2Exception.G2ModuleGenericException as err:
@@ -899,11 +897,7 @@ class G2Initializer:
 
         default_config_id_bytearray = bytearray()
         try:
-            return_code = self.g2_configuration_manager.getDefaultConfigID(default_config_id_bytearray)
-            if return_code != 0:
-                err_message = message_error(704, default_config_id_bytearray, return_code)
-                logging.error(err_message)
-                raise Exception(err_message)
+            self.g2_configuration_manager.getDefaultConfigID(default_config_id_bytearray)
         except Exception as err:
             logging.error(message_error(705, default_config_id_bytearray, err))
             raise err
@@ -918,11 +912,7 @@ class G2Initializer:
         config_handle = self.g2_config.create()
         configuration_bytearray = bytearray()
         try:
-            return_code = self.g2_config.save(config_handle, configuration_bytearray)
-            if return_code != 0:
-                err_message = message_error(706, config_handle, configuration_bytearray, return_code)
-                logging.error(err_message)
-                raise Exception(err_message)
+            self.g2_config.save(config_handle, configuration_bytearray)
         except Exception as err:
             logging.error(message_error(707, config_handle, configuration_bytearray, err))
             raise err
@@ -934,11 +924,7 @@ class G2Initializer:
         config_comment = "Initial configuration."
         new_config_id = bytearray()
         try:
-            return_code = self.g2_configuration_manager.addConfig(configuration_bytearray.decode(), config_comment, new_config_id)
-            if return_code != 0:
-                err_message = message_error(708, configuration_bytearray.decode(), config_comment, new_config_id, return_code)
-                logging.error(err_message)
-                raise Exception(err_message)
+            self.g2_configuration_manager.addConfig(configuration_bytearray.decode(), config_comment, new_config_id)
         except Exception as err:
             logging.error(message_error(709, configuration_bytearray.decode(), config_comment, new_config_id, err))
             raise err
@@ -946,11 +932,7 @@ class G2Initializer:
         # Set the default configuration ID.
 
         try:
-            return_code = self.g2_configuration_manager.setDefaultConfigID(new_config_id)
-            if return_code != 0:
-                err_message = message_error(710, new_config_id, return_code)
-                logging.error(err_message)
-                raise Exception(err_message)
+            self.g2_configuration_manager.setDefaultConfigID(new_config_id)
         except Exception as err:
             logging.error(message_error(711, new_config_id, err))
             raise err
@@ -1245,7 +1227,7 @@ def do_service(args):
 
     handle_post_resolver([])
     g2_engine = get_g2_engine(config)
-    return_code = g2_engine.primeEngine()
+    g2_engine.primeEngine()
 
     # Run the service application.
 
