@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2020-07-21
+
+### Changed in 1.3.0
+
+- Update for Senzing 2.0.0
+- Remove `G2_ENTITY_BRIEF_FORMAT`, use other flags
+- Update to senzing/senzing-base:1.5.1
+
 ## [1.2.1] - 2020-05-28
 
 ### Changed in 1.2.1
