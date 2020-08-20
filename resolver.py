@@ -827,12 +827,10 @@ class G2Client:
         # Loop through results and append to result.
 
         response_bytearray = bytearray()
-        xxxxx = self.g2_engine.fetchNext(export_handle, response_bytearray)
-        while xxxxx:
-            print("MJD was here 3")
-            response_dictionary = json.loads(xxxxx.decode())
-            result.append(response_dictionary)
-            xxxxx = self.g2_engine.fetchNext(export_handle, xxxxx)
+        self.g2_engine.fetchNext(export_handle, response_bytearray)
+        while response_bytearray:
+            response_dictionary = json.loads(response_bytearray.decode())
+            self.g2_engine.fetchNext(export_handle, response_bytearray)
 
         return result
 
@@ -862,13 +860,13 @@ class G2Client:
         ''' Run G2Engine.purgeRepository(). '''
 
         return
-#         try:
-#             self.g2_engine.purgeRepository()
-#         except G2Exception.G2ModuleNotInitialized as err:
-#             exit_error(703, err)
-#         except Exception as err:
-#             logging.error(message_error(702, err))
-#             raise err
+        try:
+            self.g2_engine.purgeRepository()
+        except G2Exception.G2ModuleNotInitialized as err:
+            exit_error(703, err)
+        except Exception as err:
+            logging.error(message_error(702, err))
+            raise err
 
     def send_jsonline_to_g2_engine(self, jsonline):
         ''' Send the JSONline to G2 engine. '''
