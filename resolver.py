@@ -35,9 +35,9 @@ from flask_api import status
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "1.1.3"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.3.1"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2020-05-28'
+__updated__ = '2020-08-20'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -50,9 +50,9 @@ GIGABYTES = 1024 * MEGABYTES
 
 # Lists from https://www.ietf.org/rfc/rfc1738.txt
 
-safe_character_list = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"' ] + list(string.ascii_letters)
-unsafe_character_list = [ '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
-reserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
+safe_character_list = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"'] + list(string.ascii_letters)
+unsafe_character_list = ['"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
+reserved_character_list = [';', ',', '/', '?', ':', '@', '=', '&']
 
 # The "configuration_locator" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
@@ -568,6 +568,11 @@ def get_configuration(args):
         if value:
             result[new_key] = value
 
+    # Add program information.
+
+    result['program_version'] = __version__
+    result['program_updated'] = __updated__
+
     # Special case: subcommand from command-line
 
     if args.subcommand:
@@ -741,7 +746,9 @@ class G2Client:
         json_dictionary = json.loads(jsonline)
         data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
         entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
-        record_id = str(json_dictionary.get('RECORD_ID'))
+        record_id = json_dictionary.get('RECORD_ID')
+        if record_id is not None:
+            record_id = str(record_id)
 
         # Determine if it's a new data_source.
 
@@ -820,11 +827,12 @@ class G2Client:
         # Loop through results and append to result.
 
         response_bytearray = bytearray()
-        self.g2_engine.fetchNext(export_handle, response_bytearray)
-        while response_bytearray:
-            response_dictionary = json.loads(response_bytearray.decode())
+        xxxxx = self.g2_engine.fetchNext(export_handle, response_bytearray)
+        while xxxxx:
+            print("MJD was here 3")
+            response_dictionary = json.loads(xxxxx.decode())
             result.append(response_dictionary)
-            self.g2_engine.fetchNext(export_handle, response_bytearray)
+            xxxxx = self.g2_engine.fetchNext(export_handle, xxxxx)
 
         return result
 
@@ -853,13 +861,14 @@ class G2Client:
     def purge_repository(self):
         ''' Run G2Engine.purgeRepository(). '''
 
-        try:
-            self.g2_engine.purgeRepository()
-        except G2Exception.G2ModuleNotInitialized as err:
-            exit_error(703, err)
-        except Exception as err:
-            logging.error(message_error(702, err))
-            raise err
+        return
+#         try:
+#             self.g2_engine.purgeRepository()
+#         except G2Exception.G2ModuleNotInitialized as err:
+#             exit_error(703, err)
+#         except Exception as err:
+#             logging.error(message_error(702, err))
+#             raise err
 
     def send_jsonline_to_g2_engine(self, jsonline):
         ''' Send the JSONline to G2 engine. '''
