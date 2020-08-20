@@ -830,6 +830,7 @@ class G2Client:
         self.g2_engine.fetchNext(export_handle, response_bytearray)
         while response_bytearray:
             response_dictionary = json.loads(response_bytearray.decode())
+            result.append(response_dictionary)
             self.g2_engine.fetchNext(export_handle, response_bytearray)
 
         return result
@@ -859,7 +860,6 @@ class G2Client:
     def purge_repository(self):
         ''' Run G2Engine.purgeRepository(). '''
 
-        return
         try:
             self.g2_engine.purgeRepository()
         except G2Exception.G2ModuleNotInitialized as err:
