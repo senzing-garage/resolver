@@ -75,7 +75,7 @@ configuration_locator = {
         "cli": "debug"
     },
     "entity_type": {
-        "default": "TEST",
+        "default": "GENERIC",
         "env": "SENZING_ENTITY_TYPE",
         "cli": "entity-type"
     },
