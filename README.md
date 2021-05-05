@@ -798,8 +798,8 @@ This deployment launches the resolver.
     helm delete --purge ${DEMO_PREFIX}-senzing-init-container
     helm delete --purge ${DEMO_PREFIX}-senzing-yum
     helm repo remove senzing
-    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-opt-senzing.yaml
-    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-opt-senzing.yaml
+    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-senzing.yaml
+    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-senzing.yaml
     kubectl delete -f ${KUBERNETES_DIR}/namespace.yaml
     ```
 
