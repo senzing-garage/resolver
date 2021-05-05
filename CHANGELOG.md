@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2020-05-05
+
+### Changed in 1.3.2
+
+- Updated to senzingdata-v2
+- Changed default entity type from "TEST" to "GENERIC"
+- Update docker image versions
+  - senzing/debug:1.2.2 to senzing/debug:1.3.5
+  - senzing/init-container:1.5.5 to senzing/init-container:1.6.9
+  - senzing/resolver:1.2.1 to senzing/resolver:1.3.1
+  - senzing/yum:1.1.3 to senzing/yum:1.1.4
+
 ## [1.3.1] - 2020-08-20
 
 ### Changed in 1.3.1
