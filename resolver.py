@@ -896,7 +896,7 @@ class G2Client:
         self.g2_configuration_manager.setDefaultConfigID(configuration_id_bytearray)
 
         # Re-initialize G2 engine.
-        
+
         self.g2_engine.reinitV2(configuration_id_bytearray)
 
     def purge_repository(self):
