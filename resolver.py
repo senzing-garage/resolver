@@ -810,7 +810,7 @@ class G2Client:
             if self.is_g2_default_configuration_changed():
                 self.update_active_g2_configuration()
                 return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
-            else: 
+            else:
                 raise err
         return return_code
 
