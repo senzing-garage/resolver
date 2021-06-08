@@ -740,6 +740,41 @@ class G2Client:
         configuration_comment = message(102, entity_type)
         self.persist_configuration(config_handle, configuration_comment)
 
+    def is_g2_default_configuration_changed(self):
+
+        # Update early to avoid "thundering heard problem".
+
+        self.config['last_configuration_check'] = time.time()
+
+        # Get active Configuration ID being used by g2_engine.
+
+        active_config_id = bytearray()
+        self.g2_engine.getActiveConfigID(active_config_id)
+
+        # Get most current Configuration ID from G2 database.
+
+        default_config_id = bytearray()
+        self.g2_configuration_manager.getDefaultConfigID(default_config_id)
+
+        # Determine if configuration has changed.
+
+        result = active_config_id != default_config_id
+        if result:
+            logging.info(message_info(292, active_config_id.decode(), default_config_id.decode()))
+
+        return result
+
+    def update_active_g2_configuration(self):
+
+        # Get most current Configuration ID from G2 database.
+
+        default_config_id = bytearray()
+        self.g2_configuration_manager.getDefaultConfigID(default_config_id)
+
+        # Apply new configuration to g2_engine.
+
+        self.g2_engine.reinitV2(default_config_id)
+
     def add_record(self, jsonline):
         ''' Run G2Engine.addRecord(). '''
 
@@ -769,8 +804,15 @@ class G2Client:
                 logging.info(message_info(106, entity_type, err))
 
         # Run G2Engine.addRecord().
-
-        return self.g2_engine.addRecord(data_source, record_id, jsonline)
+        try:
+            return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+        except Exception as err:
+            if self.is_g2_default_configuration_changed():
+                self.update_active_g2_configuration()
+                return_code = self.g2_engine.addRecord(data_source, record_id, jsonline)
+            else: 
+                raise err
+        return return_code
 
     def add_record_to_failure_queue(self, jsonline):
         ''' Handle records that fail to be inserted into Senzing. '''
@@ -854,7 +896,7 @@ class G2Client:
         self.g2_configuration_manager.setDefaultConfigID(configuration_id_bytearray)
 
         # Re-initialize G2 engine.
-
+        
         self.g2_engine.reinitV2(configuration_id_bytearray)
 
     def purge_repository(self):

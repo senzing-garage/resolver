@@ -1,2 +1,3 @@
 Flask==1.0.2
 flask_api
+werkzeug==1.0.0
