@@ -215,7 +215,7 @@ Configuration values specified by environment variable or command line parameter
    Example:
 
     ```console
-    export SENZING_VOLUME=/opt/my-senzing
+    export SENZING_VOLUME=~/my-senzing
     ```
 
     1. Here's a simple test to see if `SENZING_VOLUME` is correct.
@@ -778,7 +778,7 @@ _Method #2:_ This method can be done on kubernetes with a non-root container.
     export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
 
     export SENZING_ACCEPT_EULA=put-in-correct-value
-    export SENZING_VOLUME=/opt/my-senzing
+    export SENZING_VOLUME=~/my-senzing
 
     export SENZING_DATA_DIR=${SENZING_VOLUME}/data
     export SENZING_G2_DIR=${SENZING_VOLUME}/g2
