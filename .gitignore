@@ -107,4 +107,5 @@ venv.bak/
 
 helm-values/
 kubernetes/
+.history/
 
