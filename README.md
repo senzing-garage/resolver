@@ -100,7 +100,7 @@ describing where we can improve.   Now on with the show...
 1. :pencil2: - A "pencil" icon means that the instructions may need modification before performing.
 1. :warning: - A "warning" icon means that something tricky is happening, so pay attention.
 
-### Related artifacts
+## Related artifacts
 
 1. [DockerHub](https://hub.docker.com/r/senzing/resolver)
 1. [Helm Chart](https://github.com/Senzing/charts/tree/master/charts/resolver)
