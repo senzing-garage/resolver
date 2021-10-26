@@ -37,7 +37,7 @@ docker-rmi-for-build:
 		$(DOCKER_IMAGE_NAME)
 
 .PHONY: clean
-clean: docker-rmi-for-build docker-rmi-for-build-development-cache
+clean: docker-rmi-for-build
 
 # -----------------------------------------------------------------------------
 # Help

@@ -1,11 +1,11 @@
 ARG BASE_IMAGE=senzing/senzing-base:1.6.2
 FROM ${BASE_IMAGE}
 
-ENV REFRESHED_AT=2021-10-11
+ENV REFRESHED_AT=2021-10-26
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="1.3.4"
+      Version="1.3.5"
 
 HEALTHCHECK CMD ["/app/healthcheck.sh"]
 
@@ -15,9 +15,10 @@ USER root
 
 # Install packages via PIP.
 
-RUN pip3 install \
-    Flask==1.0.2 \
-    flask_api
+COPY requirements.txt ./
+RUN pip3 install --upgrade pip \
+ && pip3 install -r requirements.txt \
+ && rm requirements.txt
 
 # The port for the Flask is 5000.
 
