@@ -4,6 +4,8 @@
 # resolver.py
 # -----------------------------------------------------------------------------
 
+# Import from standard library. https://docs.python.org/3/library/
+
 import argparse
 import json
 import linecache
@@ -17,6 +19,13 @@ import time
 from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
+# Import from https://pypi.org/
+
+from flask import Flask, Response, json
+from flask import request as flask_request
+from flask import url_for
+from flask_api import status
+
 # Import Senzing libraries.
 
 try:
@@ -27,17 +36,12 @@ try:
 except ImportError:
     pass
 
-from flask import Flask, Response, json
-from flask import request as flask_request
-from flask import url_for
-from flask_api import status
-
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "1.3.1"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.3.5"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2020-08-20'
+__updated__ = '2021-10-26'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
