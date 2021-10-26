@@ -89,7 +89,7 @@ For the most part, instructions are copy and paste.
 Whenever thinking is needed, it's marked with a "thinking" icon :thinking:.
 Whenever customization is needed, it's marked with a "pencil" icon :pencil2:.
 If the instructions are not clear, please let us know by opening a new
-[Documentation issue](https://github.com/Senzing/kubernetes-demo/issues/new?assignees=&labels=&template=documentation_request.md)
+[Documentation issue](https://github.com/Senzing/resolver/issues/new?assignees=&labels=&template=documentation_request.md)
 describing where we can improve.   Now on with the show...
 
 ### Legend
@@ -379,7 +379,7 @@ The Git repository has files that will be used in the `helm install --values` pa
 
     ```console
     export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=kubernetes-demo
+    export GIT_REPOSITORY=resolver
     export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
