@@ -307,7 +307,7 @@ This Option starts a micro-service supporting HTTP requests.
    Example:
 
     ```console
-    sudo
+    sudo \
       --preserve-env \
       docker run \
         --interactive \
@@ -349,7 +349,7 @@ This Option uses file input and output.
    Example:
 
     ```console
-    sudo
+    sudo \
       --preserve-env \
       docker run \
         --rm \
