@@ -4,9 +4,6 @@
 # resolver.py
 # -----------------------------------------------------------------------------
 
-from glob import glob
-from urllib.parse import urlparse, urlunparse
-from urllib.request import urlopen
 import argparse
 import json
 import linecache
@@ -17,19 +14,22 @@ import signal
 import string
 import sys
 import time
+from urllib.parse import urlparse, urlunparse
+from urllib.request import urlopen
 
 # Import Senzing libraries.
 
 try:
+    import G2Exception
     from G2Config import G2Config
     from G2ConfigMgr import G2ConfigMgr
     from G2Engine import G2Engine
-    import G2Exception
 except ImportError:
     pass
 
-from flask import Flask, json, Response, url_for
+from flask import Flask, Response, json
 from flask import request as flask_request
+from flask import url_for
 from flask_api import status
 
 app = Flask(__name__)
