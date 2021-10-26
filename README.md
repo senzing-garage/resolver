@@ -1052,7 +1052,7 @@ Delete Kubernetes artifacts using
 1. Example:
 
     ```console
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-debug
+    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-console
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-resolver
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-init-container
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-yum
