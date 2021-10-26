@@ -307,18 +307,20 @@ This Option starts a micro-service supporting HTTP requests.
    Example:
 
     ```console
-    sudo docker run \
-      --interactive \
-      --publish 8252:8252 \
-      --rm \
-      --tty \
-      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-      ${SENZING_NETWORK_PARAMETER} \
-      ${SENZING_RUNAS_USER_PARAMETER} \
-      senzing/resolver
+    sudo
+      --preserve-env \
+      docker run \
+        --interactive \
+        --publish 8252:8252 \
+        --rm \
+        --tty \
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+        ${SENZING_NETWORK_PARAMETER} \
+        ${SENZING_RUNAS_USER_PARAMETER} \
+        senzing/resolver
     ```
 
 1. Test HTTP API.
@@ -347,18 +349,20 @@ This Option uses file input and output.
    Example:
 
     ```console
-    sudo docker run \
-      --rm \
-      --volume ${DATA_DIR}:/data \
-      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-      ${SENZING_NETWORK_PARAMETER} \
-      ${SENZING_RUNAS_USER_PARAMETER} \
-      senzing/resolver file-input \
-        --input-file  /data/test-data-1.json \
-        --output-file /data/my-output.json
+    sudo
+      --preserve-env \
+      docker run \
+        --rm \
+        --volume ${DATA_DIR}:/data \
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+        ${SENZING_NETWORK_PARAMETER} \
+        ${SENZING_RUNAS_USER_PARAMETER} \
+        senzing/resolver file-input \
+          --input-file  /data/test-data-1.json \
+          --output-file /data/my-output.json
     ```
 
 1. Output will be on workstation at ${DATA_DIR}/my-output.json
