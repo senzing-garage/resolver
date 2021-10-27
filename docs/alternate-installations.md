@@ -360,11 +360,11 @@ Only one method needs to be performed.
     minikube ssh
     ```
 
-1. In the `minikube` instance, create `/mnt/vda1/senzing/senzing-rpms`.
+1. In the `minikube` instance, create `/mnt/vda1/senzing`.
    Example:
 
     ```console
-    sudo mkdir -p /mnt/vda1/senzing/senzing-rpms
+    sudo mkdir -p /mnt/vda1/senzing
     exit
     ```
 
