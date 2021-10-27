@@ -448,6 +448,15 @@ will be used later to:
     dpkg --force-all -i /var/opt/senzing/*.deb
     ```
 
+   **Note:** You will have to manually accept the Senzing EULA twice.
+
+1. Exit the console pod.
+   Example:
+
+    ```console
+    exit
+    ```
+
 ### Install init-container Helm chart
 
 The [init-container](https://github.com/Senzing/docker-init-container)
