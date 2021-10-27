@@ -69,16 +69,6 @@ as a guide, start a minikube cluster.
     minikube dashboard
     ```
 
-### EULA
-
-To use the Senzing code, you must agree to the End User License Agreement (EULA).
-
-1. :warning: This step is intentionally tricky and not simply copy/paste.
-   This ensures that you make a conscious effort to accept the EULA.
-   Example:
-
-    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
-
 ### Set environment variables
 
 1. Set environment variables listed in "[Clone repository for Helm install](#clone-repository-for-helm-install)".
