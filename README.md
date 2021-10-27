@@ -789,7 +789,7 @@ Example: A personal laptop.
 
     ```console
     helm install \
-      name ${DEMO_PREFIX}-senzing-base \
+      ${DEMO_PREFIX}-senzing-base \
       senzing/senzing-base \
       --namespace ${DEMO_NAMESPACE} \
       --values ${HELM_VALUES_DIR}/senzing-base.yaml \
