@@ -524,7 +524,7 @@ creates files from templates and initializes the G2 database.
     G2ConfigTool.py -c /etc/opt/senzing/G2Module.ini -f /var/opt/senzing/config-changes.gtc
     ```
 
-1. :thinking: **Optional:** Exit Senzing console pod.
+1. Exit Senzing console pod.
    Example:
 
     ```console
