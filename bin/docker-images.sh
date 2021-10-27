@@ -3,6 +3,7 @@
 # List all of the docker images to be installed into the minikube registry.
 
 export DOCKER_IMAGES=(
+    "senzing/apt:${SENZING_DOCKER_IMAGE_VERSION_APT:-latest}"
     "senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER:-latest}"
     "senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}"
     "senzing/senzing-base:${SENZING_DOCKER_IMAGE_VERSION_SENZING_BASE:-latest}"
