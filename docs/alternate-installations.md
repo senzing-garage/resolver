@@ -4,6 +4,27 @@
 
 ### Contents
 
+1. [Helm install using specific DEB files](#helm-install-using-specific-deb-files)
+    1. [Clone repository for Helm install](#clone-repository-for-helm-install)
+    1. [Create artifact directory](#create-artifact-directory)
+    1. [Start minikube cluster](#start-minikube-cluster)
+    1. [View minikube cluster](#view-minikube-cluster)
+    1. [Set environment variables](#set-environment-variables)
+    1. [Identify Docker registry](#identify-docker-registry)
+    1. [Create custom helm values files](#create-custom-helm-values-files)
+    1. [Create custom kubernetes configuration files](#create-custom-kubernetes-configuration-files)
+    1. [Save environment variables](#save-environment-variables)
+    1. [Create namespace](#create-namespace)
+    1. [Create persistent volume](#create-persistent-volume)
+    1. [Add helm repositories](#add-helm-repositories)
+    1. [Make mount point](#make-mount-point)
+    1. [Install senzing-console Helm chart](#install-senzing-console-helm-chart)
+    1. [Deploy Senzing](#deploy-senzing)
+    1. [Install init-container Helm chart](#install-init-container-helm-chart)
+    1. [Install custom Senzing configuration](#install-custom-senzing-configuration)
+    1. [Install resolver Helm chart](#install-resolver-helm-chart)
+    1. [Cleanup](Cleanup)
+
 ## Helm install using specific DEB files
 
 ### Clone repository for Helm install
@@ -105,7 +126,7 @@ as a guide, start a minikube cluster.
    Example:
 
     ```console
-    export SENZING_DEB_SENZING_API=~/Downloads/senzingapi-ibm-leip_2.8.3-21277_amd64.deb
+    export SENZING_DEB_SENZING_API=~/Downloads/senzingapi-XXXXXXXX_2.8.3-21277_amd64.deb
     export SENZING_DEB_SENZING_DATA=~/Downloads/senzingdata-v2_2.0.0-2_amd64.deb
     ```
 
