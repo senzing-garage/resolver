@@ -116,7 +116,7 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
 
     ```console
     export SENZING_DEB_SENZING_API=~/Downloads/senzingapi-ibm-leip_2.8.3-21277_amd64.deb
-    export SENZING_DEB_SENZING_DATA=~/Downloads/senzingdata-v2_2.0.0-1_amd64.deb
+    export SENZING_DEB_SENZING_DATA=~/Downloads/senzingdata-v2_2.0.0-2_amd64.deb
     ```
 
 1. :pencil2: Location of Senzing configuration (`gtc`) file:
