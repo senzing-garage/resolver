@@ -350,6 +350,24 @@ Only one method needs to be performed.
     helm repo list
     ```
 
+### Make mount point
+
+1. Log into `minikube` instance using
+   [minikube ssh](https://minikube.sigs.k8s.io/docs/commands/ssh/).
+   Example:
+
+    ```console
+    minikube ssh
+    ```
+
+1. In the `minikube` instance, create `/mnt/vda1/senzing`.
+   Example:
+
+    ```console
+    sudo mkdir -p /mnt/vda1/senzing
+    exit
+    ```
+
 ### Install senzing-console Helm chart
 
 The [senzing-console](https://github.com/Senzing/docker-senzing-console)
