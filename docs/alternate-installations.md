@@ -445,7 +445,7 @@ will be used later to:
    Example:
 
     ```console
-    dpkg --force-all -i /var/opt/senzing/senzing-rpms/*.deb
+    dpkg --force-all -i /var/opt/senzing/*.deb
     ```
 
    **Note:** You will have to manually accept the Senzing EULA twice.
