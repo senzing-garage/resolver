@@ -796,6 +796,16 @@ Example: A personal laptop.
       --version ${SENZING_HELM_VERSION_SENZING_BASE:-""}
     ```
 
+1. Wait for pods to run using
+   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
+   Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
+
 1. Copy files from local machine to `senzing-base` pod using
    [kubectl cp](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#cp).
    Example:
