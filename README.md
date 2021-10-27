@@ -68,6 +68,7 @@ To see the options for a subcommand, run commands like:
     1. [Create namespace](#create-namespace)
     1. [Create persistent volume](#create-persistent-volume)
     1. [Add helm repositories](#add-helm-repositories)
+    1. [Deploy Senzing](#deploy-senzing)
     1. [Install init-container Helm chart](#install-init-container-helm-chart)
     1. [Install resolver Helm chart](#install-resolver-helm-chart)
     1. [Install senzing-console Helm chart](#install-senzing-console-helm-chart)
