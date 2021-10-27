@@ -766,7 +766,7 @@ Example: A personal laptop.
     export SENZING_VAR_DIR=${SENZING_DEMO_DIR}/var
     ```
 
-1. Run docker image.
+1. Run docker image to download and extract Senzing binaries.
    Example:
 
     ```console
@@ -782,7 +782,7 @@ Example: A personal laptop.
 
 1. Install chart with non-root container using
    [helm install](https://helm.sh/docs/helm/helm_install/).
-   This pod will be the recipient of a `docker cp` command.
+   This pod will be the recipient of `kubectl cp` commands.
    Example:
 
     ```console
