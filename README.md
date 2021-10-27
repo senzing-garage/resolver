@@ -752,43 +752,26 @@ This method uses a dockerized [apt](https://github.com/Senzing/docker-apt) comma
 
 #### Non-root container method
 
-**FIXME:**  non-root container method not verified.
-
 _Method #2:_ This method can be done on kubernetes with a non-root container.
+The following instructions are done on a non-kubernetes machine which allows root docker containers.
+Example: A personal laptop.
 
-1. Install chart with non-root container using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   This pod will be the recipient of a `docker cp` command.
+1. Set environment variables.
    Example:
 
     ```console
-    helm install \
-      name ${DEMO_PREFIX}-senzing-base \
-      senzing/senzing-base \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-base.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_BASE:-""}
+    export SENZING_DATA_DIR=${SENZING_DEMO_DIR}/data
+    export SENZING_G2_DIR=${SENZING_DEMO_DIR}/g2
+    export SENZING_ETC_DIR=${SENZING_DEMO_DIR}/etc
+    export SENZING_VAR_DIR=${SENZING_DEMO_DIR}/var
     ```
 
-1. The following instructions are done on a non-kubernetes machine which allows root docker containers.
-   Example:  a personal laptop.
-
-1. :pencil2: Set environment variables.
-   **Note:** See [SENZING_ACCEPT_EULA](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_accept_eula) for correct value.
+1. :warning: To use the Senzing code, you must agree to the End User License Agreement (EULA).
+   This step is intentionally tricky and not simply copy/paste.
+   This ensures that you make a conscious effort to accept the EULA.
    Example:
 
-    ```console
-    export DEMO_PREFIX=my
-    export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
-
-    export SENZING_ACCEPT_EULA=put-in-correct-value
-    export SENZING_VOLUME=~/my-senzing
-
-    export SENZING_DATA_DIR=${SENZING_VOLUME}/data
-    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-    ```
+    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
 
 1. Run docker image.
    Example:
@@ -802,6 +785,20 @@ _Method #2:_ This method can be done on kubernetes with a non-root container.
       --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
       senzing/apt
+    ```
+
+1. Install chart with non-root container using
+   [helm install](https://helm.sh/docs/helm/helm_install/).
+   This pod will be the recipient of a `docker cp` command.
+   Example:
+
+    ```console
+    helm install \
+      name ${DEMO_PREFIX}-senzing-base \
+      senzing/senzing-base \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${HELM_VALUES_DIR}/senzing-base.yaml \
+      --version ${SENZING_HELM_VERSION_SENZING_BASE:-""}
     ```
 
 1. Copy files from local machine to `senzing-base` pod using
