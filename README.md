@@ -765,7 +765,7 @@ Example: A personal laptop.
     ```
 
 1. Run docker container to download and extract Senzing binaries to
-   `SENZING_DATA_DIR` and `SENZING_DATA_DIR`.
+   `SENZING_DATA_DIR` and `SENZING_G2_DIR`.
    Example:
 
     ```console
