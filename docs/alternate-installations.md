@@ -364,7 +364,7 @@ Only one method needs to be performed.
    Example:
 
     ```console
-    mkdir -p /mnt/vda1/senzing/senzing-rpms
+    sudo mkdir -p /mnt/vda1/senzing/senzing-rpms
     exit
     ```
 
