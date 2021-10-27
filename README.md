@@ -764,7 +764,7 @@ Example: A personal laptop.
     export SENZING_G2_DIR=${SENZING_DEMO_DIR}/g2
     ```
 
-1. Run docker image to download and extract Senzing binaries to
+1. Run docker container to download and extract Senzing binaries to
    `SENZING_DATA_DIR` and `SENZING_DATA_DIR`.
    Example:
 
@@ -793,7 +793,7 @@ Example: A personal laptop.
       --version ${SENZING_HELM_VERSION_SENZING_BASE:-""}
     ```
 
-1. Wait for pods to run using
+1. Wait for pod to run using
    [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
    Example:
 
@@ -803,8 +803,7 @@ Example: A personal laptop.
       --watch
     ```
 
-1. Copy files from local machine to `senzing-base` pod using
-   [kubectl cp](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#cp).
+1. Identify Senzing Base pod name.
    Example:
 
     ```console
@@ -816,7 +815,7 @@ Example: A personal laptop.
       )
     ```
 
-1. Copy files from local machine to `senzing-base` pod using
+1. Copy files from local machine to Senzing Base pod using
    [kubectl cp](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#cp).
    Example:
 
