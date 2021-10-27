@@ -766,13 +766,6 @@ Example: A personal laptop.
     export SENZING_VAR_DIR=${SENZING_DEMO_DIR}/var
     ```
 
-1. :warning: To use the Senzing code, you must agree to the End User License Agreement (EULA).
-   This step is intentionally tricky and not simply copy/paste.
-   This ensures that you make a conscious effort to accept the EULA.
-   Example:
-
-    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
-
 1. Run docker image.
    Example:
 
