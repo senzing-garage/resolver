@@ -58,7 +58,7 @@ as a guide, start a minikube cluster.
 
 ### View minikube cluster
 
-View the minikube cluster using the
+:thinking: **Optional:** View the minikube cluster using the
 [dashboard](https://minikube.sigs.k8s.io/docs/handbook/dashboard/).
 
 1. Run command in a new terminal using
