@@ -450,6 +450,13 @@ will be used later to:
 
    **Note:** You will have to manually accept the Senzing EULA twice.
 
+1. Adjust `/opt/senzing/data`.
+   Example:
+
+    ```console
+    mv /opt/senzing/data/2.0.0/* /opt/senzing/data
+    ```
+
 1. Exit the console pod.
    Example:
 
