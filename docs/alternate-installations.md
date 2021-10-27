@@ -424,13 +424,13 @@ will be used later to:
     ```console
     kubectl cp \
       --namespace ${DEMO_NAMESPACE} \
-      ${SENZING_DEB_SENZING_API} ${CONSOLE_POD_NAME}:/var/opt/senzing/senzing-rpms
+      ${SENZING_DEB_SENZING_API} ${CONSOLE_POD_NAME}:/var/opt/senzing/senzing-rpms/
     ```
 
     ```console
     kubectl cp \
       --namespace ${DEMO_NAMESPACE} \
-      ${SENZING_DEB_SENZING_DATA} ${CONSOLE_POD_NAME}:/var/opt/senzing/senzing-rpms
+      ${SENZING_DEB_SENZING_DATA} ${CONSOLE_POD_NAME}:/var/opt/senzing/senzing-rpms/
     ```
 
 1. Log into Senzing Console pod using
