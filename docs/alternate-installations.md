@@ -455,6 +455,7 @@ will be used later to:
 
     ```console
     mv /opt/senzing/data/2.0.0/* /opt/senzing/data
+    rmdir /opt/senzing/data/2.0.0
     ```
 
 1. Exit the console pod.
