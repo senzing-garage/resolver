@@ -762,11 +762,10 @@ Example: A personal laptop.
     ```console
     export SENZING_DATA_DIR=${SENZING_DEMO_DIR}/data
     export SENZING_G2_DIR=${SENZING_DEMO_DIR}/g2
-    export SENZING_ETC_DIR=${SENZING_DEMO_DIR}/etc
-    export SENZING_VAR_DIR=${SENZING_DEMO_DIR}/var
     ```
 
-1. Run docker image to download and extract Senzing binaries.
+1. Run docker image to download and extract Senzing binaries to
+   `SENZING_DATA_DIR` and `SENZING_DATA_DIR`.
    Example:
 
     ```console
@@ -777,8 +776,6 @@ Example: A personal laptop.
       --tty \
       --volume ${SENZING_DATA_DIR}:/opt/senzing/data \
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
       senzing/apt
     ```
 
@@ -819,34 +816,13 @@ Example: A personal laptop.
       )
     ```
 
-1. Log into Senzing Base pod using
-   [kubectl exec](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#exec).
+1. Copy files from local machine to `senzing-base` pod using
+   [kubectl cp](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#cp).
    Example:
 
     ```console
-    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${SENZING_BASE_POD_NAME} -- /bin/bash
-    ```
-
-1. In Senzing Base pod, create directories and exit.
-   Example:
-
-    ```console
-    mkdir /opt/senzing/senzing-data
-    mkdir /opt/senzing/senzing-g2
-    mkdir /opt/senzing/senzing-etc
-    mkdir /opt/senzing/senzing-var
-
-    exit
-    ```
-
-1. On local machine, copy directories to Senzing Base pod.
-   Example:
-
-    ```console
-    kubectl cp ${SENZING_DATA_DIR} ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-data
-    kubectl cp ${SENZING_G2_DIR}   ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-g2
-    kubectl cp ${SENZING_ETC_DIR}  ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-etc
-    kubectl cp ${SENZING_VAR_DIR}  ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-var
+    kubectl cp ${SENZING_DATA_DIR} ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/data
+    kubectl cp ${SENZING_G2_DIR}   ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/g2
     ```
 
 #### yum localinstall method
