@@ -817,7 +817,32 @@ Example: A personal laptop.
       --selector "app.kubernetes.io/name=senzing-base, \
                   app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-base" \
       )
+    ```
 
+1. Log into Senzing Base pod using
+   [kubectl exec](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#exec).
+   Example:
+
+    ```console
+    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${SENZING_BASE_POD_NAME} -- /bin/bash
+    ```
+
+1. In Senzing Base pod, create directories and exit.
+   Example:
+
+    ```console
+    mkdir /opt/senzing/senzing-data
+    mkdir /opt/senzing/senzing-g2
+    mkdir /opt/senzing/senzing-etc
+    mkdir /opt/senzing/senzing-var
+
+    exit
+    ```
+
+1. On local machine, copy directories to Senzing Base pod.
+   Example:
+
+    ```console
     kubectl cp ${SENZING_DATA_DIR} ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-data
     kubectl cp ${SENZING_G2_DIR}   ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-g2
     kubectl cp ${SENZING_ETC_DIR}  ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/senzing-etc
