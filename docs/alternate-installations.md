@@ -111,7 +111,7 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
     source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/senzing-versions-latest.sh)
     ```
 
-1. :pencil2: Location of Senzing `deb` file:
+1. :pencil2: Locations of Senzing `deb` files:
    Example:
 
     ```console
