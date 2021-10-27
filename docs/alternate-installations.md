@@ -360,11 +360,11 @@ Only one method needs to be performed.
     minikube ssh
     ```
 
-1. In the `minikube` instance, create `/mnt/vda1/senzing`.
+1. In the `minikube` instance, create `/mnt/vda1/senzing/senzing-rpms`.
    Example:
 
     ```console
-    sudo mkdir -p /mnt/vda1/senzing
+    sudo mkdir -p /mnt/vda1/senzing/senzing-rpms
     exit
     ```
 
@@ -424,13 +424,13 @@ will be used later to:
     ```console
     kubectl cp \
       --namespace ${DEMO_NAMESPACE} \
-      ${SENZING_DEB_SENZING_API} ${CONSOLE_POD_NAME}:/var/opt/senzing
+      ${SENZING_DEB_SENZING_API} ${CONSOLE_POD_NAME}:/var/opt/senzing/senzing-rpms
     ```
 
     ```console
     kubectl cp \
       --namespace ${DEMO_NAMESPACE} \
-      ${SENZING_DEB_SENZING_DATA} ${CONSOLE_POD_NAME}:/var/opt/senzing
+      ${SENZING_DEB_SENZING_DATA} ${CONSOLE_POD_NAME}:/var/opt/senzing/senzing-rpms
     ```
 
 1. Log into Senzing Console pod using
@@ -445,7 +445,7 @@ will be used later to:
    Example:
 
     ```console
-    dpkg --force-all -i /var/opt/senzing/*.deb
+    dpkg --force-all -i /var/opt/senzing/senzing-rpms/*.deb
     ```
 
    **Note:** You will have to manually accept the Senzing EULA twice.
