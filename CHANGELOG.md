@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2021-12-06
+
+### Changed in 2.0.0
+
+- Changed engine flags for export call to also fetch relationships
+
 ## [1.3.5] - 2021-10-26
 
 ### Changed in 1.3.5
