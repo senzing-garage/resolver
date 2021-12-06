@@ -19,13 +19,11 @@ import time
 from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
+# Import from https://pypi.org/
 from flask import Flask, Response, json
 from flask import request as flask_request
 from flask import url_for
 from flask_api import status
-
-# Import from https://pypi.org/
-
 
 # Import Senzing libraries.
 
@@ -907,13 +905,13 @@ class G2Client:
     def purge_repository(self):
         ''' Run G2Engine.purgeRepository(). '''
 
-    #    try:
-    #        self.g2_engine.purgeRepository()
-    #    except G2Exception.G2ModuleNotInitialized as err:
-    #        exit_error(703, err)
-    #    except Exception as err:
-    #        logging.error(message_error(702, err))
-    #        raise err
+        try:
+            self.g2_engine.purgeRepository()
+        except G2Exception.G2ModuleNotInitialized as err:
+            exit_error(703, err)
+        except Exception as err:
+            logging.error(message_error(702, err))
+            raise err
 
     def send_jsonline_to_g2_engine(self, jsonline):
         ''' Send the JSONline to G2 engine. '''
