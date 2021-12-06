@@ -20,7 +20,6 @@ from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
 # Import from https://pypi.org/
-
 from flask import Flask, Response, json
 from flask import request as flask_request
 from flask import url_for
@@ -867,7 +866,7 @@ class G2Client:
         # Get the raw report.
 
         result = []
-        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_INCLUDE_RECORD_MATCHING_INFO | G2Engine.G2_EXPORT_INCLUDE_ALL_RELATIONSHIPS | G2Engine.G2_ENTITY_INCLUDE_RELATED_MATCHING_INFO
+        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
         export_handle = self.g2_engine.exportJSONEntityReport(flags)
 
         # Loop through results and append to result.
