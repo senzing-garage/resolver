@@ -20,6 +20,7 @@ from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
 # Import from https://pypi.org/
+
 from flask import Flask, Response, json
 from flask import request as flask_request
 from flask import url_for
@@ -38,9 +39,9 @@ except ImportError:
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "1.3.5"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "2.0.1"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2021-10-26'
+__updated__ = '2021-12-13'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -860,14 +861,15 @@ class G2Client:
         entity_types_dictionary = json.loads(entity_types_bytearray.decode())
         return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES")]
 
-    def get_resolved_entities(self):
+    def get_resolved_entities(self, senzing_engine_flags=None):
         ''' Run G2Engine.exportJSONEngineReport(). '''
 
         # Get the raw report.
 
         result = []
-        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
-        export_handle = self.g2_engine.exportJSONEntityReport(flags)
+        if not senzing_engine_flags:
+            senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+        export_handle = self.g2_engine.exportJSONEntityReport(senzing_engine_flags)
 
         # Loop through results and append to result.
 
@@ -1141,7 +1143,7 @@ def common_prolog(config):
     logging.info(entry_template(config))
 
 
-def handle_post_resolver(iterator):
+def handle_post_resolver(iterator, senzing_engine_flags=None):
     ''' Add records to Senzing G2.  Pull resolved entities from G2. '''
 
     # Create G2 configuration objects.
@@ -1176,7 +1178,7 @@ def handle_post_resolver(iterator):
 
     # Get results from Senzing G2.
 
-    result = g2_client.get_resolved_entities()
+    result = g2_client.get_resolved_entities(senzing_engine_flags)
 
     # Purge G2 database.
 
@@ -1201,12 +1203,19 @@ def http_post_resolve():
 
     # Get POST payload.
 
+    query_parameters_dict = flask_request.args
     payload = flask_request.get_data(as_text=True)
+    logging.info(message_info(299, query_parameters_dict))
+
+    # Calculate Senzing Flags from query parameters.
+    # FIXME:
+
+    senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
 
     # Create HTTP response.
 
     try:
-        response = handle_post_resolver(payload.splitlines())
+        response = handle_post_resolver(payload.splitlines(), senzing_engine_flags)
         response_pretty = json.dumps(response, sort_keys=True)
     except Exception as err:
         response_status = status.HTTP_400_BAD_REQUEST
