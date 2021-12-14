@@ -35,7 +35,6 @@ try:
     from G2ConfigMgr import G2ConfigMgr
     from G2Engine import G2Engine
 except ImportError:
-    print(">>>>>>>>>>>>>>>")
     pass
 
 app = Flask(__name__)
