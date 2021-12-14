@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2021-12-14
 
-### Added in 2.2.0
+### Added in 2.1.0
 
 - `SENZING_WITH_FEATURES`
 - `SENZING_WITH_JSON`
