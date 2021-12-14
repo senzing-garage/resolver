@@ -40,7 +40,7 @@ except ImportError:
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "2.0.1"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "2.1.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
 __updated__ = '2021-12-14'
 
