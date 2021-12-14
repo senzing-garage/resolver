@@ -35,6 +35,7 @@ try:
     from G2ConfigMgr import G2ConfigMgr
     from G2Engine import G2Engine
 except ImportError:
+    print(">>>>>>>>>>>>>>>")
     pass
 
 app = Flask(__name__)
@@ -138,6 +139,16 @@ configuration_locator = {
         "env": "SENZING_VAR_DIR",
         "cli": "var-dir"
     },
+    "with_features": {
+        "default": False,
+        "env": "SENZING_WITH_FEATURES",
+        "cli": "with-features"
+    },
+    "with_json": {
+        "default": False,
+        "env": "SENZING_WITH_JSON",
+        "cli": "with-json"
+    },
 }
 
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
@@ -211,6 +222,16 @@ def get_parser():
                     "dest": "var_dir",
                     "metavar": "SENZING_VAR_DIR",
                     "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
+                },
+                "--with-features": {
+                    "dest": "with_features",
+                    "metavar": "SENZING_WITH_FEATURES",
+                    "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES flag. Default: false"
+                },
+                "--with-json": {
+                    "dest": "with_json",
+                    "metavar": "SENZING_WITH_JSON",
+                    "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA flag. Default: false"
                 },
             },
         },
@@ -586,7 +607,9 @@ def get_configuration(args):
     # Special case: Change boolean strings to booleans.
 
     booleans = [
-        'debug'
+        'debug',
+        'with_features',
+        'with_json'
     ]
     for boolean in booleans:
         boolean_value = result.get(boolean)
@@ -1259,10 +1282,18 @@ def do_file_input(args):
     config = get_configuration(args)
     common_prolog(config)
 
+    # Calculate Senzing Flags.
+
+    senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    if config.get('with_json', False):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+    if config.get('with_features', False):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
+
     # Create iterator over JSON Lines and ingest data.
 
     with open(config.get('input_file')) as input_iterator:
-        result = handle_post_resolver(input_iterator)
+        result = handle_post_resolver(input_iterator, senzing_engine_flags)
 
     # Create output.
 
