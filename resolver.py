@@ -7,7 +7,6 @@
 # Import from standard library. https://docs.python.org/3/library/
 
 import argparse
-import distutils
 import json
 import linecache
 import logging
@@ -17,6 +16,7 @@ import signal
 import string
 import sys
 import time
+from distutils.util import strtobool
 from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
@@ -1209,9 +1209,9 @@ def http_post_resolve():
     # Calculate Senzing Flags from query parameters.
 
     senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
-    if distutils.util.strtobool(flask_request.args.get('withJson', False)):
+    if strtobool(flask_request.args.get('withJson', 'false')):
         senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
-    if distutils.util.strtobool(flask_request.args.get('withFeatures', False)):
+    if strtobool(flask_request.args.get('withFeatures', 'false')):
         senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
 
     # Create HTTP response.
