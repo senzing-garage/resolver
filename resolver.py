@@ -7,6 +7,7 @@
 # Import from standard library. https://docs.python.org/3/library/
 
 import argparse
+import distutils
 import json
 import linecache
 import logging
@@ -41,7 +42,7 @@ app = Flask(__name__)
 __all__ = []
 __version__ = "2.0.1"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2021-12-13'
+__updated__ = '2021-12-14'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1203,14 +1204,15 @@ def http_post_resolve():
 
     # Get POST payload.
 
-    query_parameters_dict = flask_request.args
     payload = flask_request.get_data(as_text=True)
-    logging.info(message_info(299, query_parameters_dict))
 
     # Calculate Senzing Flags from query parameters.
-    # FIXME:
 
     senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    if distutils.util.strtobool(flask_request.args.get('withJson', False)):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+    if distutils.util.strtobool(flask_request.args.get('withFeatures', False)):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
 
     # Create HTTP response.
 
