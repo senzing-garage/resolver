@@ -16,10 +16,12 @@ import signal
 import string
 import sys
 import time
+from distutils.util import strtobool
 from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
 # Import from https://pypi.org/
+
 from flask import Flask, Response, json
 from flask import request as flask_request
 from flask import url_for
@@ -38,9 +40,9 @@ except ImportError:
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "1.3.5"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "2.1.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2021-10-26'
+__updated__ = '2021-12-14'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -136,6 +138,16 @@ configuration_locator = {
         "env": "SENZING_VAR_DIR",
         "cli": "var-dir"
     },
+    "with_features": {
+        "default": False,
+        "env": "SENZING_WITH_FEATURES",
+        "cli": "with-features"
+    },
+    "with_json": {
+        "default": False,
+        "env": "SENZING_WITH_JSON",
+        "cli": "with-json"
+    },
 }
 
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
@@ -209,6 +221,16 @@ def get_parser():
                     "dest": "var_dir",
                     "metavar": "SENZING_VAR_DIR",
                     "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
+                },
+                "--with-features": {
+                    "dest": "with_features",
+                    "metavar": "SENZING_WITH_FEATURES",
+                    "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES flag. Default: false"
+                },
+                "--with-json": {
+                    "dest": "with_json",
+                    "metavar": "SENZING_WITH_JSON",
+                    "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA flag. Default: false"
                 },
             },
         },
@@ -584,7 +606,9 @@ def get_configuration(args):
     # Special case: Change boolean strings to booleans.
 
     booleans = [
-        'debug'
+        'debug',
+        'with_features',
+        'with_json'
     ]
     for boolean in booleans:
         boolean_value = result.get(boolean)
@@ -860,14 +884,15 @@ class G2Client:
         entity_types_dictionary = json.loads(entity_types_bytearray.decode())
         return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES")]
 
-    def get_resolved_entities(self):
+    def get_resolved_entities(self, senzing_engine_flags=None):
         ''' Run G2Engine.exportJSONEngineReport(). '''
 
         # Get the raw report.
 
         result = []
-        flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
-        export_handle = self.g2_engine.exportJSONEntityReport(flags)
+        if not senzing_engine_flags:
+            senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+        export_handle = self.g2_engine.exportJSONEntityReport(senzing_engine_flags)
 
         # Loop through results and append to result.
 
@@ -1141,7 +1166,7 @@ def common_prolog(config):
     logging.info(entry_template(config))
 
 
-def handle_post_resolver(iterator):
+def handle_post_resolver(iterator, senzing_engine_flags=None):
     ''' Add records to Senzing G2.  Pull resolved entities from G2. '''
 
     # Create G2 configuration objects.
@@ -1176,7 +1201,7 @@ def handle_post_resolver(iterator):
 
     # Get results from Senzing G2.
 
-    result = g2_client.get_resolved_entities()
+    result = g2_client.get_resolved_entities(senzing_engine_flags)
 
     # Purge G2 database.
 
@@ -1203,10 +1228,18 @@ def http_post_resolve():
 
     payload = flask_request.get_data(as_text=True)
 
+    # Calculate Senzing Flags from query parameters.
+
+    senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    if strtobool(flask_request.args.get('withJson', 'false')):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+    if strtobool(flask_request.args.get('withFeatures', 'false')):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
+
     # Create HTTP response.
 
     try:
-        response = handle_post_resolver(payload.splitlines())
+        response = handle_post_resolver(payload.splitlines(), senzing_engine_flags)
         response_pretty = json.dumps(response, sort_keys=True)
     except Exception as err:
         response_status = status.HTTP_400_BAD_REQUEST
@@ -1248,10 +1281,18 @@ def do_file_input(args):
     config = get_configuration(args)
     common_prolog(config)
 
+    # Calculate Senzing Flags.
+
+    senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    if config.get('with_json', False):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+    if config.get('with_features', False):
+        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
+
     # Create iterator over JSON Lines and ingest data.
 
     with open(config.get('input_file')) as input_iterator:
-        result = handle_post_resolver(input_iterator)
+        result = handle_post_resolver(input_iterator, senzing_engine_flags)
 
     # Create output.
 

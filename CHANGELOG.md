@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2021-12-14
+
+### Added in 2.1.0
+
+- `SENZING_WITH_FEATURES`
+- `SENZING_WITH_JSON`
+- URL query parameters `withFeatures` and `withJson`
+
 ## [2.0.0] - 2021-12-06
 
 ### Changed in 2.0.0
