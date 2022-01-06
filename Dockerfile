@@ -1,7 +1,7 @@
-ARG BASE_IMAGE=senzing/senzing-base:1.6.3
+ARG BASE_IMAGE=senzing/senzing-base:1.6.4
 FROM ${BASE_IMAGE}
 
-ENV REFRESHED_AT=2021-12-07
+ENV REFRESHED_AT=2022-01-06
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
