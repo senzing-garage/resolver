@@ -17,7 +17,7 @@ services:
 
   redoer:
     container_name: senzing-redoer
-    image: senzing/senzing-resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}
+    image: senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}
     networks:
       - backend
     ports:
