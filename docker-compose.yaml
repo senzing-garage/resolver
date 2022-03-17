@@ -7,7 +7,7 @@ services:
     networks:
       - backend
     read_only: true
-    restart: on-failure
+    restart: never
     user: "0"
     volumes:
       - ${SENZING_DATA_VERSION_DIR:-/opt/senzing/data/2.0.0}:/opt/senzing/data
@@ -15,8 +15,10 @@ services:
       - ${SENZING_G2_DIR:-/opt/senzing/g2}:/opt/senzing/g2
       - ${SENZING_VAR_DIR:-/var/opt/senzing}:/var/opt/senzing
 
-  redoer:
-    container_name: senzing-redoer
+  resolver:
+    container_name: senzing-resolver
+    depends_on:
+      - initcontainer
     image: senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}
     networks:
       - backend
