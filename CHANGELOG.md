@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2022-03-17
+
+### Changed in 2.1.1
+
+ - Support for enhanced v3 python package styles
+
 ## [2.1.0] - 2021-12-14
 
 ### Added in 2.1.0
