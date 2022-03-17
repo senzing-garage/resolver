@@ -747,8 +747,8 @@ class G2Client:
         self.data_sources = self.get_data_sources_list()
         self.entity_types = self.get_entity_types_list()
 
-        logger.info(">>> data_sources: {0}".format(self.data_sources))
-        logger.info(">>> entity_types: {0}".format(self.entity_types))
+        logging.info(">>> data_sources: {0}".format(self.data_sources))
+        logging.info(">>> entity_types: {0}".format(self.entity_types))
 
     def add_data_source(self, data_source):
         ''' Add a data source to G2 configuration. '''
