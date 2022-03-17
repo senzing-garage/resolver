@@ -29,20 +29,36 @@ from flask_api import status
 
 # Import Senzing libraries.
 
+# Determine "Major" version of Senzing SDK.
+
+senzing_sdk_version_major = None
+
+# Import from Senzing.
+
 try:
-    import G2Exception
-    from G2Config import G2Config
-    from G2ConfigMgr import G2ConfigMgr
-    from G2Engine import G2Engine
-except ImportError:
-    pass
+    from senzing import G2Config, G2ConfigMgr, G2Engine, G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
+    senzing_sdk_version_major = 3
+
+except:
+
+    # Fall back to pre-Senzing-Python-SDK style of imports.
+
+    try:
+        from G2Config import G2Config
+        from G2ConfigMgr import G2ConfigMgr
+        from G2Engine import G2Engine
+        from G2Exception import G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
+        senzing_sdk_version_major = 2
+    except:
+        senzing_sdk_version_major = None
+
 
 app = Flask(__name__)
 
 __all__ = []
 __version__ = "2.1.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2021-12-14'
+__updated__ = '2022-03-16'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -932,7 +948,7 @@ class G2Client:
 
         try:
             self.g2_engine.purgeRepository()
-        except G2Exception.G2ModuleNotInitialized as err:
+        except G2ModuleNotInitialized as err:
             exit_error(703, err)
         except Exception as err:
             logging.error(message_error(702, err))
@@ -945,9 +961,9 @@ class G2Client:
 
         try:
             self.add_record(jsonline)
-        except G2Exception.G2ModuleNotInitialized as err:
+        except G2ModuleNotInitialized as err:
             exit_error(888, err, jsonline)
-        except G2Exception.G2ModuleGenericException as err:
+        except G2ModuleGenericException as err:
             logging.error(message_error(889, err, jsonline))
             self.add_record_to_failure_queue(jsonline)
             raise err
@@ -1108,7 +1124,7 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Config()
         result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
-    except G2Exception.G2ModuleException as err:
+    except G2ModuleException as err:
         exit_error(897, g2_configuration_json, err)
 
     g2_config_singleton = result
@@ -1126,7 +1142,7 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2ConfigMgr()
         result.initV2(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
-    except G2Exception.G2ModuleException as err:
+    except G2ModuleException as err:
         exit_error(896, g2_configuration_json, err)
 
     g2_configuration_manager_singleton = result
@@ -1144,7 +1160,7 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Engine()
         result.initV2(g2_engine_name, g2_configuration_json, config.get('debug', False))
-    except G2Exception.G2ModuleException as err:
+    except G2ModuleException as err:
         exit_error(898, g2_configuration_json, err)
 
     g2_engine_singleton = result
