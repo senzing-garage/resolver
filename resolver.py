@@ -36,7 +36,7 @@ senzing_sdk_version_major = None
 # Import from Senzing.
 
 try:
-    from senzing import G2Config, G2ConfigMgr, G2Engine, G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
+    from senzing import G2Config, G2ConfigMgr, G2Engine, G2EngineFlags, G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
     senzing_sdk_version_major = 3
 
 except:
@@ -48,6 +48,9 @@ except:
         from G2ConfigMgr import G2ConfigMgr
         from G2Engine import G2Engine
         from G2Exception import G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
+
+
+
         senzing_sdk_version_major = 2
     except:
         senzing_sdk_version_major = None
@@ -916,7 +919,7 @@ class G2Client:
 
         result = []
         if not senzing_engine_flags:
-            senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+            senzing_engine_flags = G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
         export_handle = self.g2_engine.exportJSONEntityReport(senzing_engine_flags)
 
         # Loop through results and append to result.
