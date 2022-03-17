@@ -17,6 +17,7 @@ import string
 import sys
 import time
 from distutils.util import strtobool
+from enum import IntFlag
 from urllib.parse import urlparse, urlunparse
 from urllib.request import urlopen
 
@@ -49,7 +50,16 @@ except:
         from G2Engine import G2Engine
         from G2Exception import G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
 
+        # Create a class like what is seen in Senzing Version 3.
+
+        class G2EngineFlags(IntFlag):
+            G2_ENTITY_BRIEF_DEFAULT_FLAGS = G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+            G2_ENTITY_INCLUDE_ALL_FEATURES = G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
+            G2_ENTITY_INCLUDE_RECORD_JSON_DATA = G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+            G2_EXPORT_INCLUDE_ALL_ENTITIES = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES
+
         senzing_sdk_version_major = 2
+
     except:
         senzing_sdk_version_major = None
 
@@ -744,14 +754,7 @@ class G2Client:
         self.g2_engine = g2_engine
         self.senzing_sdk_version_major = config.get("senzing_sdk_version_major")
 
-        # Support prior Senzing versions.
-
-        if self.senzing_sdk_version_major == 2:
-            self.g2_config.addDataSource = self.g2_config.addDataSourceV2
-            self.g2_config.addEntityType = self.g2_config.addEntityTypeV2
-            self.g2_config.listDataSources = self.g2_config.listDataSourcesV2
-            self.g2_config.listDataSources = self.g2_config.listDataSourcesV2
-            self.g2_engine.reinit = self.g2_engine.reinitV2
+        # Must run after instance variable are set.
 
         self.data_sources = self.get_data_sources_list()
         self.entity_types = self.get_entity_types_list()
@@ -991,7 +994,7 @@ class G2Client:
             raise err
 
 # -----------------------------------------------------------------------------
-# Class: G2Client
+# Class: G2Initializer
 # -----------------------------------------------------------------------------
 
 
@@ -1141,10 +1144,19 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
     try:
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Config()
+
+        # Backport methods from earlier Senzing versions.
+
         if config.get('senzing_sdk_version_major') == 2:
-            result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
-        else:
-            result.init(g2_config_name, g2_configuration_json, config.get('debug', False))
+            result.addDataSource = result.addDataSourceV2
+            result.addEntityType = result.addEntityTypeV2
+            result.init = result.initV2
+            result.listDataSources = result.listDataSourcesV2
+            result.listDataSources = result.listDataSourcesV2
+
+        # Initialize G2ConfigMgr.
+
+        result.init(g2_config_name, g2_configuration_json, config.get('debug', False))
     except G2ModuleException as err:
         exit_error(897, g2_configuration_json, err)
 
@@ -1162,10 +1174,15 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver
     try:
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2ConfigMgr()
+
+        # Backport methods from earlier Senzing versions.
+
         if config.get('senzing_sdk_version_major') == 2:
-            result.initV2(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
-        else:
-            result.init(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
+            result.init = result.initV2
+
+        # Initialize G2ConfigMgr.
+
+        result.init(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
     except G2ModuleException as err:
         exit_error(896, g2_configuration_json, err)
 
@@ -1183,10 +1200,16 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
     try:
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Engine()
+
+        # Backport methods from earlier Senzing versions.
+
         if config.get('senzing_sdk_version_major') == 2:
-            result.initV2(g2_engine_name, g2_configuration_json, config.get('debug', False))
-        else:
-            result.init(g2_engine_name, g2_configuration_json, config.get('debug', False))
+            result.init = result.initV2
+            result.reinit = result.reinitV2
+
+        # Initialize G2Engine.
+
+        result.init(g2_engine_name, g2_configuration_json, config.get('debug', False))
     except G2ModuleException as err:
         exit_error(898, g2_configuration_json, err)
 
