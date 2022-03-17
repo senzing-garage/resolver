@@ -49,12 +49,9 @@ except:
         from G2Engine import G2Engine
         from G2Exception import G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
 
-
-
         senzing_sdk_version_major = 2
     except:
         senzing_sdk_version_major = None
-
 
 app = Flask(__name__)
 
@@ -750,6 +747,9 @@ class G2Client:
         self.data_sources = self.get_data_sources_list()
         self.entity_types = self.get_entity_types_list()
 
+        logger.info(">>> data_sources: {0}".format(self.data_sources))
+        logger.info(">>> entity_types: {0}".format(self.entity_types))
+
     def add_data_source(self, data_source):
         ''' Add a data source to G2 configuration. '''
 
@@ -905,7 +905,6 @@ class G2Client:
         ''' Determine entity_types already defined. '''
         config_handle = self.get_config_handle()
         entity_types_bytearray = bytearray()
-
         entity_types_dictionary = {}
         if self.senzing_sdk_version_major == 2:
             self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
@@ -1135,7 +1134,10 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
     try:
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Config()
-        result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
+        if config.get('senzing_sdk_version_major') == 2:
+            result.initV2(g2_config_name, g2_configuration_json, config.get('debug', False))
+        else:
+            result.init(g2_config_name, g2_configuration_json, config.get('debug', False))
     except G2ModuleException as err:
         exit_error(897, g2_configuration_json, err)
 
@@ -1153,7 +1155,10 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver
     try:
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2ConfigMgr()
-        result.initV2(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
+        if config.get('senzing_sdk_version_major') == 2:
+            result.initV2(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
+        else:
+            result.init(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
     except G2ModuleException as err:
         exit_error(896, g2_configuration_json, err)
 
@@ -1171,7 +1176,10 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
     try:
         g2_configuration_json = get_g2_configuration_json(config)
         result = G2Engine()
-        result.initV2(g2_engine_name, g2_configuration_json, config.get('debug', False))
+        if config.get('senzing_sdk_version_major') == 2:
+            result.initV2(g2_engine_name, g2_configuration_json, config.get('debug', False))
+        else:
+            result.init(g2_engine_name, g2_configuration_json, config.get('debug', False))
     except G2ModuleException as err:
         exit_error(898, g2_configuration_json, err)
 
@@ -1258,11 +1266,11 @@ def http_post_resolve():
 
     # Calculate Senzing Flags from query parameters.
 
-    senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    senzing_engine_flags = G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
     if strtobool(flask_request.args.get('withJson', 'false')):
-        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
     if strtobool(flask_request.args.get('withFeatures', 'false')):
-        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
+        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_ALL_FEATURES
 
     # Create HTTP response.
 
@@ -1311,11 +1319,11 @@ def do_file_input(args):
 
     # Calculate Senzing Flags.
 
-    senzing_engine_flags = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    senzing_engine_flags = G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
     if config.get('with_json', False):
-        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
     if config.get('with_features', False):
-        senzing_engine_flags = senzing_engine_flags | G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
+        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_ALL_FEATURES
 
     # Create iterator over JSON Lines and ingest data.
 
