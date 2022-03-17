@@ -744,11 +744,17 @@ class G2Client:
         self.g2_engine = g2_engine
         self.senzing_sdk_version_major = config.get("senzing_sdk_version_major")
 
+        # Support prior Senzing versions.
+
+        if self.senzing_sdk_version_major == 2:
+            self.g2_config.addDataSource = self.g2_config.addDataSourceV2
+            self.g2_config.addEntityType = self.g2_config.addEntityTypeV2
+            self.g2_config.listDataSources = self.g2_config.listDataSourcesV2
+            self.g2_config.listDataSources = self.g2_config.listDataSourcesV2
+            self.g2_engine.reinit = self.g2_engine.reinitV2
+
         self.data_sources = self.get_data_sources_list()
         self.entity_types = self.get_entity_types_list()
-
-        logging.info(">>> data_sources: {0}".format(self.data_sources))
-        logging.info(">>> entity_types: {0}".format(self.entity_types))
 
     def add_data_source(self, data_source):
         ''' Add a data source to G2 configuration. '''
@@ -761,7 +767,7 @@ class G2Client:
         }
         data_source_json = json.dumps(data_source_dictionary)
         response_bytearray = bytearray()
-        self.g2_config.addDataSourceV2(config_handle, data_source_json, response_bytearray)
+        self.g2_config.addDataSource(config_handle, data_source_json, response_bytearray)
         logging.info(message_info(111, data_source, response_bytearray.decode()))
 
         # Push configuration to database.
@@ -772,22 +778,26 @@ class G2Client:
     def add_entity_type(self, entity_type):
         ''' Add an entity type to G2 configuration. '''
 
-        # Add entity type to configuration.
+        # Only valid upto Senzing Version 2.
 
-        config_handle = self.get_config_handle()
-        entity_type_dictionary = {
-            "ETYPE_CODE": entity_type,
-            "ECLASS_CODE": "ACTOR"
-        }
-        entity_type_json = json.dumps(entity_type_dictionary)
-        response_bytearray = bytearray()
-        self.g2_config.addEntityTypeV2(config_handle, entity_type_json, response_bytearray)
-        logging.info(message_info(112, entity_type, response_bytearray))
+        if self.senzing_sdk_version_major == 2:
 
-        # Push configuration to database.
+            # Add entity type to configuration.
 
-        configuration_comment = message(102, entity_type)
-        self.persist_configuration(config_handle, configuration_comment)
+            config_handle = self.get_config_handle()
+            entity_type_dictionary = {
+                "ETYPE_CODE": entity_type,
+                "ECLASS_CODE": "ACTOR"
+            }
+            entity_type_json = json.dumps(entity_type_dictionary)
+            response_bytearray = bytearray()
+            self.g2_config.addEntityType(config_handle, entity_type_json, response_bytearray)
+            logging.info(message_info(112, entity_type, response_bytearray))
+
+            # Push configuration to database.
+
+            configuration_comment = message(102, entity_type)
+            self.persist_configuration(config_handle, configuration_comment)
 
     def is_g2_default_configuration_changed(self):
 
@@ -822,7 +832,7 @@ class G2Client:
 
         # Apply new configuration to g2_engine.
 
-        self.g2_engine.reinitV2(default_config_id)
+        self.g2_engine.reinit(default_config_id)
 
     def add_record(self, jsonline):
         ''' Run G2Engine.addRecord(). '''
@@ -894,10 +904,7 @@ class G2Client:
         ''' Determine data_sources already defined. '''
         config_handle = self.get_config_handle()
         datasources_bytearray = bytearray()
-        if self.senzing_sdk_version_major == 2:
-            self.g2_config.listDataSourcesV2(config_handle, datasources_bytearray)
-        else:
-            self.g2_config.listDataSources(config_handle, datasources_bytearray)
+        self.g2_config.listDataSources(config_handle, datasources_bytearray)
         datasources_dictionary = json.loads(datasources_bytearray.decode())
         return [x.get("DSRC_CODE") for x in datasources_dictionary.get("DATA_SOURCES")]
 
@@ -952,7 +959,7 @@ class G2Client:
 
         # Re-initialize G2 engine.
 
-        self.g2_engine.reinitV2(configuration_id_bytearray)
+        self.g2_engine.reinit(configuration_id_bytearray)
 
     def purge_repository(self):
         ''' Run G2Engine.purgeRepository(). '''
