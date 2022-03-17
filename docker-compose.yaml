@@ -7,7 +7,7 @@ services:
     networks:
       - backend
     read_only: true
-    restart: never
+    restart: on-failure
     user: "0"
     volumes:
       - ${SENZING_DATA_VERSION_DIR:-/opt/senzing/data/2.0.0}:/opt/senzing/data

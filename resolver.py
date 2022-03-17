@@ -613,6 +613,7 @@ def get_configuration(args):
 
     result['program_version'] = __version__
     result['program_updated'] = __updated__
+    result['senzing_sdk_version_major'] = senzing_sdk_version_major
 
     # Special case: subcommand from command-line
 
@@ -741,6 +742,8 @@ class G2Client:
         self.g2_config = g2_config
         self.g2_configuration_manager = g2_configuration_manager
         self.g2_engine = g2_engine
+        self.senzing_sdk_version_major = config.get("senzing_sdk_version_major")
+
         self.data_sources = self.get_data_sources_list()
         self.entity_types = self.get_entity_types_list()
 
@@ -888,7 +891,10 @@ class G2Client:
         ''' Determine data_sources already defined. '''
         config_handle = self.get_config_handle()
         datasources_bytearray = bytearray()
-        self.g2_config.listDataSourcesV2(config_handle, datasources_bytearray)
+        if self.senzing_sdk_version_major == 2:
+            self.g2_config.listDataSourcesV2(config_handle, datasources_bytearray)
+        else:
+            self.g2_config.listDataSources(config_handle, datasources_bytearray)
         datasources_dictionary = json.loads(datasources_bytearray.decode())
         return [x.get("DSRC_CODE") for x in datasources_dictionary.get("DATA_SOURCES")]
 
@@ -896,9 +902,12 @@ class G2Client:
         ''' Determine entity_types already defined. '''
         config_handle = self.get_config_handle()
         entity_types_bytearray = bytearray()
-        self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
-        entity_types_dictionary = json.loads(entity_types_bytearray.decode())
-        return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES")]
+
+        entity_types_dictionary = {}
+        if self.senzing_sdk_version_major == 2:
+            self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
+            entity_types_dictionary = json.loads(entity_types_bytearray.decode())
+        return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES", {})]
 
     def get_resolved_entities(self, senzing_engine_flags=None):
         ''' Run G2Engine.exportJSONEngineReport(). '''
