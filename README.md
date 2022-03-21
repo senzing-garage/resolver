@@ -1,5 +1,9 @@
 # resolver
 
+## Synopsis
+
+Performs resolution on a single set of input records.  There is no persistence of input records.
+
 ## Overview
 
 The [resolver.py](resolver.py) python script receives records, sends the records to Senzing, then queries Senzing for the resolved entities.
@@ -202,7 +206,7 @@ Configuration values specified by environment variable or command line parameter
 - **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_subcommand)**
 - **[SENZING_VAR_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_var_dir)**
 
-1. To determine which configuration parameters are used for each `<subcommand>`, run:
+1. To determine which configuration parameters are used for each `subcommand`, run:
 
     ```console
     ./resolver.py <subcommand> --help
@@ -491,7 +495,7 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
 
 #### Use public registry
 
-_Method #1:_ Pulls docker images from public internet registry.
+**Method #1:** Pulls docker images from public internet registry.
 
 1. Use the default public `docker.io` registry which pulls images from
    [hub.docker.com](https://hub.docker.com/).
@@ -504,7 +508,7 @@ _Method #1:_ Pulls docker images from public internet registry.
 
 #### Use private registry
 
-_Method #2:_ Pulls docker images from a private registry.
+**Method #2:** Pulls docker images from a private registry.
 
 1. :pencil2: Specify a private registry.
    Example:
@@ -518,7 +522,7 @@ _Method #2:_ Pulls docker images from a private registry.
 
 #### Use minikube registry
 
-_Method #3:_ Pulls docker images from minikube's registry.
+**Method #3:** Pulls docker images from minikube's registry.
 
 1. Use minikube's docker registry using
    [minkube addons enable](https://minikube.sigs.k8s.io/docs/commands/addons/#minikube-addons-enable) and
@@ -718,7 +722,7 @@ Choose one:
 
 #### Root container method
 
-_Method #1:_ This method is simpler, but requires a root container.
+**Method #1:** This method is simpler, but requires a root container.
 This method uses a dockerized [apt](https://github.com/Senzing/docker-apt) command.
 
 1. Install chart using
@@ -753,7 +757,7 @@ This method uses a dockerized [apt](https://github.com/Senzing/docker-apt) comma
 
 #### Non-root container method
 
-_Method #2:_ This method can be done on kubernetes with a non-root container.
+**Method #2:** This method can be done on kubernetes with a non-root container.
 The following instructions are done on a non-kubernetes machine which allows root docker containers.
 Example: A personal laptop.
 
@@ -827,7 +831,7 @@ Example: A personal laptop.
 
 #### yum localinstall method
 
-_Method #3:_ This method inserts the Senzing RPMs into the minikube environment for a `yum localinstall`.
+**Method #3:** This method inserts the Senzing RPMs into the minikube environment for a `yum localinstall`.
 The advantage of this method is that the Senzing RPMs are not downloaded from the internet during installation.
 This produces the same result as the `apt` installs describe in prior methods.
 *Note:*  The environment variables were "sourced" in
