@@ -126,8 +126,8 @@ as a guide, start a minikube cluster.
    Example:
 
     ```console
-    export SENZING_DEB_SENZING_API=~/Downloads/senzingapi-XXXXXXXX_2.8.3-21277_amd64.deb
-    export SENZING_DEB_SENZING_DATA=~/Downloads/senzingdata-v2_2.0.0-2_amd64.deb
+    export SENZING_DEB_SENZING_API=~/Downloads/senzingapi-XXXXXXXX_3.0.0-22119_amd64.deb
+    export SENZING_DEB_SENZING_DATA=~/Downloads/senzingdata-v3-3.0.0_amd64.deb
     ```
 
 1. :pencil2: Location of Senzing configuration (`gtc`) file on local system:
@@ -465,8 +465,8 @@ will be used later to:
    Example:
 
     ```console
-    mv /opt/senzing/data/2.0.0/* /opt/senzing/data
-    rmdir /opt/senzing/data/2.0.0
+    mv /opt/senzing/data/3.0.0/* /opt/senzing/data
+    rmdir /opt/senzing/data/3.0.0
     ```
 
 1. Exit the console pod.
