@@ -10,19 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed in 2.2.0
 
- - Support for senzingdata-v3.
+- Support for senzingdata-v3.
 
 ## [2.1.2] - 2022-05-04
 
 ### Changed in 2.1.2
 
- - Last release supporting senzingdata-v2.
+- Last release supporting senzingdata-v2.
 
 ## [2.1.1] - 2022-03-21
 
 ### Changed in 2.1.1
 
- - Support for enhanced v3 python package styles
+- Support for enhanced v3 python package styles
 
 ## [2.1.0] - 2021-12-14
 
