@@ -66,9 +66,9 @@ except:
 app = Flask(__name__)
 
 __all__ = []
-__version__ = "2.1.1"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "2.2.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2022-03-21'
+__updated__ = '2022-05-05'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -670,9 +670,9 @@ def get_configuration(args):
         if relative_path:
             result[path] = os.path.abspath(relative_path)
 
-    # Special case: /opt/senzing/data/2.0.0
+    # Special case: /opt/senzing/data/3.0.0
 
-    test_data_dir_path = "{0}/2.0.0".format(result.get('data_dir'))
+    test_data_dir_path = "{0}/3.0.0".format(result.get('data_dir'))
     if os.path.exists(test_data_dir_path):
         result['data_dir'] = test_data_dir_path
 
