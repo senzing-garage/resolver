@@ -47,7 +47,7 @@ image.
     ```console
     curl -X GET \
       --output ~/init-container.py \
-      https://raw.githubusercontent.com/Senzing/docker-init-container/master/init-container.py
+      https://raw.githubusercontent.com/Senzing/docker-init-container/main/init-container.py
     ```
 
 1. Make `init-container.py` executable.

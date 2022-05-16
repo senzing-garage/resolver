@@ -89,7 +89,7 @@ To see the options for a subcommand, run commands like:
 
 At [Senzing](http://senzing.com),
 we strive to create GitHub documentation in a
-"[don't make me think](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/dont-make-me-think.md)" style.
+"[don't make me think](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/dont-make-me-think.md)" style.
 For the most part, instructions are copy and paste.
 Whenever thinking is needed, it's marked with a "thinking" icon :thinking:.
 Whenever customization is needed, it's marked with a "pencil" icon :pencil2:.
@@ -108,16 +108,16 @@ describing where we can improve.   Now on with the show...
 ## Related artifacts
 
 1. [DockerHub](https://hub.docker.com/r/senzing/resolver)
-1. [Helm Chart](https://github.com/Senzing/charts/tree/master/charts/resolver)
+1. [Helm Chart](https://github.com/Senzing/charts/tree/main/charts/resolver)
 
 ## Expectations
 
 - **Space:** This repository and demonstration require 20 GB free disk space.
 - **Time:** Budget 4 hours to get the demonstration up-and-running, depending on CPU and network speeds.
 - **Background knowledge:** This repository assumes a working knowledge of:
-  - [Docker](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/docker.md)
-  - [Kubernetes](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/kubernetes.md)
-  - [Helm](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/helm.md)
+  - [Docker](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/docker.md)
+  - [Kubernetes](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/kubernetes.md)
+  - [Helm](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/helm.md)
 
 ## Demonstrate using Command Line
 
@@ -125,9 +125,9 @@ describing where we can improve.   Now on with the show...
 
 The following software programs need to be installed:
 
-1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
-1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-data.md)
-1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md)
+1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
+1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-data.md)
+1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-api.md)
 
 ### Clone repository
 
@@ -140,7 +140,7 @@ The following software programs need to be installed:
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Install
 
@@ -185,26 +185,26 @@ The following software programs need to be installed:
 ### Initialize Senzing
 
 1. If Senzing has not been initialized, visit
-   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/initialize-senzing-with-docker.md)".
+   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/initialize-senzing-with-docker.md)".
 
 ### Configuration
 
 Configuration values specified by environment variable or command line parameter.
 
-- **[SENZING_DATA_SOURCE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_data_source)**
-- **[SENZING_DATA_VERSION_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_data_version_dir)**
-- **[SENZING_DATABASE_URL](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_database_url)**
-- **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_debug)**
-- **[SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_dir)**
-- **[SENZING_ENTITY_TYPE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_entity_type)**
-- **[SENZING_ETC_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_etc_dir)**
-- **[SENZING_G2_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_g2_dir)**
-- **[SENZING_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_log_level)**
-- **[SENZING_NETWORK](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_network)**
-- **[SENZING_RUNAS_USER](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_runas_user)**
-- **[SENZING_SLEEP_TIME](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_sleep_time)**
-- **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_subcommand)**
-- **[SENZING_VAR_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_var_dir)**
+- **[SENZING_DATA_SOURCE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_data_source)**
+- **[SENZING_DATA_VERSION_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_data_version_dir)**
+- **[SENZING_DATABASE_URL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_database_url)**
+- **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_debug)**
+- **[SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_dir)**
+- **[SENZING_ENTITY_TYPE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_entity_type)**
+- **[SENZING_ETC_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_etc_dir)**
+- **[SENZING_G2_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_g2_dir)**
+- **[SENZING_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_log_level)**
+- **[SENZING_NETWORK](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_network)**
+- **[SENZING_RUNAS_USER](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_runas_user)**
+- **[SENZING_SLEEP_TIME](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_sleep_time)**
+- **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_subcommand)**
+- **[SENZING_VAR_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_var_dir)**
 
 1. To determine which configuration parameters are used for each `subcommand`, run:
 
@@ -216,7 +216,7 @@ Configuration values specified by environment variable or command line parameter
 
 1. :pencil2: Specify the directory containing the Senzing installation.
    Use the same `SENZING_VOLUME` value used when performing
-   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/initialize-senzing-with-docker.md)".
+   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/initialize-senzing-with-docker.md)".
    Example:
 
     ```console
@@ -233,10 +233,10 @@ Configuration values specified by environment variable or command line parameter
         ```
 
     1. :warning:
-       **macOS** - [File sharing](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/share-directories-with-docker.md#macos)
+       **macOS** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#macos)
        must be enabled for `SENZING_VOLUME`.
     1. :warning:
-       **Windows** - [File sharing](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/share-directories-with-docker.md#windows)
+       **Windows** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#windows)
        must be enabled for `SENZING_VOLUME`.
 
 1. Identify the `data_version`, `etc`, `g2`, and `var` directories.
@@ -376,9 +376,9 @@ This Option uses file input and output.
 
 ### Prerequisite software for Helm demonstration
 
-1. [minikube](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-minikube.md)
-1. [kubectl](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-kubectl.md)
-1. [Helm 3](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-helm.md)
+1. [minikube](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-minikube.md)
+1. [kubectl](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-kubectl.md)
+1. [Helm 3](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-helm.md)
 
 ### Clone repository for Helm demonstration
 
@@ -393,7 +393,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Create artifact directory
 
@@ -451,7 +451,7 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
    This ensures that you make a conscious effort to accept the EULA.
    Example:
 
-    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
+    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
 
 ### Set environment variables
 
@@ -468,21 +468,21 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/docker-versions-latest.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-latest.sh)
     ```
 
 1. Retrieve stable Helm Chart version numbers and set their environment variables.
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/helm-versions-stable.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/helm-versions-stable.sh)
     ```
 
 1. Retrieve latest Senzing version numbers and set their environment variables.
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/senzing-versions-latest.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-latest.sh)
     ```
 
 ### Identify Docker registry
@@ -1094,14 +1094,14 @@ Delete minikube artifacts using
 
 The following software programs need to be installed:
 
-1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
-1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md)
-1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
+1. [make](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-make.md)
+1. [docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-docker.md)
 
 ### Clone repository for development
 
 For more information on environment variables,
-see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md).
+see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md).
 
 1. Set these environment variable values:
 
@@ -1112,7 +1112,7 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Build docker image for development
 
