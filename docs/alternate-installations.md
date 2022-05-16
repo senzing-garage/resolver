@@ -40,7 +40,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
 
 ### Create artifact directory
 
@@ -105,21 +105,21 @@ as a guide, start a minikube cluster.
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/docker-versions-latest.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-latest.sh)
     ```
 
 1. Retrieve stable Helm Chart version numbers and set their environment variables.
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/helm-versions-stable.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/helm-versions-stable.sh)
     ```
 
 1. Retrieve latest Senzing version numbers and set their environment variables.
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/master/lists/senzing-versions-latest.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-latest.sh)
     ```
 
 1. :pencil2: Locations of Senzing `deb` files on local system:
