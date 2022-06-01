@@ -706,66 +706,14 @@ If PVs and PVCs already exist, this step may be skipped.
     helm repo list
     ```
 
-
 ### Deploy Senzing
 
-:thinking: This deployment initializes the Persistent Volume with Senzing code and data
+This deployment initializes the Persistent Volume with Senzing code and data
 at `/opt/senzing/g2` and `/opt/senzing/data`.
 These paths are relative to inside the containers via PVC mounts.
 The actual location on the PVC may vary.
 
-There are 4 options when it comes to initializing the Persistent Volume with Senzing code and data.
-Choose one:
-
-1. [Root container method](#root-container-method) - requires a root container
-1. [senzing/installer container method](#senzing-installer-container-method) - uses
-   [senzing/installer](https://github.com/Senzing/docker-installer)
-   container optionally built in
-   [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
-   step.
-1. [Non-root container method](#non-root-container-method) - can be done on kubernetes with a non-root container
-1. [yum localinstall method](#yum-localinstall-method) - Uses existing Senzing RPMs, so no downloading during installation.
-
-#### Root container method
-
-**Method #1:** This method is simpler, but requires a root container.
-This method uses a dockerized [apt](https://github.com/Senzing/docker-apt) command.
-
-1. Install
-   [senzing/senzing-apt](https://github.com/Senzing/charts/tree/main/charts/senzing-apt)
-   chart using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-apt \
-      senzing/senzing-apt \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-apt.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_APT:-""}
-    ```
-
-1. Wait until Job has completed using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. Example of completion:
-
-    ```console
-    NAME                       READY   STATUS      RESTARTS   AGE
-    my-senzing-apt-8n2ql       0/1     Completed   0          2m44s
-    ```
-
-#### senzing/installer container method
-
-**Method #2:** This method uses a docker container to copy Senzing binaries that are "baked-in"
+This method uses a docker container to copy Senzing binaries that are "baked-in"
 the container to mounted volumes.
 This method requires:
 
@@ -831,220 +779,6 @@ The actual location on the PVC may vary.
     my-senzing-installer-8n2ql   0/1     Completed   0          2m44s
     ```
 
-#### Non-root container method
-
-**Method #3:** This method can be done on kubernetes with a non-root container.
-The following instructions are done on a non-kubernetes machine which allows root docker containers.
-Example: A personal laptop.
-
-1. Set environment variables.
-   Example:
-
-    ```console
-    export SENZING_DATA_DIR=${SENZING_DEMO_DIR}/data
-    export SENZING_G2_DIR=${SENZING_DEMO_DIR}/g2
-    ```
-
-1. Run docker container to download and extract Senzing binaries to
-   `SENZING_DATA_DIR` and `SENZING_G2_DIR`.
-   Example:
-
-    ```console
-    sudo docker run \
-      --env SENZING_ACCEPT_EULA=${SENZING_ACCEPT_EULA} \
-      --interactive \
-      --rm \
-      --tty \
-      --volume ${SENZING_DATA_DIR}:/opt/senzing/data \
-      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-      senzing/apt
-    ```
-
-1. Install
-   [senzing/senzing-base](https://github.com/Senzing/charts/tree/main/charts/senzing-base)
-   chart with non-root container using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   This pod will be the recipient of `kubectl cp` commands.
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-base \
-      senzing/senzing-base \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-base.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_BASE:-""}
-    ```
-
-1. Wait for pod to run using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. Identify Senzing Base pod name.
-   Example:
-
-    ```console
-    export SENZING_BASE_POD_NAME=$(kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --output jsonpath="{.items[0].metadata.name}" \
-      --selector "app.kubernetes.io/name=senzing-base, \
-                  app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-base" \
-      )
-    ```
-
-1. Copy files from local machine to Senzing Base pod using
-   [kubectl cp](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#cp).
-   Example:
-
-    ```console
-    kubectl cp ${SENZING_DATA_DIR} ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/data
-    kubectl cp ${SENZING_G2_DIR}   ${DEMO_NAMESPACE}/${SENZING_BASE_POD_NAME}:/opt/senzing/g2
-    ```
-
-#### yum localinstall method
-
-**Method #4:** This method inserts the Senzing RPMs into the minikube environment for a `yum localinstall`.
-The advantage of this method is that the Senzing RPMs are not downloaded from the internet during installation.
-This produces the same result as the `apt` installs describe in prior methods.
-**Note:**  The environment variables were "sourced" in
-[Set environment variables](#set-environment-variables).
-
-1. :pencil2: Identify a directory to store downloaded files.
-   Example:
-
-    ```console
-    export DOWNLOAD_DIR=~/Downloads
-    ```
-
-1. Download Senzing RPMs.
-   Example:
-
-    ```console
-    docker run \
-      --rm \
-      --volume ${DOWNLOAD_DIR}:/download \
-      senzing/yumdownloader \
-        senzingapi-${SENZING_VERSION_SENZINGAPI_BUILD} \
-        senzingdata-v2-${SENZING_VERSION_SENZINGDATA_BUILD}
-    ```
-
-1. Copy files into minikube.
-   Example:
-
-    ```console
-    scp -i $(minikube ssh-key) \
-        ${DOWNLOAD_DIR}/${SENZING_VERSION_SENZINGAPI_RPM_FILENAME} \
-        docker@$(minikube ip):/home/docker
-
-    scp -i $(minikube ssh-key) \
-        ${DOWNLOAD_DIR}/${SENZING_VERSION_SENZINGDATA_RPM_FILENAME} \
-        docker@$(minikube ip):/home/docker
-    ```
-
-1. Log into `minikube` instance using
-   [minikube ssh](https://minikube.sigs.k8s.io/docs/commands/ssh/).
-   Example:
-
-    ```console
-    minikube ssh
-    ```
-
-1. In the `minikube` instance, move files to `/mnt/vda1/senzing/senzing-rpms`.
-   Example:
-
-    ```console
-    sudo mkdir -p /mnt/vda1/senzing/senzing-rpms
-    sudo mv /home/docker/senzingdata* /mnt/vda1/senzing/senzing-rpms
-    sudo mv /home/docker/senzingapi* /mnt/vda1/senzing/senzing-rpms
-    exit
-    ```
-
-1. Install
-   [senzing/senzing-yum](https://github.com/Senzing/charts/tree/main/charts/senzing-yum)
-   chart to perform `yum localinstall` using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-yum \
-      senzing/senzing-yum \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-yum-localinstall.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_YUM:-""}
-    ```
-
-1. Wait until Job has completed using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. Example of completion:
-
-    ```console
-    NAME                       READY   STATUS      RESTARTS   AGE
-    my-senzing-yum-8n2ql       0/1     Completed   0          2m44s
-    ```
-
-### Install senzing-console Helm chart
-
-The [senzing-console](https://github.com/Senzing/docker-senzing-console)
-will be used later to
-inspect mounted volumes,
-debug issues, or
-run command-line tools.
-
-1. Install
-   [senzing/senzing-console](https://github.com/Senzing/charts/tree/main/charts/senzing-console)
-   chart using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-console \
-      senzing/senzing-console \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-console.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_CONSOLE:-""}
-    ```
-
-1. Wait until Deployment has completed using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. In a separate terminal window, log into Senzing Console pod using
-   [kubectl exec](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#exec).
-   Example:
-
-    ```console
-    export CONSOLE_POD_NAME=$(kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --output jsonpath="{.items[0].metadata.name}" \
-      --selector "app.kubernetes.io/name=senzing-console, \
-                  app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-console" \
-      )
-
-    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${CONSOLE_POD_NAME} -- /bin/bash
-    ```
-
 ### Install init-container Helm chart
 
 The [init-container](https://github.com/Senzing/docker-init-container)
@@ -1061,7 +795,7 @@ creates files from templates and initializes the G2 database.
       ${DEMO_PREFIX}-senzing-init-container \
       senzing/senzing-init-container \
       --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-init-container-postgresql.yaml \
+      --values ${HELM_VALUES_DIR}/senzing-init-container.yaml \
       --version ${SENZING_HELM_VERSION_SENZING_INIT_CONTAINER:-""}
     ```
 
@@ -1147,12 +881,8 @@ Delete Kubernetes artifacts using
 1. Example:
 
     ```console
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-console
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-resolver
+    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-resolver
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-init-container
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-yum
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-apt
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-base
     helm repo remove senzing
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-senzing.yaml
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-senzing.yaml
