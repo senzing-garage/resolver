@@ -240,7 +240,7 @@ The following software programs need to be installed:
         ```console
         curl -X GET \
           --output ${SENZING_VOLUME}/docker-versions-stable.sh \
-          https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable
+          https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
         source ${SENZING_VOLUME}/docker-versions-stable.sh
 
         sudo docker run \
