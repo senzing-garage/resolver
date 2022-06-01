@@ -50,6 +50,7 @@ To see the options for a subcommand, run commands like:
     1. [Clone repository](#clone-repository)
     1. [Install](#install)
     1. [Run commands](#run-commands)
+    1. [HTTP requests](#http-requests)
 1. [Demonstrate using Docker](#demonstrate-using-docker)
     1. [Initialize Senzing](#initialize-senzing)
     1. [Configuration](#configuration)
@@ -126,7 +127,6 @@ describing where we can improve.   Now on with the show...
 The following software programs need to be installed:
 
 1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
-1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-data.md)
 1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-api.md)
 
 ### Clone repository
@@ -150,18 +150,35 @@ The following software programs need to be installed:
 
 ### Run commands
 
-1. :pencil2: Run command for file input/output.
-   Note: **GIT_REPOSITORY_DIR** needs to be set.
+1. Make sure the following environment variables are set.
+   Example:
+
+    ```console
+    export LD_LIBRARY_PATH=/opt/senzing/g2/lib:/opt/senzing/g2/lib/debian:$LD_LIBRARY_PATH
+    export PYTHONPATH=/opt/senzing/g2/python
+    ```
+
+1. View `file-input` subcommand parameters.
+   Example:
+
+    ```console
+    cd ${GIT_REPOSITORY_DIR}
+    ./resolver.py file-input --help
+    ```
+
+1. Run command for file input/output.
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py file-input \
-      --input-file test/test-data-1.json
+      --input-file test/test-data-1.json \
+      --output-file ${GIT_REPOSITORY_DIR}/resolver-output.json
     ```
 
-1. :pencil2: Run command for starting HTTP API.
-   Note: **GIT_REPOSITORY_DIR** needs to be set.
+1. Run command for starting HTTP API.
+   Once service has started, try the
+   [HTTP requests](#http-requests).
    Example:
 
     ```console
@@ -169,23 +186,50 @@ The following software programs need to be installed:
     ./resolver.py service
     ```
 
-1. Test HTTP API.
-   Note: **GIT_REPOSITORY_DIR** needs to be set.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve
-    ```
-
 ## Demonstrate using Docker
 
 ### Initialize Senzing
 
-1. If Senzing has not been initialized, visit
-   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/initialize-senzing-with-docker.md)".
+1. If Senzing has not been installed,
+   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
+1. If Senzing has not been initialized and configured,
+   [configure Senzing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/configure-senzing.md).
+   Example:
+
+    1. :pencil2: Identify location of Senzing installation.
+
+        ```console
+        export SENZING_VOLUME=~/my-senzing
+        ```
+
+    1. Identify directories for Senzing files.
+       Example:
+
+        ```console
+        export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
+        export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
+        export SENZING_G2_DIR=${SENZING_VOLUME}/g2
+        export SENZING_VAR_DIR=${SENZING_VOLUME}/var
+        ```
+
+    1. Initialize Senzing.
+       Example:
+
+        ```console
+        curl -X GET \
+          --output ${SENZING_VOLUME}/docker-versions-stable.sh \
+          https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
+        source ${SENZING_VOLUME}/docker-versions-stable.sh
+
+        sudo docker run \
+          --rm \
+          --user 0 \
+          --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+          --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+          --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+          --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+          senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+        ```
 
 ### Configuration
 
@@ -216,21 +260,12 @@ Configuration values specified by environment variable or command line parameter
 
 1. :pencil2: Specify the directory containing the Senzing installation.
    Use the same `SENZING_VOLUME` value used when performing
-   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/initialize-senzing-with-docker.md)".
+   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
    Example:
 
     ```console
     export SENZING_VOLUME=~/my-senzing
     ```
-
-    1. Here's a simple test to see if `SENZING_VOLUME` is correct.
-       The following commands should return file contents.
-       Example:
-
-        ```console
-        cat ${SENZING_VOLUME}/g2/g2BuildVersion.json
-        cat ${SENZING_VOLUME}/data/3.0.0/libpostal/data_version
-        ```
 
     1. :warning:
        **macOS** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#macos)
@@ -243,101 +278,42 @@ Configuration values specified by environment variable or command line parameter
    Example:
 
     ```console
-    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/3.0.0
+    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
     export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
     export SENZING_G2_DIR=${SENZING_VOLUME}/g2
     export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-    ```
-
-### Docker network
-
-:thinking: **Optional:**  Use if docker container is part of a docker network.
-
-1. List docker networks.
-   Example:
-
-    ```console
-    sudo docker network ls
-    ```
-
-1. :pencil2: Specify docker network.
-   Choose value from NAME column of `docker network ls`.
-   Example:
-
-    ```console
-    export SENZING_NETWORK=*nameofthe_network*
-    ```
-
-1. Construct parameter for `docker run`.
-   Example:
-
-    ```console
-    export SENZING_NETWORK_PARAMETER="--net ${SENZING_NETWORK}"
-    ```
-
-### Docker user
-
-:thinking: **Optional:**  The docker container runs as "USER 1001".
-Use if a different userid (UID) is required.
-
-1. :pencil2: Manually identify user.
-   User "0" is root.
-   Example:
-
-    ```console
-    export SENZING_RUNAS_USER="0"
-    ```
-
-   Another option, use current user.
-   Example:
-
-    ```console
-    export SENZING_RUNAS_USER=$(id -u)
-    ```
-
-1. Construct parameter for `docker run`.
-   Example:
-
-    ```console
-    export SENZING_RUNAS_USER_PARAMETER="--user ${SENZING_RUNAS_USER}"
     ```
 
 ### Run docker container
 
 #### Option #1
 
-This Option starts a micro-service supporting HTTP requests.
+This option starts a micro-service supporting HTTP requests.
 
 1. Run the docker container.
    Example:
 
     ```console
+    curl -X GET \
+      --output ${SENZING_VOLUME}/docker-versions-stable.sh \
+      https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
+    source ${SENZING_VOLUME}/docker-versions-stable.sh
+
     sudo \
       --preserve-env \
       docker run \
-        --interactive \
         --publish 8252:8252 \
         --rm \
-        --tty \
         --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        ${SENZING_NETWORK_PARAMETER} \
-        ${SENZING_RUNAS_USER_PARAMETER} \
-        senzing/resolver
+        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
     ```
 
 1. Test HTTP API.
-   Note: **GIT_REPOSITORY_DIR** needs to be set.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve
-    ```
+   Once service has started, try the
+   [HTTP requests](#http-requests).
 
 #### Option #2
 
@@ -354,6 +330,11 @@ This Option uses file input and output.
    Example:
 
     ```console
+    curl -X GET \
+      --output ${SENZING_VOLUME}/docker-versions-stable.sh \
+      https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
+    source ${SENZING_VOLUME}/docker-versions-stable.sh
+
     sudo \
       --preserve-env \
       docker run \
@@ -363,9 +344,7 @@ This Option uses file input and output.
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        ${SENZING_NETWORK_PARAMETER} \
-        ${SENZING_RUNAS_USER_PARAMETER} \
-        senzing/resolver file-input \
+        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER} file-input \
           --input-file  /data/test-data-1.json \
           --output-file /data/my-output.json
     ```
@@ -1141,6 +1120,47 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/main/
     Note: `sudo make docker-build-development-cache` can be used to create cached docker layers.
 
 ## Examples
+
+### HTTP requests
+
+1. Set these environment variable values:
+
+    ```console
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=resolver
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+    ```
+
+1. Test HTTP API.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve
+    ```
+
+1. Test HTTP API with JSON.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve?withJson=true
+    ```
+
+1. Test HTTP API with Features.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve?withFeatures=true
+    ```
 
 ## Errors
 

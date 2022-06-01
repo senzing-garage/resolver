@@ -1,0 +1,20 @@
+[pylint]
+disable=
+    broad-except,
+    consider-using-f-string,
+    fixme,
+    global-statement,
+    import-error,
+    line-too-long,
+    no-self-use,
+    too-few-public-methods,
+    too-many-branches,
+    too-many-lines,
+    too-many-locals,
+    unspecified-encoding,
+good-names=
+    template-python
+ignore=
+    __init__.py,
+notes=
+    FIXME,
