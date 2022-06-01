@@ -150,6 +150,14 @@ The following software programs need to be installed:
 
 ### Run commands
 
+1. Make sure the following environment variables are set.
+   Example:
+
+    ```console
+    export LD_LIBRARY_PATH=/opt/senzing/g2/lib:/opt/senzing/g2/lib/debian:$LD_LIBRARY_PATH
+    export PYTHONPATH=/opt/senzing/g2/python
+    ```
+
 1. View `file-input` subcommand parameters.
    Example:
 
