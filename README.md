@@ -127,7 +127,6 @@ The following software programs need to be installed:
 
 1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
 1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-api.md)
-1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-data.md)
 
 ### Clone repository
 
