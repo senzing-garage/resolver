@@ -1,4 +1,4 @@
-# See https://github.com/Senzing/charts/tree/main/charts/senzing-init-container#parameters
+# See https://github.com/Senzing/charts/tree/main/charts/senzing-installer#parameters
 
 main:
 
@@ -10,8 +10,7 @@ main:
 
   image:
     registry: ${DOCKER_REGISTRY_URL}
-    tag: ${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+    tag: ${SENZING_VERSION_SENZINGAPI}
 
   senzing:
-    databaseUrl: "sqlite3://na:na@/var/opt/senzing/sqlite/G2C.db"
     persistentVolumeClaim: senzing-persistent-volume-claim

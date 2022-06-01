@@ -432,7 +432,7 @@ as a guide, start a minikube cluster.
     export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
     ```
 
-1. Retrieve latest docker image version numbers and set their environment variables.
+1. Retrieve stable docker image version numbers and set their environment variables.
    Example:
 
     ```console
@@ -446,7 +446,7 @@ as a guide, start a minikube cluster.
     source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/helm-versions-stable.sh)
     ```
 
-1. Retrieve latest Senzing version numbers and set their environment variables.
+1. Retrieve stable Senzing version numbers and set their environment variables.
    Example:
 
     ```console
@@ -467,8 +467,7 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
 
 ### Create senzing/installer docker image
 
-:thinking: **Optional:**
-One method of installing the Senzing binaries on the Kubernetes PV/PVC
+A method of installing the Senzing binaries on the Kubernetes PV/PVC
 is to make a Docker image that contains the contents of the Senzing `g2` and `data` folders.
 
 1. Run the `docker build` command using
@@ -1081,7 +1080,7 @@ This deployment launches the
 [resolver](https://github.com/Senzing/resolver).
 
 1. Install
-   [senzing/senzing-resolver](https://github.com/Senzing/charts/tree/main/charts/senzing-resolver)    
+   [senzing/senzing-resolver](https://github.com/Senzing/charts/tree/main/charts/senzing-resolver)
    chart using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    Example:
