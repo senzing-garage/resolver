@@ -169,43 +169,13 @@ The following software programs need to be installed:
     ```
 
 1. Run command for starting HTTP API.
+   Once service has started, try the
+   [HTTP requests](#http-requests).
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py service
-    ```
-
-### HTTP requests
-
-1. Test HTTP API.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve
-    ```
-
-1. Test HTTP API with JSON.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve?withJson=true
-    ```
-
-1. Test HTTP API with Features.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve?withFeatures=true
     ```
 
 ## Demonstrate using Docker
@@ -391,15 +361,8 @@ This option starts a micro-service supporting HTTP requests.
     ```
 
 1. Test HTTP API.
-   Note: **GIT_REPOSITORY_DIR** needs to be set.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve
-    ```
+   Once service has started, try the
+   [HTTP requests](#http-requests).
 
 #### Option #2
 
@@ -1203,6 +1166,38 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/main/
     Note: `sudo make docker-build-development-cache` can be used to create cached docker layers.
 
 ## Examples
+
+### HTTP requests
+
+1. Test HTTP API.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve
+    ```
+
+1. Test HTTP API with JSON.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve?withJson=true
+    ```
+
+1. Test HTTP API with Features.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve?withFeatures=true
+    ```
 
 ## Errors
 
