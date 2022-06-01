@@ -126,8 +126,6 @@ describing where we can improve.   Now on with the show...
 The following software programs need to be installed:
 
 1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
-1. [senzingdata](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-data.md)
-1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-api.md)
 
 ### Clone repository
 
