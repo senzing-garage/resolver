@@ -218,7 +218,7 @@ The following software programs need to be installed:
    [configure Senzing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/configure-senzing.md).
    Example:
 
-    1. :pencil2: Identify location of Senzing installation
+    1. :pencil2: Identify location of Senzing installation.
 
         ```console
         export SENZING_VOLUME=~/my-senzing
@@ -238,7 +238,10 @@ The following software programs need to be installed:
        Example:
 
         ```console
-        sudo docker pull senzing/init-container:latest
+        curl -X GET \
+          --output ${SENZING_VOLUME}/docker-versions-stable.sh \
+          https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable
+        source ${SENZING_VOLUME}/docker-versions-stable.sh
 
         sudo docker run \
           --rm \
@@ -247,7 +250,7 @@ The following software programs need to be installed:
           --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
           --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
           --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-          senzing/init-container
+          senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
         ```
 
 ### Configuration
