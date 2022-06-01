@@ -221,7 +221,7 @@ The following software programs need to be installed:
     1. :pencil2: Identify location of Senzing installation
 
         ```console
-        export SENZING_VOLUME=~/senzing-3.0.0
+        export SENZING_VOLUME=~/my-senzing
         ```
 
     1. Identify directories for Senzing files.
