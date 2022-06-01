@@ -55,8 +55,6 @@ To see the options for a subcommand, run commands like:
     1. [Initialize Senzing](#initialize-senzing)
     1. [Configuration](#configuration)
     1. [Volumes](#volumes)
-    1. [Docker network](#docker-network)
-    1. [Docker user](#docker-user)
     1. [Run docker container](#run-docker-container)
 1. [Demonstrate using Helm](#demonstrate-using-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
@@ -376,11 +374,12 @@ The Git repository has files that will be used in the `helm install --values` pa
 
 ### Create artifact directory
 
-1. :pencil2: Create unique prefix.
+1. :pencil2: Create a unique prefix.
    This will be used in a local directory name
-   as well as a prefix to kubernetes object.
+   as well as a prefix to Kubernetes object.
 
-   :warning:  Must be all lowercase.
+   :warning:  Because it's used in Kubernetes resource names,
+   it must be all lowercase.
 
    Example:
 
@@ -422,16 +421,6 @@ as a guide, start a minikube cluster.
     minikube dashboard
     ```
 
-### EULA
-
-To use the Senzing code, you must agree to the End User License Agreement (EULA).
-
-1. :warning: This step is intentionally tricky and not simply copy/paste.
-   This ensures that you make a conscious effort to accept the EULA.
-   Example:
-
-    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
-
 ### Set environment variables
 
 1. Set environment variables listed in "[Clone repository](#clone-repository)".
@@ -447,7 +436,7 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-latest.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh)
     ```
 
 1. Retrieve stable Helm Chart version numbers and set their environment variables.
@@ -461,7 +450,35 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-latest.sh)
+    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-stable.sh)
+    ```
+
+### EULA
+
+To use the Senzing code, you must agree to the End User License Agreement (EULA).
+
+1. :warning:
+   To use the Senzing code, you must agree to the End User License Agreement (EULA).
+   This step is intentionally tricky and not simply copy/paste.
+   This ensures that you make a conscious effort to accept the EULA.
+   Example:
+
+    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
+
+### Create senzing/installer docker image
+
+:thinking: **Optional:**
+One method of installing the Senzing binaries on the Kubernetes PV/PVC
+is to make a Docker image that contains the contents of the Senzing `g2` and `data` folders.
+
+1. Run the `docker build` command using
+   [docker-build-senzing-installer.sh](../../bin/docker-build-senzing-installer.sh).
+   **Note:**
+   This will take a while as the Senzing binary packages will be downloaded.
+   Example:
+
+    ```console
+    ${GIT_REPOSITORY_DIR}/bin/docker-build-senzing-installer.sh
     ```
 
 ### Identify Docker registry
@@ -517,21 +534,21 @@ To use the Senzing code, you must agree to the End User License Agreement (EULA)
 
 ### Create custom helm values files
 
+For final customization of the Helm Charts,
+various files need to be created for use in the
+`--values` parameter of `helm install`.
+
 :thinking: In this step, Helm template files are populated with actual values.
 There are two methods of accomplishing this.
 Only one method needs to be performed.
 
-1. **Method #1:** Quick method using `envsubst`.
-   Example:
+1. **Method #1:** Helm template files are instantiated with actual values
+   into `${HELM_VALUES_DIR}` directory by using
+   [make-helm-values-files.sh](../../bin/make-helm-values-files.sh).
 
     ```console
     export HELM_VALUES_DIR=${SENZING_DEMO_DIR}/helm-values
-    mkdir -p ${HELM_VALUES_DIR}
-
-    for file in ${GIT_REPOSITORY_DIR}/helm-values-templates/*.yaml; \
-    do \
-      envsubst < "${file}" > "${HELM_VALUES_DIR}/$(basename ${file})";
-    done
+    ${GIT_REPOSITORY_DIR}/bin/make-helm-values-files.sh
     ```
 
 1. **Method #2:** Copy and manually modify files method.
@@ -551,23 +568,30 @@ Only one method needs to be performed.
     1. `${DOCKER_REGISTRY_URL}`
     1. `${SENZING_ACCEPT_EULA}`
 
+1. :thinking: **Optional:**
+   List newly generated files.
+   Example:
+
+    ```console
+    ls ${HELM_VALUES_DIR}
+    ```
+
 ### Create custom kubernetes configuration files
+
+Create Kubernetes manifest files for use with `kubectl create`.
 
 :thinking: In this step, Kubernetes template files are populated with actual values.
 There are two methods of accomplishing this.
 Only one method needs to be performed.
 
-1. **Method #1:** Quick method using `envsubst`.
+1. **Method #1:** Kubernetes manifest files are instantiated with actual values
+   into `{KUBERNETES_DIR}` directory by using
+   [make-kubernetes-manifest-files.sh](../../bin/make-kubernetes-manifest-files.sh).
    Example:
 
     ```console
     export KUBERNETES_DIR=${SENZING_DEMO_DIR}/kubernetes
-    mkdir -p ${KUBERNETES_DIR}
-
-    for file in ${GIT_REPOSITORY_DIR}/kubernetes-templates/*; \
-    do \
-      envsubst < "${file}" > "${KUBERNETES_DIR}/$(basename ${file})";
-    done
+    ${GIT_REPOSITORY_DIR}/bin/make-kubernetes-manifest-files.sh
     ```
 
 1. **Method #2:** Copy and manually modify files method.
@@ -586,34 +610,23 @@ Only one method needs to be performed.
 
 ### Save environment variables
 
+Environment variables will be needed in new terminal windows using
+[save-environment-variables.sh](../../bin/save-environment-variables.sh).
+
 1. Save environment variables into a file that can be sourced.
    Example:
 
     ```console
-    cat <<EOT > ${SENZING_DEMO_DIR}/environment.sh
-    #!/usr/bin/env bash
-
-    EOT
-
-    env \
-    | grep \
-        --regexp="^DEMO_" \
-        --regexp="^DATABASE_" \
-        --regexp="^DOCKER_" \
-        --regexp="^GIT_" \
-        --regexp="^HELM_" \
-        --regexp="^KUBERNETES_" \
-        --regexp="^SENZING_" \
-    | sort \
-    | awk -F= '{ print "export", $0 }' \
-    >> ${SENZING_DEMO_DIR}/environment.sh
-
-    chmod +x ${SENZING_DEMO_DIR}/environment.sh
+    ${GIT_REPOSITORY_DIR}/bin/save-environment-variables.sh
     ```
 
 ### Create namespace
 
-1. Create namespace using
+A new
+[Kubernetes namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+is created to isolate this demonstration from other applications running on Kubernetes.
+
+1. Create Kubernetes namespace using
    [kubectl create](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#create).
    Example:
 
@@ -631,6 +644,12 @@ Only one method needs to be performed.
     ```
 
 ### Create persistent volume
+
+:thinking: **Optional:**
+These steps for creating Persistent Volumes (PV) and Persistent Volume Claims (PVC)
+are for a demonstration environment.
+They are not sufficient for a production environment.
+If PVs and PVCs already exist, this step may be skipped.
 
 1. Create persistent volumes using
    [kubectl create](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#create).
@@ -688,14 +707,23 @@ Only one method needs to be performed.
     helm repo list
     ```
 
+
 ### Deploy Senzing
 
-:thinking: This deployment initializes the Persistent Volume with Senzing code and data.
+:thinking: This deployment initializes the Persistent Volume with Senzing code and data
+at `/opt/senzing/g2` and `/opt/senzing/data`.
+These paths are relative to inside the containers via PVC mounts.
+The actual location on the PVC may vary.
 
-There are 3 options when it comes to initializing the Persistent Volume with Senzing code and data.
+There are 4 options when it comes to initializing the Persistent Volume with Senzing code and data.
 Choose one:
 
 1. [Root container method](#root-container-method) - requires a root container
+1. [senzing/installer container method](#senzing-installer-container-method) - uses
+   [senzing/installer](https://github.com/Senzing/docker-installer)
+   container optionally built in
+   [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
+   step.
 1. [Non-root container method](#non-root-container-method) - can be done on kubernetes with a non-root container
 1. [yum localinstall method](#yum-localinstall-method) - Uses existing Senzing RPMs, so no downloading during installation.
 
@@ -704,7 +732,9 @@ Choose one:
 **Method #1:** This method is simpler, but requires a root container.
 This method uses a dockerized [apt](https://github.com/Senzing/docker-apt) command.
 
-1. Install chart using
+1. Install
+   [senzing/senzing-apt](https://github.com/Senzing/charts/tree/main/charts/senzing-apt)
+   chart using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    Example:
 
@@ -734,9 +764,77 @@ This method uses a dockerized [apt](https://github.com/Senzing/docker-apt) comma
     my-senzing-apt-8n2ql       0/1     Completed   0          2m44s
     ```
 
+#### senzing/installer container method
+
+**Method #2:** This method uses a docker container to copy Senzing binaries that are "baked-in"
+the container to mounted volumes.
+This method requires:
+
+1. The `senzing/installer` image built in the
+   [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
+   step.
+1. Registry choice of
+   "[Use private registry](#use-private-registry)"
+   or
+   "[Use minikube registry](#use-minikube-registry)".
+   That is, the image is not available on the public DockerHub registry.
+
+Copy Senzing's `g2` and `data` directories onto the Persistent Volume Claim (PVC)
+at `/opt/senzing/g2` and `/opt/senzing/data`.
+These paths are relative to inside the containers via PVC mounts.
+The actual location on the PVC may vary.
+
+1. Log into `minikube` instance using
+   [minikube ssh](https://minikube.sigs.k8s.io/docs/commands/ssh/).
+   Example:
+
+    ```console
+    minikube ssh
+    ```
+
+1. In the `minikube` instance, create `/mnt/vda1/senzing`.
+   Example:
+
+    ```console
+    sudo mkdir -p /mnt/vda1/senzing
+    exit
+    ```
+
+1. Install
+   [senzing/senzing-installer](https://github.com/Senzing/charts/tree/main/charts/senzing-installer)
+   chart using
+   [helm install](https://helm.sh/docs/helm/helm_install/).
+   Example:
+
+    ```console
+    helm install \
+      ${DEMO_PREFIX}-senzing-installer \
+      senzing/senzing-installer \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${HELM_VALUES_DIR}/senzing-installer.yaml\
+      --version ${SENZING_HELM_VERSION_SENZING_INSTALLER:-""}
+    ```
+
+1. Wait until Job has completed using
+   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
+   Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
+
+1. Example of completion:
+
+    ```console
+    NAME                         READY   STATUS      RESTARTS   AGE
+    my-senzing-installer-8n2ql   0/1     Completed   0          2m44s
+    ```
+
 #### Non-root container method
 
-**Method #2:** This method can be done on kubernetes with a non-root container.
+**Method #3:** This method can be done on kubernetes with a non-root container.
 The following instructions are done on a non-kubernetes machine which allows root docker containers.
 Example: A personal laptop.
 
@@ -763,7 +861,9 @@ Example: A personal laptop.
       senzing/apt
     ```
 
-1. Install chart with non-root container using
+1. Install
+   [senzing/senzing-base](https://github.com/Senzing/charts/tree/main/charts/senzing-base)
+   chart with non-root container using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    This pod will be the recipient of `kubectl cp` commands.
    Example:
@@ -810,10 +910,10 @@ Example: A personal laptop.
 
 #### yum localinstall method
 
-**Method #3:** This method inserts the Senzing RPMs into the minikube environment for a `yum localinstall`.
+**Method #4:** This method inserts the Senzing RPMs into the minikube environment for a `yum localinstall`.
 The advantage of this method is that the Senzing RPMs are not downloaded from the internet during installation.
 This produces the same result as the `apt` installs describe in prior methods.
-*Note:*  The environment variables were "sourced" in
+**Note:**  The environment variables were "sourced" in
 [Set environment variables](#set-environment-variables).
 
 1. :pencil2: Identify a directory to store downloaded files.
@@ -866,7 +966,9 @@ This produces the same result as the `apt` installs describe in prior methods.
     exit
     ```
 
-1. Install chart to perform `yum localinstall` using
+1. Install
+   [senzing/senzing-yum](https://github.com/Senzing/charts/tree/main/charts/senzing-yum)
+   chart to perform `yum localinstall` using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    Example:
 
@@ -896,25 +998,30 @@ This produces the same result as the `apt` installs describe in prior methods.
     my-senzing-yum-8n2ql       0/1     Completed   0          2m44s
     ```
 
-### Install init-container Helm chart
+### Install senzing-console Helm chart
 
-The [init-container](https://github.com/Senzing/docker-init-container)
-creates files from templates and initializes the G2 database.
+The [senzing-console](https://github.com/Senzing/docker-senzing-console)
+will be used later to
+inspect mounted volumes,
+debug issues, or
+run command-line tools.
 
-1. Install chart using
+1. Install
+   [senzing/senzing-console](https://github.com/Senzing/charts/tree/main/charts/senzing-console)
+   chart using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    Example:
 
     ```console
     helm install \
-      ${DEMO_PREFIX}-senzing-init-container \
-      senzing/senzing-init-container \
+      ${DEMO_PREFIX}-senzing-console \
+      senzing/senzing-console \
       --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/init-container.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_INIT_CONTAINER:-""}
+      --values ${HELM_VALUES_DIR}/senzing-console.yaml \
+      --version ${SENZING_HELM_VERSION_SENZING_CONSOLE:-""}
     ```
 
-1. Wait for pods to run using
+1. Wait until Deployment has completed using
    [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
    Example:
 
@@ -924,12 +1031,58 @@ creates files from templates and initializes the G2 database.
       --watch
     ```
 
+1. In a separate terminal window, log into Senzing Console pod using
+   [kubectl exec](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#exec).
+   Example:
+
+    ```console
+    export CONSOLE_POD_NAME=$(kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --output jsonpath="{.items[0].metadata.name}" \
+      --selector "app.kubernetes.io/name=senzing-console, \
+                  app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-console" \
+      )
+
+    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${CONSOLE_POD_NAME} -- /bin/bash
+    ```
+
+### Install init-container Helm chart
+
+The [init-container](https://github.com/Senzing/docker-init-container)
+creates files from templates and initializes the G2 database.
+
+1. Install
+   [senzing/senzing-init-container](https://github.com/Senzing/charts/tree/main/charts/senzing-init-container)
+   chart using
+   [helm install](https://helm.sh/docs/helm/helm_install/).
+   Example:
+
+    ```console
+    helm install \
+      ${DEMO_PREFIX}-senzing-init-container \
+      senzing/senzing-init-container \
+      --namespace ${DEMO_NAMESPACE} \
+      --values ${HELM_VALUES_DIR}/senzing-init-container-postgresql.yaml \
+      --version ${SENZING_HELM_VERSION_SENZING_INIT_CONTAINER:-""}
+    ```
+
+1. Wait for pod to complete
+   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
+   Example:
+
+    ```console
+    kubectl get pods \
+      --namespace ${DEMO_NAMESPACE} \
+      --watch
+    ```
 ### Install resolver Helm chart
 
 This deployment launches the
 [resolver](https://github.com/Senzing/resolver).
 
-1. Install chart using
+1. Install
+   [senzing/senzing-resolver](https://github.com/Senzing/charts/tree/main/charts/senzing-resolver)    
+   chart using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    Example:
 
@@ -981,53 +1134,6 @@ This deployment launches the
       --header "Content-Type: text/plain" \
       --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
       http://localhost:8252/resolve
-    ```
-
-### Install senzing-console Helm chart
-
-The [senzing-console](https://github.com/Senzing/docker-senzing-console)
-will be used later to:
-
-- Inspect mounted volumes
-- Debug issues
-- Run command-line tools
-
-1. Install chart using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-console \
-      senzing/senzing-console \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-console.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_CONSOLE:-""}
-    ```
-
-1. Wait until Deployment has completed using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. In a separate terminal window, log into Senzing Console pod using
-   [kubectl exec](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#exec).
-   Example:
-
-    ```console
-    export CONSOLE_POD_NAME=$(kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --output jsonpath="{.items[0].metadata.name}" \
-      --selector "app.kubernetes.io/name=senzing-console, \
-                  app.kubernetes.io/instance=${DEMO_PREFIX}-senzing-console" \
-      )
-
-    kubectl exec -it --namespace ${DEMO_NAMESPACE} ${CONSOLE_POD_NAME} -- /bin/bash
     ```
 
 ### Cleanup
