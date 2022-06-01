@@ -228,7 +228,7 @@ The following software programs need to be installed:
        Example:
 
         ```console
-        export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/3.0.0
+        export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
         export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
         export SENZING_G2_DIR=${SENZING_VOLUME}/g2
         export SENZING_VAR_DIR=${SENZING_VOLUME}/var
@@ -282,21 +282,12 @@ Configuration values specified by environment variable or command line parameter
 
 1. :pencil2: Specify the directory containing the Senzing installation.
    Use the same `SENZING_VOLUME` value used when performing
-   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/initialize-senzing-with-docker.md)".
+   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
    Example:
 
     ```console
     export SENZING_VOLUME=~/my-senzing
     ```
-
-    1. Here's a simple test to see if `SENZING_VOLUME` is correct.
-       The following commands should return file contents.
-       Example:
-
-        ```console
-        cat ${SENZING_VOLUME}/g2/g2BuildVersion.json
-        cat ${SENZING_VOLUME}/data/3.0.0/libpostal/data_version
-        ```
 
     1. :warning:
        **macOS** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#macos)
@@ -309,7 +300,7 @@ Configuration values specified by environment variable or command line parameter
    Example:
 
     ```console
-    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/3.0.0
+    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
     export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
     export SENZING_G2_DIR=${SENZING_VOLUME}/g2
     export SENZING_VAR_DIR=${SENZING_VOLUME}/var
@@ -317,7 +308,8 @@ Configuration values specified by environment variable or command line parameter
 
 ### Docker network
 
-:thinking: **Optional:**  Use if docker container is part of a docker network.
+:thinking: **Optional:**
+Use if docker container is part of a docker network.
 
 1. List docker networks.
    Example:
@@ -343,7 +335,8 @@ Configuration values specified by environment variable or command line parameter
 
 ### Docker user
 
-:thinking: **Optional:**  The docker container runs as "USER 1001".
+:thinking: **Optional:**
+The docker container runs as "USER 1001".
 Use if a different userid (UID) is required.
 
 1. :pencil2: Manually identify user.
@@ -372,26 +365,29 @@ Use if a different userid (UID) is required.
 
 #### Option #1
 
-This Option starts a micro-service supporting HTTP requests.
+This option starts a micro-service supporting HTTP requests.
 
 1. Run the docker container.
    Example:
 
     ```console
+    curl -X GET \
+      --output ${SENZING_VOLUME}/docker-versions-stable.sh \
+      https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
+    source ${SENZING_VOLUME}/docker-versions-stable.sh
+
     sudo \
       --preserve-env \
       docker run \
-        --interactive \
         --publish 8252:8252 \
         --rm \
-        --tty \
         --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
         ${SENZING_NETWORK_PARAMETER} \
         ${SENZING_RUNAS_USER_PARAMETER} \
-        senzing/resolver
+        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
     ```
 
 1. Test HTTP API.
