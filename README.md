@@ -212,8 +212,43 @@ The following software programs need to be installed:
 
 ### Initialize Senzing
 
-1. If Senzing has not been initialized, visit
-   "[How to initialize Senzing with Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/initialize-senzing-with-docker.md)".
+1. If Senzing has not been installed,
+   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
+1. If Senzing has not been initialized and configured,
+   [configure Senzing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/configure-senzing.md).
+   Example:
+
+    1. :pencil2: Identify location of Senzing installation
+
+        ```console
+        export SENZING_VOLUME=~/senzing-3.0.0
+        ```
+
+    1. Identify directories for Senzing files.
+       Example:
+
+        ```console
+        export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data/3.0.0
+        export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
+        export SENZING_G2_DIR=${SENZING_VOLUME}/g2
+        export SENZING_VAR_DIR=${SENZING_VOLUME}/var
+        ```
+
+    1. Initialize Senzing.
+       Example:
+
+        ```console
+        sudo docker pull senzing/init-container:latest
+
+        sudo docker run \
+          --rm \
+          --user 0 \
+          --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+          --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+          --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+          --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+          senzing/init-container
+        ```
 
 ### Configuration
 
