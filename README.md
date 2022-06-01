@@ -50,6 +50,7 @@ To see the options for a subcommand, run commands like:
     1. [Clone repository](#clone-repository)
     1. [Install](#install)
     1. [Run commands](#run-commands)
+    1. [HTTP requests](#http-requests)
 1. [Demonstrate using Docker](#demonstrate-using-docker)
     1. [Initialize Senzing](#initialize-senzing)
     1. [Configuration](#configuration)
@@ -149,7 +150,15 @@ The following software programs need to be installed:
 
 ### Run commands
 
-1. :pencil2: Run command for file input/output.
+1. View `file-input` subcommand parameters.
+   Example:
+
+    ```console
+    cd ${GIT_REPOSITORY_DIR}
+    ./resolver.py file-input --help
+    ```
+
+1. Run command for file input/output.
    Example:
 
     ```console
@@ -159,13 +168,15 @@ The following software programs need to be installed:
       --output-file ${GIT_REPOSITORY_DIR}/resolver-output.json
     ```
 
-1. :pencil2: Run command for starting HTTP API.
+1. Run command for starting HTTP API.
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py service
     ```
+
+### HTTP requests
 
 1. Test HTTP API.
    Example:
@@ -175,6 +186,26 @@ The following software programs need to be installed:
       --header "Content-Type: text/plain" \
       --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
       http://localhost:8252/resolve
+    ```
+
+1. Test HTTP API with JSON.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve?withJson=true
+    ```
+
+1. Test HTTP API with Features.
+   Example:
+
+    ```console
+    curl -X POST \
+      --header "Content-Type: text/plain" \
+      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
+      http://localhost:8252/resolve?withFeatures=true
     ```
 
 ## Demonstrate using Docker
