@@ -1115,6 +1115,15 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/main/
 
 ### HTTP requests
 
+1. Set these environment variable values:
+
+    ```console
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=resolver
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+    ```
+
 1. Test HTTP API.
    Example:
 
