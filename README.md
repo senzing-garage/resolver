@@ -322,6 +322,11 @@ This Option uses file input and output.
    Example:
 
     ```console
+    curl -X GET \
+      --output ${SENZING_VOLUME}/docker-versions-stable.sh \
+      https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
+    source ${SENZING_VOLUME}/docker-versions-stable.sh
+
     sudo \
       --preserve-env \
       docker run \
@@ -331,9 +336,7 @@ This Option uses file input and output.
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        ${SENZING_NETWORK_PARAMETER} \
-        ${SENZING_RUNAS_USER_PARAMETER} \
-        senzing/resolver file-input \
+        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER} file-input \
           --input-file  /data/test-data-1.json \
           --output-file /data/my-output.json
     ```
