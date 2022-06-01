@@ -1302,21 +1302,18 @@ def handle_post_resolver(iterator, senzing_engine_flags=None):
     return result
 
 
-def strtobool(val):
-    """ From /usr/lib/python3.8/distutils/util.py
+def strtobool(value):
+    """ Inspired by /usr/lib/python3.8/distutils/util.py """
 
-    Convert a string representation of truth to true (1) or false (0).
-    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
-    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
-    'val' is anything else.
-    """
-    val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
-        return 1
-    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
-        return 0
+    result = False
+    lower_value = value.lower()
+    if lower_value in ('y', 'yes', 't', 'true', 'on', '1'):
+        result = True
+    elif lower_value in ('n', 'no', 'f', 'false', 'off', '0'):
+        result = False
     else:
-        raise ValueError("invalid truth value %r" % (val,))
+        raise ValueError("invalid truth value %r" % (value,))
+    return result
 
 # -----------------------------------------------------------------------------
 # Flask @app.routes
