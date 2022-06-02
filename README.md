@@ -855,7 +855,7 @@ This deployment launches the
     kubectl port-forward \
       --address 0.0.0.0 \
       --namespace ${DEMO_NAMESPACE} \
-      svc/${DEMO_PREFIX}-resolver 8252:8252
+      svc/${DEMO_PREFIX}-senzing-resolver 8252:8252
     ```
 
 1. Test HTTP API.
