@@ -613,6 +613,14 @@ Only one method needs to be performed.
 
     1. `${DEMO_NAMESPACE}`
 
+1. :thinking: **Optional:**
+   List newly generated files.
+   Example:
+
+    ```console
+    ls ${KUBERNETES_DIR}
+    ```
+
 ### Save environment variables
 
 Environment variables will be needed in new terminal windows using
