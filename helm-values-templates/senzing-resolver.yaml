@@ -1,0 +1,17 @@
+# See https://github.com/Senzing/charts/tree/main/charts/senzing-resolverr#parameters
+
+main:
+
+  containerSecurityContext:
+    enabled: true
+    privileged: true
+    runAsGroup: 0
+    runAsUser: 0
+
+  image:
+    registry: ${DOCKER_REGISTRY_URL}
+    tag: ${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
+
+  senzing:
+    persistentVolumeClaim: senzing-persistent-volume-claim
+    subcommand: service
