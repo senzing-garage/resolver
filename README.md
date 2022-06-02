@@ -55,7 +55,7 @@ To see the options for a subcommand, run commands like:
     1. [Configuration](#configuration)
     1. [Volumes](#volumes)
     1. [Run docker container](#run-docker-container)
-1. [Demonstrate using Helm](#demonstrate-using-helm)
+1. [Demonstrate using Kubernetes and Helm](#demonstrate-using-kubernetes-and-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
     1. [Clone repository for Helm demonstration](#clone-repository-for-helm-demonstration)
     1. [Create artifact directory](#create-artifact-directory)
@@ -352,7 +352,7 @@ This Option uses file input and output.
 
 1. Output will be on workstation at ${DATA_DIR}/my-output.json
 
-## Demonstrate using Helm
+## Demonstrate using Kubernetes and Helm
 
 ### Prerequisite software for Helm demonstration
 
