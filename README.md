@@ -63,7 +63,7 @@ To see the options for a subcommand, run commands like:
     1. [View minikube cluster](#view-minikube-cluster)
     1. [Set environment variables](#set-environment-variables)
     1. [EULA](#eula)
-    1. [create senzing/installer docker image](#create-senzing-installer-docker-image)
+    1. [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
     1. [Identify Docker registry](#identify-docker-registry)
     1. [Create custom helm values files](#create-custom-helm-values-files)
     1. [Create custom kubernetes configuration files](#create-custom-kubernetes-configuration-files)
