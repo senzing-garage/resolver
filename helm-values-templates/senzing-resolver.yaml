@@ -1,11 +1,17 @@
-image:
-  registry: ${DOCKER_REGISTRY_URL}
-  tag: ${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
+# See https://github.com/Senzing/charts/tree/main/charts/senzing-resolverr#parameters
 
-imagePullSecrets:
-  - name: ${DOCKER_REGISTRY_SECRET}
+main:
 
-senzing:
-# debug: 1
-  persistentVolumeClaim: senzing-persistent-volume-claim
-  subcommand: service
+  containerSecurityContext:
+    enabled: true
+    privileged: true
+    runAsGroup: 0
+    runAsUser: 0
+
+  image:
+    registry: ${DOCKER_REGISTRY_URL}
+    tag: ${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
+
+  senzing:
+    persistentVolumeClaim: senzing-persistent-volume-claim
+    subcommand: service

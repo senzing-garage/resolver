@@ -821,10 +821,10 @@ This deployment launches the
 
     ```console
     helm install \
-      ${DEMO_PREFIX}-resolver \
-      senzing/resolver \
+      ${DEMO_PREFIX}-senzing-resolver \
+      senzing/senzing-resolver \
       --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/resolver.yaml \
+      --values ${HELM_VALUES_DIR}/senzing-resolver.yaml \
       --version ${SENZING_HELM_VERSION_SENZING_RESOLVER:-""}
     ```
 
