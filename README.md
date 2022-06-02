@@ -70,7 +70,7 @@ To see the options for a subcommand, run commands like:
     1. [Save environment variables](#save-environment-variables)
     1. [Create namespace](#create-namespace)
     1. [Create persistent volume](#create-persistent-volume)
-    1. [Add helm repositories](#add-helm-repositories)
+    1. [Add Helm repositories](#add-helm-repositories)
     1. [Deploy Senzing](#deploy-senzing)
     1. [Install init-container Helm chart](#install-init-container-helm-chart)
     1. [Install resolver Helm chart](#install-resolver-helm-chart)
@@ -435,25 +435,24 @@ as a guide, start a minikube cluster.
     export DEMO_NAMESPACE=${DEMO_PREFIX}-namespace
     ```
 
-1. Retrieve stable docker image version numbers and set their environment variables.
+1. Retrieve stable Docker image versions, Helm Chart versions, and Senzing versions and set their environment variables.
    Example:
 
     ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh)
-    ```
+    curl -X GET \
+        --output ${SENZING_DEMO_DIR}/docker-versions-stable.sh \
+        https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
+    source ${SENZING_DEMO_DIR}/docker-versions-stable.sh
 
-1. Retrieve stable Helm Chart version numbers and set their environment variables.
-   Example:
+    curl -X GET \
+        --output ${SENZING_DEMO_DIR}/helm-versions-stable.sh \
+        https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/helm-versions-stable.sh
+    source ${SENZING_DEMO_DIR}/helm-versions-stable.sh
 
-    ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/helm-versions-stable.sh)
-    ```
-
-1. Retrieve stable Senzing version numbers and set their environment variables.
-   Example:
-
-    ```console
-    source <(curl -X GET https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-stable.sh)
+    curl -X GET \
+        --output ${SENZING_DEMO_DIR}/senzing-versions-stable.sh \
+        https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-stable.sh
+    source ${SENZING_DEMO_DIR}/senzing-versions-stable.sh
     ```
 
 ### EULA
@@ -682,7 +681,7 @@ If PVs and PVCs already exist, this step may be skipped.
       --namespace ${DEMO_NAMESPACE}
     ```
 
-### Add helm repositories
+### Add Helm repositories
 
 1. Add Senzing repository using
    [helm repo add](https://helm.sh/docs/helm/helm_repo_add/).
