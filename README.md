@@ -841,6 +841,8 @@ This deployment launches the
       --watch
     ```
 
+### Port forward senzing-resolver service
+
 1. In a separate terminal window, port forward to local machine using
    [kubectl port-forward](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#port-forward).
    Example:
@@ -858,7 +860,7 @@ This deployment launches the
     kubectl port-forward \
       --address 0.0.0.0 \
       --namespace ${DEMO_NAMESPACE} \
-      svc/${DEMO_PREFIX}-senzing-resolver 8252:80
+      svc/${DEMO_PREFIX}-resolver-senzing-resolver 8252:80
     ```
 
 1. Test HTTP API.
