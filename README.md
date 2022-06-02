@@ -175,14 +175,16 @@ The following software programs need to be installed:
     ```
 
 1. Run command for starting HTTP API.
-   Once service has started, try the
-   [HTTP requests](#http-requests).
    Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     ./resolver.py service
     ```
+
+1. Test HTTP API.
+   Once service has started, try the
+   [HTTP requests](#http-requests).
 
 ## Demonstrate using Docker
 
@@ -808,6 +810,7 @@ creates files from templates and initializes the G2 database.
       --namespace ${DEMO_NAMESPACE} \
       --watch
     ```
+
 ### Install resolver Helm chart
 
 This deployment launches the
@@ -855,19 +858,12 @@ This deployment launches the
     kubectl port-forward \
       --address 0.0.0.0 \
       --namespace ${DEMO_NAMESPACE} \
-      svc/${DEMO_PREFIX}-senzing-resolver 8252:8252
+      svc/${DEMO_PREFIX}-senzing-resolver 8252:80
     ```
 
 1. Test HTTP API.
-   Note: **GIT_REPOSITORY_DIR** needs to be set.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve
-    ```
+   Once service has started, try the
+   [HTTP requests](#http-requests).
 
 ### Cleanup
 
@@ -883,6 +879,7 @@ Delete Kubernetes artifacts using
     ```console
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-resolver
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-init-container
+    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-installer
     helm repo remove senzing
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-senzing.yaml
     kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-senzing.yaml
