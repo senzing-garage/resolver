@@ -354,6 +354,10 @@ This Option uses file input and output.
 
 ## Demonstrate using Kubernetes and Helm
 
+This demonstrations uses
+[minikube](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-minikube.md)
+to demonstrate installing and using the Senzing Resolver in a Kubernetes environment.
+
 ### Prerequisite software for Helm demonstration
 
 1. [minikube](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-minikube.md)
