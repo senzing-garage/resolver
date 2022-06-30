@@ -70,9 +70,9 @@ APP = Flask(__name__)
 # Metadata
 
 __all__ = []
-__version__ = "2.2.2"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "2.2.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2022-06-02'
+__updated__ = '2022-06-30'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/main/lists/senzing-product-ids.md
 LOG_FORMAT = '%(asctime)s %(message)s'
@@ -89,7 +89,7 @@ SAFE_CHARACTER_LIST = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"'] + 
 UNSAFE_CHARACTER_LIST = ['"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
 RESERVED_CHARACTER_LIST = [';', ',', '/', '?', ':', '@', '=', '&']
 
-# The "configuration_locator" describes where configuration variables are in:
+# The "CONFIGURATION_LOCATOR" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
 
 GLOBAL_CONFIG = {}
@@ -143,6 +143,11 @@ CONFIGURATION_LOCATOR = {
         "default": None,
         "env": "SENZING_INPUT_FILE",
         "cli": "input-file"
+    },
+    "license_base64_encoded": {
+        "default": None,
+        "env": "SENZING_LICENSE_BASE64_ENCODED",
+        "cli": "license-base64-encoded"
     },
     "output_file": {
         "default": "resolver-output.json",
@@ -202,36 +207,6 @@ def get_parser():
         'file-input': {
             "help": 'File based input / output.',
             "arguments": {
-                "--data-dir": {
-                    "dest": "data_dir",
-                    "metavar": "SENZING_DATA_DIR",
-                    "help": "Location of Senzing's data. Default: /opt/senzing/data"
-                },
-                "--data-source": {
-                    "dest": "data_source",
-                    "metavar": "SENZING_DATA_SOURCE",
-                    "help": "Data Source."
-                },
-                "--database-url": {
-                    "dest": "g2_database_url_generic",
-                    "metavar": "SENZING_DATABASE_URL",
-                    "help": "Information for connecting to database."
-                },
-                "--debug": {
-                    "dest": "debug",
-                    "action": "store_true",
-                    "help": "Enable debugging. (SENZING_DEBUG) Default: False"
-                },
-                "--etc-dir": {
-                    "dest": "etc_dir",
-                    "metavar": "SENZING_ETC_DIR",
-                    "help": "Location of Senzing configuration. Default: /etc/opt/senzing"
-                },
-                "--g2-dir": {
-                    "dest": "g2_dir",
-                    "metavar": "SENZING_G2_DIR",
-                    "help": "Location of Senzing's G2. Default: /opt/senzing/g2"
-                },
                 "--input-file": {
                     "dest": "input_file",
                     "metavar": "SENZING_INPUT_FILE",
@@ -242,56 +217,13 @@ def get_parser():
                     "metavar": "SENZING_OUTPUT_FILE",
                     "help": "File of JSON lines to be read. Default: resolver-output.json"
                 },
-                "--var-dir": {
-                    "dest": "var_dir",
-                    "metavar": "SENZING_VAR_DIR",
-                    "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
-                },
-                "--with-features": {
-                    "dest": "with_features",
-                    "metavar": "SENZING_WITH_FEATURES",
-                    "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES flag. Default: false"
-                },
-                "--with-json": {
-                    "dest": "with_json",
-                    "metavar": "SENZING_WITH_JSON",
-                    "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA flag. Default: false"
-                },
+
             },
+            "argument_aspects": ["common"],
         },
         'service': {
             "help": 'Receive HTTP requests.',
             "arguments": {
-                "--data-dir": {
-                    "dest": "data_dir",
-                    "metavar": "SENZING_DATA_DIR",
-                    "help": "Location of Senzing's data. Default: /opt/senzing/data"
-                },
-                "--data-source": {
-                    "dest": "data_source",
-                    "metavar": "SENZING_DATA_SOURCE",
-                    "help": "Data Source."
-                },
-                "--database-url": {
-                    "dest": "g2_database_url_generic",
-                    "metavar": "SENZING_DATABASE_URL",
-                    "help": "Information for connecting to database."
-                },
-                "--debug": {
-                    "dest": "debug",
-                    "action": "store_true",
-                    "help": "Enable debugging. (SENZING_DEBUG) Default: False"
-                },
-                "--etc-dir": {
-                    "dest": "etc_dir",
-                    "metavar": "SENZING_ETC_DIR",
-                    "help": "Location of Senzing configuration. Default: /etc/opt/senzing"
-                },
-                "--g2-dir": {
-                    "dest": "g2_dir",
-                    "metavar": "SENZING_G2_DIR",
-                    "help": "Location of Senzing's G2. Default: /opt/senzing/g2"
-                },
                 "--host": {
                     "dest": "host",
                     "metavar": "SENZING_HOST",
@@ -302,12 +234,8 @@ def get_parser():
                     "metavar": "SENZING_PORT",
                     "help": "Port to listen on. Default: 8252"
                 },
-                "--var-dir": {
-                    "dest": "var_dir",
-                    "metavar": "SENZING_VAR_DIR",
-                    "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
-                },
             },
+            "argument_aspects": ["common"],
         },
         'sleep': {
             "help": 'Do nothing but sleep. For Docker testing.',
@@ -320,12 +248,77 @@ def get_parser():
             },
         },
         'version': {
-            "help": 'Print version of resolver.py.',
+            "help": 'Print version of program.',
         },
         'docker-acceptance-test': {
             "help": 'For Docker acceptance testing.',
         },
     }
+
+    # Define argument_aspects.
+
+    argument_aspects = {
+        "common": {
+            "--data-dir": {
+                "dest": "data_dir",
+                "metavar": "SENZING_DATA_DIR",
+                "help": "Location of Senzing's data. Default: /opt/senzing/data"
+            },
+            "--data-source": {
+                "dest": "data_source",
+                "metavar": "SENZING_DATA_SOURCE",
+                "help": "Data Source."
+            },
+            "--database-url": {
+                "dest": "g2_database_url_generic",
+                "metavar": "SENZING_DATABASE_URL",
+                "help": "Information for connecting to database."
+            },
+            "--debug": {
+                "dest": "debug",
+                "action": "store_true",
+                "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+            },
+            "--etc-dir": {
+                "dest": "etc_dir",
+                "metavar": "SENZING_ETC_DIR",
+                "help": "Location of Senzing configuration. Default: /etc/opt/senzing"
+            },
+            "--g2-dir": {
+                "dest": "g2_dir",
+                "metavar": "SENZING_G2_DIR",
+                "help": "Location of Senzing's G2. Default: /opt/senzing/g2"
+            },
+            "--var-dir": {
+                "dest": "var_dir",
+                "metavar": "SENZING_VAR_DIR",
+                "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
+            },
+            "--with-features": {
+                "dest": "with_features",
+                "metavar": "SENZING_WITH_FEATURES",
+                "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES flag. Default: false"
+            },
+            "--with-json": {
+                "dest": "with_json",
+                "metavar": "SENZING_WITH_JSON",
+                "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA flag. Default: false"
+            },
+        },
+    }
+
+    # Augment "subcommands" variable with arguments specified by aspects.
+
+    for subcommand_value in subcommands.values():
+        if 'argument_aspects' in subcommand_value:
+            for aspect in subcommand_value['argument_aspects']:
+                if 'arguments' not in subcommand_value:
+                    subcommand_value['arguments'] = {}
+                arguments = argument_aspects.get(aspect, {})
+                for argument, argument_value in arguments.items():
+                    subcommand_value['arguments'][argument] = argument_value
+
+    # Parse command line arguments.
 
     parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
@@ -471,11 +464,11 @@ def get_exception():
 # -----------------------------------------------------------------------------
 
 
-def translate(mapping, astring):
+def translate(a_map, astring):
     ''' Translate characters. '''
 
     new_string = str(astring)
-    for key, value in mapping.items():
+    for key, value in a_map.items():
         new_string = new_string.replace(key, value)
     return new_string
 
@@ -638,6 +631,11 @@ def get_configuration(subcommand, args):
     result['program_version'] = __version__
     result['program_updated'] = __updated__
     result['senzing_sdk_version_major'] = SENZING_SDK_VERSION_MAJOR
+
+    # Add "run_as" information.
+
+    result['run_as_uid'] = os.getuid()
+    result['run_as_gid'] = os.getgid()
 
     # Special case: subcommand from command-line
 
@@ -1079,6 +1077,12 @@ class G2Initializer:
 # -----------------------------------------------------------------------------
 
 
+def bootstrap_signal_handler(signal_number, frame):
+    ''' Exit on signal error. '''
+    logging.debug(message_debug(901, signal_number, frame))
+    sys.exit(0)
+
+
 def create_signal_handler_function(args):
     ''' Tricky code.  Uses currying technique. Create a function for signal handling.
         that knows about "args".
@@ -1090,12 +1094,6 @@ def create_signal_handler_function(args):
         sys.exit(0)
 
     return result_function
-
-
-def bootstrap_signal_handler(signal_number, frame):
-    ''' Exit on signal error. '''
-    logging.debug(message_debug(901, signal_number, frame))
-    sys.exit(0)
 
 
 def entry_template(config):
@@ -1152,12 +1150,24 @@ def get_g2_configuration_dictionary(config):
             "CONNECTION": config.get("g2_database_url_specific"),
         }
     }
+    license_base64_encoded = config.get("license_base64_encoded")
+    if license_base64_encoded:
+        result["PIPELINE"]["LICENSESTRINGBASE64"] = license_base64_encoded
     return result
 
 
 def get_g2_configuration_json(config):
     ''' Return a JSON string with Senzing configuration. '''
-    return json.dumps(get_g2_configuration_dictionary(config))
+    result = ""
+    if config.get('engine_configuration_json'):
+        result = config.get('engine_configuration_json')
+    else:
+        result = json.dumps(get_g2_configuration_dictionary(config))
+    return result
+
+# -----------------------------------------------------------------------------
+# Senzing services.
+# -----------------------------------------------------------------------------
 
 
 def get_g2_config(config, g2_config_name="resolver-G2-config"):

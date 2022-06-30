@@ -11,6 +11,7 @@ disable=
     too-many-branches,
     too-many-lines,
     too-many-locals,
+    too-many-statements,
     unspecified-encoding,
 good-names=
     template-python
