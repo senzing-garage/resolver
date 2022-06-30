@@ -309,7 +309,7 @@ def get_parser():
 
     # Augment "subcommands" variable with arguments specified by aspects.
 
-    for subcommand, subcommand_value in subcommands.items():
+    for subcommand_value in subcommands.values():
         if 'argument_aspects' in subcommand_value:
             for aspect in subcommand_value['argument_aspects']:
                 if 'arguments' not in subcommand_value:
