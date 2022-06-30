@@ -89,7 +89,7 @@ SAFE_CHARACTER_LIST = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"'] + 
 UNSAFE_CHARACTER_LIST = ['"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
 RESERVED_CHARACTER_LIST = [';', ',', '/', '?', ':', '@', '=', '&']
 
-# The "configuration_locator" describes where configuration variables are in:
+# The "CONFIGURATION_LOCATOR" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
 
 GLOBAL_CONFIG = {}
@@ -317,6 +317,8 @@ def get_parser():
                 arguments = argument_aspects.get(aspect, {})
                 for argument, argument_value in arguments.items():
                     subcommand_value['arguments'][argument] = argument_value
+
+    # Parse command line arguments.
 
     parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
