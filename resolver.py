@@ -312,11 +312,11 @@ def get_parser():
     for subcommand, subcommand_value in subcommands.items():
         if 'argument_aspects' in subcommand_value:
             for aspect in subcommand_value['argument_aspects']:
-                if 'arguments' not in subcommands[subcommand]:
-                    subcommands[subcommand]['arguments'] = {}
+                if 'arguments' not in subcommand_value:
+                    subcommand_value['arguments'] = {}
                 arguments = argument_aspects.get(aspect, {})
                 for argument, argument_value in arguments.items():
-                    subcommands[subcommand]['arguments'][argument] = argument_value
+                    subcommand_value['arguments'][argument] = argument_value
 
     parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
@@ -1074,10 +1074,12 @@ class G2Initializer:
 # Utility functions
 # -----------------------------------------------------------------------------
 
+
 def bootstrap_signal_handler(signal_number, frame):
     ''' Exit on signal error. '''
     logging.debug(message_debug(901, signal_number, frame))
     sys.exit(0)
+
 
 def create_signal_handler_function(args):
     ''' Tricky code.  Uses currying technique. Create a function for signal handling.
@@ -1090,6 +1092,7 @@ def create_signal_handler_function(args):
         sys.exit(0)
 
     return result_function
+
 
 def entry_template(config):
     ''' Format of entry message. '''
@@ -1163,6 +1166,7 @@ def get_g2_configuration_json(config):
 # -----------------------------------------------------------------------------
 # Senzing services.
 # -----------------------------------------------------------------------------
+
 
 def get_g2_config(config, g2_config_name="resolver-G2-config"):
     ''' Get the G2Config resource. '''
