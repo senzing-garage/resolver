@@ -53,6 +53,7 @@ To see the options for a subcommand, run commands like:
 1. [Demonstrate using Docker](#demonstrate-using-docker)
     1. [As micro-service](#as-micro-service)
     1. [As file input/output](#as-file-inputoutput)
+1. [Demonstrate using Docker-compose](#demonstrate-using-docker-compose)
 1. [Demonstrate using Kubernetes and Helm](#demonstrate-using-kubernetes-and-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
     1. [Clone repository for Helm demonstration](#clone-repository-for-helm-demonstration)
@@ -238,6 +239,16 @@ This Option uses file input and output.
     ```
 
 1. Output will be on workstation at ${DATA_DIR}/my-output.json
+
+## Demonstrate using Docker-compose
+
+1. Bring up docker-compose formation.
+   Example:
+
+    ```console
+    cd ${GIT_REPOSITORY_DIR}
+    docker-compose up
+    ```
 
 ## Demonstrate using Kubernetes and Helm
 
