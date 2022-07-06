@@ -68,20 +68,16 @@ USER root
 RUN apt update \
  && apt -y install \
       libaio1 \
-      libodbc1 \
-      librdkafka-dev \
       libxml2 \
-      postgresql-client \
       python3 \
       python3-venv \
-      unixodbc \
  && apt clean \
  && rm -rf /var/lib/apt/lists/*
- 
+
 # Make directory that resolver.py can use.
 
 RUN mkdir /var/opt/senzing-internal \
- && chown 1001 /var/opt/senzing-internal 
+ && chown 1001 /var/opt/senzing-internal
 
 # The port for the Flask is 5000.
 

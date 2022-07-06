@@ -51,10 +51,8 @@ To see the options for a subcommand, run commands like:
     1. [Install](#install)
     1. [Run commands](#run-commands)
 1. [Demonstrate using Docker](#demonstrate-using-docker)
-    1. [Initialize Senzing](#initialize-senzing)
-    1. [Configuration](#configuration)
-    1. [Volumes](#volumes)
-    1. [Run docker container](#run-docker-container)
+    1. [As micro-service](#as-micro-service)
+    1. [As file input/output](#as-file-inputoutput)
 1. [Demonstrate using Kubernetes and Helm](#demonstrate-using-kubernetes-and-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
     1. [Clone repository for Helm demonstration](#clone-repository-for-helm-demonstration)
@@ -63,7 +61,6 @@ To see the options for a subcommand, run commands like:
     1. [View minikube cluster](#view-minikube-cluster)
     1. [Set environment variables](#set-environment-variables)
     1. [EULA](#eula)
-    1. [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
     1. [Identify Docker registry](#identify-docker-registry)
     1. [Create custom helm values files](#create-custom-helm-values-files)
     1. [Create custom kubernetes configuration files](#create-custom-kubernetes-configuration-files)
@@ -189,105 +186,7 @@ The following software programs need to be installed:
 
 ## Demonstrate using Docker
 
-### Initialize Senzing
-
-1. If Senzing has not been installed,
-   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
-1. If Senzing has not been initialized and configured,
-   [configure Senzing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/configure-senzing.md).
-   Example:
-
-    1. :pencil2: Identify location of Senzing installation.
-
-        ```console
-        export SENZING_VOLUME=~/my-senzing
-        ```
-
-    1. Identify directories for Senzing files.
-       Example:
-
-        ```console
-        export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
-        export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-        export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-        export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-        ```
-
-    1. Initialize Senzing.
-       Example:
-
-        ```console
-        curl -X GET \
-          --output ${SENZING_VOLUME}/docker-versions-stable.sh \
-          https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
-        source ${SENZING_VOLUME}/docker-versions-stable.sh
-
-        sudo docker run \
-          --rm \
-          --user 0 \
-          --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-          --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-          --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-          --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-          senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
-        ```
-
-### Configuration
-
-Configuration values specified by environment variable or command line parameter.
-
-- **[SENZING_DATA_SOURCE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_data_source)**
-- **[SENZING_DATA_VERSION_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_data_version_dir)**
-- **[SENZING_DATABASE_URL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_database_url)**
-- **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_debug)**
-- **[SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_dir)**
-- **[SENZING_ENTITY_TYPE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_entity_type)**
-- **[SENZING_ETC_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_etc_dir)**
-- **[SENZING_G2_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_g2_dir)**
-- **[SENZING_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_log_level)**
-- **[SENZING_NETWORK](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_network)**
-- **[SENZING_RUNAS_USER](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_runas_user)**
-- **[SENZING_SLEEP_TIME](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_sleep_time)**
-- **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_subcommand)**
-- **[SENZING_VAR_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_var_dir)**
-
-1. To determine which configuration parameters are used for each `subcommand`, run:
-
-    ```console
-    ./resolver.py <subcommand> --help
-    ```
-
-### Volumes
-
-1. :pencil2: Specify the directory containing the Senzing installation.
-   Use the same `SENZING_VOLUME` value used when performing
-   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
-   Example:
-
-    ```console
-    export SENZING_VOLUME=~/my-senzing
-    ```
-
-    1. :warning:
-       **macOS** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#macos)
-       must be enabled for `SENZING_VOLUME`.
-    1. :warning:
-       **Windows** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#windows)
-       must be enabled for `SENZING_VOLUME`.
-
-1. Identify the `data_version`, `etc`, `g2`, and `var` directories.
-   Example:
-
-    ```console
-    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
-    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-    ```
-
-### Run docker container
-
-#### Option #1
+### As micro-service
 
 This option starts a micro-service supporting HTTP requests.
 
@@ -300,23 +199,17 @@ This option starts a micro-service supporting HTTP requests.
       https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
     source ${SENZING_VOLUME}/docker-versions-stable.sh
 
-    sudo \
-      --preserve-env \
-      docker run \
-        --publish 8252:8252 \
-        --rm \
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
+    docker run \
+      --publish 8252:8252 \
+      --rm \
+      senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}
     ```
 
 1. Test HTTP API.
    Once service has started, try the
    [HTTP requests](#http-requests).
 
-#### Option #2
+### As file input/output
 
 This Option uses file input and output.
 
@@ -336,18 +229,12 @@ This Option uses file input and output.
       https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
     source ${SENZING_VOLUME}/docker-versions-stable.sh
 
-    sudo \
-      --preserve-env \
-      docker run \
-        --rm \
-        --volume ${DATA_DIR}:/data \
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER} file-input \
-          --input-file  /data/test-data-1.json \
-          --output-file /data/my-output.json
+    docker run \
+      --rm \
+      --volume ${DATA_DIR}:/data \
+      senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest} file-input \
+        --input-file  /data/test-data-1.json \
+        --output-file /data/my-output.json
     ```
 
 1. Output will be on workstation at ${DATA_DIR}/my-output.json
