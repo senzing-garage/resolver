@@ -13,5 +13,4 @@ main:
     tag: ${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
 
   senzing:
-    persistentVolumeClaim: senzing-persistent-volume-claim
     subcommand: service
