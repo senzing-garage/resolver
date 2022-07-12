@@ -51,10 +51,9 @@ To see the options for a subcommand, run commands like:
     1. [Install](#install)
     1. [Run commands](#run-commands)
 1. [Demonstrate using Docker](#demonstrate-using-docker)
-    1. [Initialize Senzing](#initialize-senzing)
-    1. [Configuration](#configuration)
-    1. [Volumes](#volumes)
-    1. [Run docker container](#run-docker-container)
+    1. [As micro-service](#as-micro-service)
+    1. [As file input/output](#as-file-inputoutput)
+1. [Demonstrate using Docker-compose](#demonstrate-using-docker-compose)
 1. [Demonstrate using Kubernetes and Helm](#demonstrate-using-kubernetes-and-helm)
     1. [Prerequisite software for Helm demonstration](#prerequisite-software-for-helm-demonstration)
     1. [Clone repository for Helm demonstration](#clone-repository-for-helm-demonstration)
@@ -62,17 +61,12 @@ To see the options for a subcommand, run commands like:
     1. [Start minikube cluster](#start-minikube-cluster)
     1. [View minikube cluster](#view-minikube-cluster)
     1. [Set environment variables](#set-environment-variables)
-    1. [EULA](#eula)
-    1. [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
     1. [Identify Docker registry](#identify-docker-registry)
     1. [Create custom helm values files](#create-custom-helm-values-files)
     1. [Create custom kubernetes configuration files](#create-custom-kubernetes-configuration-files)
     1. [Save environment variables](#save-environment-variables)
     1. [Create namespace](#create-namespace)
-    1. [Create persistent volume](#create-persistent-volume)
     1. [Add Helm repositories](#add-helm-repositories)
-    1. [Deploy Senzing](#deploy-senzing)
-    1. [Install init-container Helm chart](#install-init-container-helm-chart)
     1. [Install resolver Helm chart](#install-resolver-helm-chart)
     1. [Port forward senzing-resolver service](#port-forward-senzing-resolver-service)
     1. [Cleanup](#cleanup)
@@ -189,105 +183,7 @@ The following software programs need to be installed:
 
 ## Demonstrate using Docker
 
-### Initialize Senzing
-
-1. If Senzing has not been installed,
-   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
-1. If Senzing has not been initialized and configured,
-   [configure Senzing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/configure-senzing.md).
-   Example:
-
-    1. :pencil2: Identify location of Senzing installation.
-
-        ```console
-        export SENZING_VOLUME=~/my-senzing
-        ```
-
-    1. Identify directories for Senzing files.
-       Example:
-
-        ```console
-        export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
-        export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-        export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-        export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-        ```
-
-    1. Initialize Senzing.
-       Example:
-
-        ```console
-        curl -X GET \
-          --output ${SENZING_VOLUME}/docker-versions-stable.sh \
-          https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
-        source ${SENZING_VOLUME}/docker-versions-stable.sh
-
-        sudo docker run \
-          --rm \
-          --user 0 \
-          --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-          --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-          --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-          --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-          senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
-        ```
-
-### Configuration
-
-Configuration values specified by environment variable or command line parameter.
-
-- **[SENZING_DATA_SOURCE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_data_source)**
-- **[SENZING_DATA_VERSION_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_data_version_dir)**
-- **[SENZING_DATABASE_URL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_database_url)**
-- **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_debug)**
-- **[SENZING_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_dir)**
-- **[SENZING_ENTITY_TYPE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_entity_type)**
-- **[SENZING_ETC_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_etc_dir)**
-- **[SENZING_G2_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_g2_dir)**
-- **[SENZING_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_log_level)**
-- **[SENZING_NETWORK](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_network)**
-- **[SENZING_RUNAS_USER](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_runas_user)**
-- **[SENZING_SLEEP_TIME](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_sleep_time)**
-- **[SENZING_SUBCOMMAND](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_subcommand)**
-- **[SENZING_VAR_DIR](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_var_dir)**
-
-1. To determine which configuration parameters are used for each `subcommand`, run:
-
-    ```console
-    ./resolver.py <subcommand> --help
-    ```
-
-### Volumes
-
-1. :pencil2: Specify the directory containing the Senzing installation.
-   Use the same `SENZING_VOLUME` value used when performing
-   [install Senzing using Docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-using-docker.md).
-   Example:
-
-    ```console
-    export SENZING_VOLUME=~/my-senzing
-    ```
-
-    1. :warning:
-       **macOS** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#macos)
-       must be enabled for `SENZING_VOLUME`.
-    1. :warning:
-       **Windows** - [File sharing](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/share-directories-with-docker.md#windows)
-       must be enabled for `SENZING_VOLUME`.
-
-1. Identify the `data_version`, `etc`, `g2`, and `var` directories.
-   Example:
-
-    ```console
-    export SENZING_DATA_VERSION_DIR=${SENZING_VOLUME}/data
-    export SENZING_ETC_DIR=${SENZING_VOLUME}/etc
-    export SENZING_G2_DIR=${SENZING_VOLUME}/g2
-    export SENZING_VAR_DIR=${SENZING_VOLUME}/var
-    ```
-
-### Run docker container
-
-#### Option #1
+### As micro-service
 
 This option starts a micro-service supporting HTTP requests.
 
@@ -300,23 +196,17 @@ This option starts a micro-service supporting HTTP requests.
       https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
     source ${SENZING_VOLUME}/docker-versions-stable.sh
 
-    sudo \
-      --preserve-env \
-      docker run \
-        --publish 8252:8252 \
-        --rm \
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER}
+    docker run \
+      --publish 8252:8252 \
+      --rm \
+      senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}
     ```
 
 1. Test HTTP API.
    Once service has started, try the
    [HTTP requests](#http-requests).
 
-#### Option #2
+### As file input/output
 
 This Option uses file input and output.
 
@@ -336,21 +226,25 @@ This Option uses file input and output.
       https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/docker-versions-stable.sh
     source ${SENZING_VOLUME}/docker-versions-stable.sh
 
-    sudo \
-      --preserve-env \
-      docker run \
-        --rm \
-        --volume ${DATA_DIR}:/data \
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER} file-input \
-          --input-file  /data/test-data-1.json \
-          --output-file /data/my-output.json
+    docker run \
+      --rm \
+      --volume ${DATA_DIR}:/data \
+      senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest} file-input \
+        --input-file  /data/test-data-1.json \
+        --output-file /data/my-output.json
     ```
 
 1. Output will be on workstation at ${DATA_DIR}/my-output.json
+
+## Demonstrate using Docker-compose
+
+1. Bring up docker-compose formation.
+   Example:
+
+    ```console
+    cd ${GIT_REPOSITORY_DIR}
+    docker-compose up
+    ```
 
 ## Demonstrate using Kubernetes and Helm
 
@@ -452,38 +346,6 @@ as a guide, start a minikube cluster.
         --output ${SENZING_DEMO_DIR}/helm-versions-stable.sh \
         https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/helm-versions-stable.sh
     source ${SENZING_DEMO_DIR}/helm-versions-stable.sh
-
-    curl -X GET \
-        --output ${SENZING_DEMO_DIR}/senzing-versions-stable.sh \
-        https://raw.githubusercontent.com/Senzing/knowledge-base/main/lists/senzing-versions-stable.sh
-    source ${SENZING_DEMO_DIR}/senzing-versions-stable.sh
-    ```
-
-### EULA
-
-To use the Senzing code, you must agree to the End User License Agreement (EULA).
-
-1. :warning:
-   To use the Senzing code, you must agree to the End User License Agreement (EULA).
-   This step is intentionally tricky and not simply copy/paste.
-   This ensures that you make a conscious effort to accept the EULA.
-   Example:
-
-    <pre>export SENZING_ACCEPT_EULA="&lt;the value from <a href="https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_accept_eula">this link</a>&gt;"</pre>
-
-### Create senzing/installer docker image
-
-A method of installing the Senzing binaries on the Kubernetes PV/PVC
-is to make a Docker image that contains the contents of the Senzing `g2` and `data` folders.
-
-1. Run the `docker build` command using
-   [docker-build-senzing-installer.sh](../../bin/docker-build-senzing-installer.sh).
-   **Note:**
-   This will take a while as the Senzing binary packages will be downloaded.
-   Example:
-
-    ```console
-    ${GIT_REPOSITORY_DIR}/bin/docker-build-senzing-installer.sh
     ```
 
 ### Identify Docker registry
@@ -518,7 +380,7 @@ is to make a Docker image that contains the contents of the Senzing `g2` and `da
     export DOCKER_REGISTRY_URL=my.example.com:5000
     export DOCKER_REGISTRY_SECRET=${DOCKER_REGISTRY_URL}-secret
     export SENZING_SUDO=sudo
-    ${GIT_REPOSITORY_DIR}/bin/populate-private-registry.sh
+    ${GIT_REPOSITORY_DIR}/bin/docker-pull-tag-and-push.sh docker-images
     ```
 
 #### Use minikube registry
@@ -534,7 +396,7 @@ is to make a Docker image that contains the contents of the Senzing `g2` and `da
     minikube addons enable registry
     export DOCKER_REGISTRY_URL=docker.io
     export DOCKER_REGISTRY_SECRET=${DOCKER_REGISTRY_URL}-secret
-    ${GIT_REPOSITORY_DIR}/bin/populate-minikube-registry.sh
+    ${GIT_REPOSITORY_DIR}/bin/populate-minikube-registry.sh docker-images
     ```
 
 ### Create custom helm values files
@@ -656,43 +518,6 @@ is created to isolate this demonstration from other applications running on Kube
     kubectl get namespaces
     ```
 
-### Create persistent volume
-
-:thinking: **Optional:**
-These steps for creating Persistent Volumes (PV) and Persistent Volume Claims (PVC)
-are for a demonstration environment.
-They are not sufficient for a production environment.
-If PVs and PVCs already exist, this step may be skipped.
-
-1. Create persistent volumes using
-   [kubectl create](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#create).
-   Example:
-
-    ```console
-    kubectl create -f ${KUBERNETES_DIR}/persistent-volume-senzing.yaml
-    ```
-
-1. Create persistent volume claims using
-   [kubectl create](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#create).
-   Example:
-
-    ```console
-    kubectl create -f ${KUBERNETES_DIR}/persistent-volume-claim-senzing.yaml
-    ```
-
-1. :thinking: **Optional:**
-   Review persistent volumes and claims using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get persistentvolumes \
-      --namespace ${DEMO_NAMESPACE}
-
-    kubectl get persistentvolumeClaims \
-      --namespace ${DEMO_NAMESPACE}
-    ```
-
 ### Add Helm repositories
 
 1. Add Senzing repository using
@@ -718,109 +543,6 @@ If PVs and PVCs already exist, this step may be skipped.
 
     ```console
     helm repo list
-    ```
-
-### Deploy Senzing
-
-This deployment initializes the Persistent Volume with Senzing code and data
-at `/opt/senzing/g2` and `/opt/senzing/data`.
-These paths are relative to inside the containers via PVC mounts.
-The actual location on the PVC may vary.
-
-This method uses a docker container to copy Senzing binaries that are "baked-in"
-the container to mounted volumes.
-This method requires:
-
-1. The `senzing/installer` image built in the
-   [Create senzing/installer docker image](#create-senzinginstaller-docker-image)
-   step.
-1. Registry choice of
-   "[Use private registry](#use-private-registry)"
-   or
-   "[Use minikube registry](#use-minikube-registry)".
-   That is, the image is not available on the public DockerHub registry.
-
-Copy Senzing's `g2` and `data` directories onto the Persistent Volume Claim (PVC)
-at `/opt/senzing/g2` and `/opt/senzing/data`.
-These paths are relative to inside the containers via PVC mounts.
-The actual location on the PVC may vary.
-
-1. Log into `minikube` instance using
-   [minikube ssh](https://minikube.sigs.k8s.io/docs/commands/ssh/).
-   Example:
-
-    ```console
-    minikube ssh
-    ```
-
-1. In the `minikube` instance, create `/mnt/vda1/senzing`.
-   Example:
-
-    ```console
-    sudo mkdir -p /mnt/vda1/senzing
-    exit
-    ```
-
-1. Install
-   [senzing/senzing-installer](https://github.com/Senzing/charts/tree/main/charts/senzing-installer)
-   chart using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-installer \
-      senzing/senzing-installer \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-installer.yaml\
-      --version ${SENZING_HELM_VERSION_SENZING_INSTALLER:-""}
-    ```
-
-1. Wait until Job has completed using
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
-    ```
-
-1. Example of completion:
-
-    ```console
-    NAME                         READY   STATUS      RESTARTS   AGE
-    my-senzing-installer-8n2ql   0/1     Completed   0          2m44s
-    ```
-
-### Install init-container Helm chart
-
-The [init-container](https://github.com/Senzing/docker-init-container)
-creates files from templates and initializes the G2 database.
-
-1. Install
-   [senzing/senzing-init-container](https://github.com/Senzing/charts/tree/main/charts/senzing-init-container)
-   chart using
-   [helm install](https://helm.sh/docs/helm/helm_install/).
-   Example:
-
-    ```console
-    helm install \
-      ${DEMO_PREFIX}-senzing-init-container \
-      senzing/senzing-init-container \
-      --namespace ${DEMO_NAMESPACE} \
-      --values ${HELM_VALUES_DIR}/senzing-init-container.yaml \
-      --version ${SENZING_HELM_VERSION_SENZING_INIT_CONTAINER:-""}
-    ```
-
-1. Wait for pod to complete
-   [kubectl get](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
-   Example:
-
-    ```console
-    kubectl get pods \
-      --namespace ${DEMO_NAMESPACE} \
-      --watch
     ```
 
 ### Install resolver Helm chart
@@ -892,11 +614,7 @@ Delete Kubernetes artifacts using
 
     ```console
     helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-resolver
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-init-container
-    helm uninstall --namespace ${DEMO_NAMESPACE} ${DEMO_PREFIX}-senzing-installer
     helm repo remove senzing
-    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-claim-senzing.yaml
-    kubectl delete -f ${KUBERNETES_DIR}/persistent-volume-senzing.yaml
     kubectl delete -f ${KUBERNETES_DIR}/namespace.yaml
     ```
 
