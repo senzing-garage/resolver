@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=senzing/senzingapi-runtime:0.1.0
+ARG BASE_IMAGE=senzing/senzingapi-runtime:3.1.0
 
 # -----------------------------------------------------------------------------
 # Stage: builder
@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2022-07-12
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="2.2.2"
+      Version="3.0.0"
 
 # Run as "root" for system installation.
 
@@ -53,7 +53,7 @@ ENV REFRESHED_AT=2022-07-12
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="2.2.2"
+      Version="3.0.0"
 
 # Define health check.
 
