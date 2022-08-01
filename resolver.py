@@ -72,7 +72,7 @@ APP = Flask(__name__)
 __all__ = []
 __version__ = "3.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
-__updated__ = '2022-07-14'
+__updated__ = '2022-08-01'
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/main/lists/senzing-product-ids.md
 LOG_FORMAT = '%(asctime)s %(message)s'
@@ -108,11 +108,6 @@ CONFIGURATION_LOCATOR = {
         "default": False,
         "env": "SENZING_DEBUG",
         "cli": "debug"
-    },
-    "entity_type": {
-        "default": "GENERIC",
-        "env": "SENZING_ENTITY_TYPE",
-        "cli": "entity-type"
     },
     "etc_dir": {
         "default": "/etc/opt/senzing",
@@ -351,15 +346,11 @@ MESSAGE_DEBUG = 900
 MESSAGE_DICTIONARY = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
     "101": "Adding data source '{0}'",
-    "102": "Adding entity type '{0}'",
     "103": "Processed {0} input records which resolved to {1} entities.",
     "104": "Adding data sources: {0}",
     "105": "Could not add data source '{0}'. Error: {1}",
-    "106": "Could not add entity type '{0}'. Error: {1}",
     "109": "Initial data sources: {0}",
-    "110": "Initial entity types: {0}",
     "111": "Adding data source '{0}'. Response: {1}",
-    "112": "Adding entity type '{0}'. Response: {1}",
     "121": "Adding record to failure queue: {0}",
     "292": "Configuration change detected.  Old: {0} New: {1}",
     "293": "For information on warnings and errors, see https://github.com/Senzing/resolver#errors",
@@ -773,7 +764,6 @@ class G2Client:
         # Must run after instance variable are set.
 
         self.data_sources = self.get_data_sources_list()
-        self.entity_types = self.get_entity_types_list()
 
     def add_data_source(self, data_source):
         ''' Add a data source to G2 configuration. '''
@@ -793,30 +783,6 @@ class G2Client:
 
         configuration_comment = message(101, data_source)
         self.persist_configuration(config_handle, configuration_comment)
-
-    def add_entity_type(self, entity_type):
-        ''' Add an entity type to G2 configuration. '''
-
-        # Only valid upto Senzing Version 2.
-
-        if self.senzing_sdk_version_major == 2:
-
-            # Add entity type to configuration.
-
-            config_handle = self.get_config_handle()
-            entity_type_dictionary = {
-                "ETYPE_CODE": entity_type,
-                "ECLASS_CODE": "ACTOR"
-            }
-            entity_type_json = json.dumps(entity_type_dictionary)
-            response_bytearray = bytearray()
-            self.g2_config.addEntityType(config_handle, entity_type_json, response_bytearray)
-            logging.info(message_info(112, entity_type, response_bytearray))
-
-            # Push configuration to database.
-
-            configuration_comment = message(102, entity_type)
-            self.persist_configuration(config_handle, configuration_comment)
 
     def is_g2_default_configuration_changed(self):
         ''' Determine if the configuration in the database differs from the in-memory configuration.'''
@@ -860,7 +826,6 @@ class G2Client:
 
         json_dictionary = json.loads(jsonline)
         data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
-        entity_type = str(json_dictionary.get('ENTITY_TYPE', self.config.get("entity_type")))
         record_id = json_dictionary.get('RECORD_ID')
         if record_id is not None:
             record_id = str(record_id)
@@ -873,15 +838,6 @@ class G2Client:
                 self.add_data_source(data_source)
             except Exception as err:
                 logging.info(message_info(105, data_source, err))
-
-        # Determine if it's a new entity_type.
-
-        if entity_type not in self.entity_types:
-            self.entity_types.append(entity_type)
-            try:
-                self.add_entity_type(entity_type)
-            except Exception as err:
-                logging.info(message_info(106, entity_type, err))
 
         # Run G2Engine.addRecord().
         try:
@@ -928,16 +884,6 @@ class G2Client:
         self.g2_config.listDataSources(config_handle, datasources_bytearray)
         datasources_dictionary = json.loads(datasources_bytearray.decode())
         return [x.get("DSRC_CODE") for x in datasources_dictionary.get("DATA_SOURCES")]
-
-    def get_entity_types_list(self):
-        ''' Determine entity_types already defined. '''
-        config_handle = self.get_config_handle()
-        entity_types_bytearray = bytearray()
-        entity_types_dictionary = {}
-        if self.senzing_sdk_version_major == 2:
-            self.g2_config.listEntityTypesV2(config_handle, entity_types_bytearray)
-            entity_types_dictionary = json.loads(entity_types_bytearray.decode())
-        return [x.get("ETYPE_CODE") for x in entity_types_dictionary.get("ENTITY_TYPES", {})]
 
     def get_resolved_entities(self, senzing_engine_flags=None):
         ''' Run G2Engine.exportJSONEngineReport(). '''
@@ -1185,7 +1131,6 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
 
         if config.get('senzing_sdk_version_major') == 2:
             result.addDataSource = result.addDataSourceV2
-            result.addEntityType = result.addEntityTypeV2
             result.init = result.initV2
             result.listDataSources = result.listDataSourcesV2
 
