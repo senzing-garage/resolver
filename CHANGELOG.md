@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [markdownlint](https://dlaa.me/markdownlint/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2022-08-26
+
+### Changed in 3.0.1
+
+- In `Dockerfile`, bump from `senzing/senzingapi-runtime:3.1.0` to `senzing/senzingapi-runtime:3.2.0`
+
+### Deleted in 3.0.1
+
+- Removed support for `SENZING_DEFAULT_ENTITY_TYPE`
+
 ## [3.0.0] - 2022-07-14
 
 ### Changed in 3.0.0
