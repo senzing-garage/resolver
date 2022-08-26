@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2022-08-25
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="3.0.0"
+      Version="3.0.1"
 
 # Run as "root" for system installation.
 
