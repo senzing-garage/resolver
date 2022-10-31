@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=senzing/senzingapi-runtime:3.3.1
+ARG BASE_IMAGE=senzing/senzingapi-runtime:3.3.2
 
 # -----------------------------------------------------------------------------
 # Stage: builder
@@ -6,7 +6,7 @@ ARG BASE_IMAGE=senzing/senzingapi-runtime:3.3.1
 
 FROM ${BASE_IMAGE} AS builder
 
-ENV REFRESHED_AT=2022-10-11
+ENV REFRESHED_AT=2022-10-27
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
@@ -49,7 +49,7 @@ RUN pip3 install --upgrade pip \
 
 FROM ${BASE_IMAGE} AS runner
 
-ENV REFRESHED_AT=2022-10-11
+ENV REFRESHED_AT=2022-10-27
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
