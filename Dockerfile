@@ -10,7 +10,7 @@ ENV REFRESHED_AT=2022-10-27
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="3.0.3"
+      Version="3.0.4"
 
 # Run as "root" for system installation.
 
@@ -53,7 +53,7 @@ ENV REFRESHED_AT=2022-10-27
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="3.0.2"
+      Version="3.0.4"
 
 # Define health check.
 
