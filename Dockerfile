@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=senzing/senzingapi-runtime:3.3.2
+ARG BASE_IMAGE=senzing/senzingapi-runtime:3.4.0
 
 # -----------------------------------------------------------------------------
 # Stage: builder
@@ -6,11 +6,11 @@ ARG BASE_IMAGE=senzing/senzingapi-runtime:3.3.2
 
 FROM ${BASE_IMAGE} AS builder
 
-ENV REFRESHED_AT=2022-10-27
+ENV REFRESHED_AT=2023-01-12
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="3.0.4"
+      Version="3.0.5"
 
 # Run as "root" for system installation.
 
@@ -49,11 +49,11 @@ RUN pip3 install --upgrade pip \
 
 FROM ${BASE_IMAGE} AS runner
 
-ENV REFRESHED_AT=2022-10-27
+ENV REFRESHED_AT=2023-01-12
 
 LABEL Name="senzing/resolver" \
       Maintainer="support@senzing.com" \
-      Version="3.0.4"
+      Version="3.0.5"
 
 # Define health check.
 
