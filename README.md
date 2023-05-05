@@ -43,7 +43,6 @@ To see the options for a subcommand, run commands like:
 ### Contents
 
 1. [Preamble](#preamble)
-1. [Related artifacts](#related-artifacts)
 1. [Expectations](#expectations)
 1. [Demonstrate using Command Line](#demonstrate-using-command-line)
     1. [Prerequisite software](#prerequisite-software)
@@ -70,13 +69,6 @@ To see the options for a subcommand, run commands like:
     1. [Install resolver Helm chart](#install-resolver-helm-chart)
     1. [Port forward senzing-resolver service](#port-forward-senzing-resolver-service)
     1. [Cleanup](#cleanup)
-1. [Develop](#develop)
-    1. [Prerequisite software for development](#prerequisite-software-for-development)
-    1. [Clone repository for development](#clone-repository-for-development)
-    1. [Build docker image for development](#build-docker-image-for-development)
-1. [Examples](#examples)
-    1. [HTTP requests](#http-requests)
-1. [Errors](#errors)
 1. [References](#references)
 
 ## Preamble
@@ -99,11 +91,6 @@ describing where we can improve.   Now on with the show...
 1. :pencil2: - A "pencil" icon means that the instructions may need modification before performing.
 1. :warning: - A "warning" icon means that something tricky is happening, so pay attention.
 
-## Related artifacts
-
-1. [DockerHub](https://hub.docker.com/r/senzing/resolver)
-1. [Helm Chart](https://github.com/Senzing/charts/tree/main/charts/resolver)
-
 ## Expectations
 
 - **Space:** This repository and demonstration require 20 GB free disk space.
@@ -119,7 +106,7 @@ describing where we can improve.   Now on with the show...
 
 The following software programs need to be installed:
 
-1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
+1. [git](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/git.md)
 1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-senzing-api.md)
 
 ### Clone repository
@@ -179,7 +166,7 @@ The following software programs need to be installed:
 
 1. Test HTTP API.
    Once service has started, try the
-   [HTTP requests](#http-requests).
+   [HTTP requests](docs/examples.md#http-requests).
 
 ## Demonstrate using Docker
 
@@ -204,7 +191,7 @@ This option starts a micro-service supporting HTTP requests.
 
 1. Test HTTP API.
    Once service has started, try the
-   [HTTP requests](#http-requests).
+   [HTTP requests](docs/examples.md#http-requests).
 
 ### As file input/output
 
@@ -249,14 +236,14 @@ This Option uses file input and output.
 ## Demonstrate using Kubernetes and Helm
 
 This demonstrations uses
-[minikube](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-minikube.md)
+[minikube](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/minikube.md)
 to demonstrate installing and using the Senzing Resolver in a Kubernetes environment.
 
 ### Prerequisite software for Helm demonstration
 
-1. [minikube](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-minikube.md)
-1. [kubectl](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-kubectl.md)
-1. [Helm 3](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-helm.md)
+1. [minikube](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/minikube.md)
+1. [kubectl](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/kubectl.md)
+1. [Helm 3](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/helm.md)
 
 ### Clone repository for Helm demonstration
 
@@ -599,7 +586,7 @@ This deployment launches the
 
 1. Test HTTP API.
    Once service has started, try the
-   [HTTP requests](#http-requests).
+   [HTTP requests](docs/examples.md#http-requests).
 
 ### Cleanup
 
@@ -631,103 +618,11 @@ Delete minikube artifacts using
     minikube delete
     ```
 
-## Develop
-
-### Prerequisite software for development
-
-The following software programs need to be installed:
-
-1. [git](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-git.md)
-1. [make](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-make.md)
-1. [docker](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/install-docker.md)
-
-### Clone repository for development
-
-For more information on environment variables,
-see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md).
-
-1. Set these environment variable values:
-
-    ```console
-    export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=resolver
-    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
-    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-    ```
-
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
-
-### Build docker image for development
-
-1. **Option #1:** Using `docker` command and GitHub.
-
-    ```console
-    sudo docker build
-      --tag senzing/resolver \
-      https://github.com/senzing/resolver.git#main
-    ```
-
-1. **Option #2:** Using `docker` command and local repository.
-
-    ```console
-    cd ${GIT_REPOSITORY_DIR}
-    sudo docker build --tag senzing/resolver .
-    ```
-
-1. **Option #3:** Using `make` command.
-
-    ```console
-    cd ${GIT_REPOSITORY_DIR}
-    sudo make docker-build
-    ```
-
-    Note: `sudo make docker-build-development-cache` can be used to create cached docker layers.
-
-## Examples
-
-### HTTP requests
-
-1. Set these environment variable values:
-
-    ```console
-    export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=resolver
-    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
-    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-    ```
-
-1. Test HTTP API.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve
-    ```
-
-1. Test HTTP API with JSON.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve?withJson=true
-    ```
-
-1. Test HTTP API with Features.
-   Example:
-
-    ```console
-    curl -X POST \
-      --header "Content-Type: text/plain" \
-      --data-binary @${GIT_REPOSITORY_DIR}/test/test-data-1.json \
-      http://localhost:8252/resolve?withFeatures=true
-    ```
-
-## Errors
-
-1. See [docs/errors.md](docs/errors.md).
-
 ## References
+
+1. [Development](docs/development.md)
+1. [Errors](docs/errors.md)
+1. [Examples](docs/examples.md)
+1. Related artifacts:
+    1. [DockerHub](https://hub.docker.com/r/senzing/resolver)
+    1. [Helm Chart](https://github.com/Senzing/charts/tree/main/charts/resolver)
