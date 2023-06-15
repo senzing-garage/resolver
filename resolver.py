@@ -70,7 +70,7 @@ APP = Flask(__name__)
 # Metadata
 
 __all__ = []
-__version__ = "3.0.8"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "3.0.7"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
 __updated__ = '2023-06-15'
 
