@@ -1,14 +1,14 @@
 # Demonstrate using Kubernetes and Helm
 
 This demonstrations uses
-[minikube](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/minikube.md)
+[minikube](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/minikube.md)
 to demonstrate installing and using the Senzing Resolver in a Kubernetes environment.
 
 ## Prerequisite software for Helm demonstration
 
-1. [minikube](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/minikube.md)
-1. [kubectl](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/kubectl.md)
-1. [Helm 3](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/helm.md)
+1. [minikube](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/minikube.md)
+1. [kubectl](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/kubectl.md)
+1. [Helm 3](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/helm.md)
 
 ## Clone repository for Helm demonstration
 
@@ -23,7 +23,7 @@ The Git repository has files that will be used in the `helm install --values` pa
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
     ```
 
-1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
+1. Follow steps in [clone-repository](https://github.com/senzing-garage/knowledge-base/blob/main/HOWTO/clone-repository.md) to install the Git repository.
 
 ## Create artifact directory
 
@@ -300,10 +300,10 @@ is created to isolate this demonstration from other applications running on Kube
 ## Install resolver Helm chart
 
 This deployment launches the
-[resolver](https://github.com/Senzing/resolver).
+[resolver](https://github.com/senzing-garage/resolver).
 
 1. Install
-   [senzing/senzing-resolver](https://github.com/Senzing/charts/tree/main/charts/senzing-resolver)
+   [senzing/senzing-resolver](https://github.com/senzing-garage/charts/tree/main/charts/senzing-resolver)
    chart using
    [helm install](https://helm.sh/docs/helm/helm_install/).
    Example:

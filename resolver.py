@@ -74,7 +74,7 @@ __version__ = "3.0.8"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2019-07-16'
 __updated__ = '2023-09-30'
 
-SENZING_PRODUCT_ID = "5006"  # See https://github.com/Senzing/knowledge-base/blob/main/lists/senzing-product-ids.md
+SENZING_PRODUCT_ID = "5006"  # See https://github.com/senzing-garage/knowledge-base/blob/main/lists/senzing-product-ids.md
 LOG_FORMAT = '%(asctime)s %(message)s'
 
 # Working with bytes.
@@ -315,7 +315,7 @@ def get_parser():
 
     # Parse command line arguments.
 
-    parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/Senzing/resolver")
+    parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/senzing-garage/resolver")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
     for subcommand_key, subcommand_values in subcommands.items():
@@ -353,7 +353,7 @@ MESSAGE_DICTIONARY = {
     "111": "Adding data source '{0}'. Response: {1}",
     "121": "Adding record to failure queue: {0}",
     "292": "Configuration change detected.  Old: {0} New: {1}",
-    "293": "For information on warnings and errors, see https://github.com/Senzing/resolver#errors",
+    "293": "For information on warnings and errors, see https://github.com/senzing-garage/resolver#errors",
     "294": "Version: {0}  Updated: {1}",
     "295": "Sleeping infinitely.",
     "296": "Sleeping {0} seconds.",
