@@ -1,5 +1,17 @@
 # resolver
 
+If you are beginning your journey with
+[Senzing](https://senzing.com/),
+please start with
+[Senzing Quick Start guides](https://docs.senzing.com/quickstart/).
+
+You are in the
+[Senzing Garage](https://github.com/senzing-garage)
+where projects are "tinkered" on.
+Although this GitHub repository may help you understand an approach to using Senzing,
+it's not considered to be "production ready" and is not considered to be part of the Senzing product.
+Heck, it may not even be appropriate for your application of Senzing!
+
 ## Synopsis
 
 Performs resolution on a single set of input records.  There is no persistence of input records.
@@ -18,7 +30,7 @@ usage: resolver.py [-h]
                    ...
 
 Resolve entities. For more information, see
-https://github.com/Senzing/resolver
+https://github.com/senzing-garage/resolver
 
 positional arguments:
   {file-input,service,sleep,version,docker-acceptance-test}
@@ -51,12 +63,12 @@ To see the options for a subcommand, run commands like:
 
 At [Senzing](http://senzing.com),
 we strive to create GitHub documentation in a
-"[don't make me think](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/dont-make-me-think.md)" style.
+"[don't make me think](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/dont-make-me-think.md)" style.
 For the most part, instructions are copy and paste.
 Whenever thinking is needed, it's marked with a "thinking" icon :thinking:.
 Whenever customization is needed, it's marked with a "pencil" icon :pencil2:.
 If the instructions are not clear, please let us know by opening a new
-[Documentation issue](https://github.com/Senzing/resolver/issues/new?assignees=&labels=&template=documentation_request.md)
+[Documentation issue](https://github.com/senzing-garage/resolver/issues/new?assignees=&labels=&template=documentation_request.md)
 describing where we can improve.   Now on with the show...
 
 ### Legend
@@ -67,14 +79,14 @@ describing where we can improve.   Now on with the show...
 1. :pencil2: - A "pencil" icon means that the instructions may need modification before performing.
 1. :warning: - A "warning" icon means that something tricky is happening, so pay attention.
 
-## Expectations
+### Expectations
 
 - **Space:** This repository and demonstration require 20 GB free disk space.
 - **Time:** Budget 4 hours to get the demonstration up-and-running, depending on CPU and network speeds.
 - **Background knowledge:** This repository assumes a working knowledge of:
-  - [Docker](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/docker.md)
-  - [Kubernetes](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/kubernetes.md)
-  - [Helm](https://github.com/Senzing/knowledge-base/blob/main/WHATIS/helm.md)
+  - [Docker](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/docker.md)
+  - [Kubernetes](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/kubernetes.md)
+  - [Helm](https://github.com/senzing-garage/knowledge-base/blob/main/WHATIS/helm.md)
 
 ## Demonstrate
 
@@ -90,4 +102,4 @@ describing where we can improve.   Now on with the show...
 1. [Examples](docs/examples.md)
 1. Related artifacts:
     1. [DockerHub](https://hub.docker.com/r/senzing/resolver)
-    1. [Helm Chart](https://github.com/Senzing/charts/tree/main/charts/resolver)
+    1. [Helm Chart](https://github.com/senzing-garage/charts/tree/main/charts/resolver)
