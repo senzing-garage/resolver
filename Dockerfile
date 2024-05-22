@@ -8,10 +8,6 @@ FROM ${BASE_IMAGE} AS builder
 
 ENV REFRESHED_AT=2024-05-22
 
-LABEL Name="senzing/resolver" \
-      Maintainer="support@senzing.com" \
-      Version="3.0.8"
-
 # Run as "root" for system installation.
 
 USER root
@@ -19,15 +15,15 @@ USER root
 # Install packages via apt.
 
 RUN apt update \
- && apt -y install \
-      curl \
-      libaio1 \
-      python3 \
-      python3-dev \
-      python3-pip \
-      python3-venv \
- && apt clean \
- && rm -rf /var/lib/apt/lists/*
+  && apt -y install \
+  curl \
+  libaio1 \
+  python3 \
+  python3-dev \
+  python3-pip \
+  python3-venv \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Create and activate virtual environment.
 
@@ -38,8 +34,8 @@ ENV PATH="/app/venv/bin:$PATH"
 
 COPY requirements.txt .
 RUN pip3 install --upgrade pip \
- && pip3 install -r requirements.txt \
- && rm requirements.txt
+  && pip3 install -r requirements.txt \
+  && rm requirements.txt
 
 # -----------------------------------------------------------------------------
 # Stage: Final
@@ -52,8 +48,8 @@ FROM ${BASE_IMAGE} AS runner
 ENV REFRESHED_AT=2024-05-22
 
 LABEL Name="senzing/resolver" \
-      Maintainer="support@senzing.com" \
-      Version="3.0.8"
+  Maintainer="support@senzing.com" \
+  Version="3.0.9"
 
 # Define health check.
 
@@ -66,18 +62,18 @@ USER root
 # Install packages via apt.
 
 RUN apt update \
- && apt -y install \
-      libaio1 \
-      libxml2 \
-      python3 \
-      python3-venv \
- && apt clean \
- && rm -rf /var/lib/apt/lists/*
+  && apt -y install \
+  libaio1 \
+  libxml2 \
+  python3 \
+  python3-venv \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Make directory that resolver.py can use.
 
 RUN mkdir /var/opt/senzing-internal \
- && chown 1001 /var/opt/senzing-internal
+  && chown 1001 /var/opt/senzing-internal
 
 # The port for the Flask is 5000.
 
