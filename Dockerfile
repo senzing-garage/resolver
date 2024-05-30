@@ -22,7 +22,7 @@ RUN apt-get update \
   python3-dev \
   python3-pip \
   python3-venv \
-  && apt clean \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Create and activate virtual environment.
