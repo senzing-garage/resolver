@@ -12,10 +12,10 @@ ENV REFRESHED_AT=2024-05-22
 
 USER root
 
-# Install packages via apt.
+# Install packages via apt-get.
 
-RUN apt update \
-  && apt -y install \
+RUN apt-get update \
+  && apt-get -y install \
   curl \
   libaio1 \
   python3 \
@@ -61,13 +61,13 @@ USER root
 
 # Install packages via apt.
 
-RUN apt update \
-  && apt -y install \
+RUN apt-get update \
+  && apt-get -y install \
   libaio1 \
   libxml2 \
   python3 \
   python3-venv \
-  && apt clean \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Make directory that resolver.py can use.
