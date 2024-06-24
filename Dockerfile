@@ -49,7 +49,7 @@ ENV REFRESHED_AT=2024-06-24
 
 LABEL Name="senzing/resolver" \
   Maintainer="support@senzing.com" \
-  Version="3.0.9"
+  Version="3.0.10"
 
 # Define health check.
 
