@@ -26,6 +26,7 @@
       "jsonline",
       "libaio",
       "LICENSESTRINGBASE",
+      "mypy",
       "pydev",
       "pydevproject",
       "pylint",
@@ -48,6 +49,7 @@
   "ignorePaths": [
     ".git/**",
     ".gitignore",
+    ".mypy_cache/**",
     "test/test-data-1.json"
   ]
 }

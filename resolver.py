@@ -36,7 +36,16 @@ SENZING_SDK_VERSION_MAJOR = None
 # Import from Senzing.
 
 try:
-    from senzing import G2Config, G2ConfigMgr, G2Engine, G2EngineFlags, G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
+    from senzing import (
+        G2Config,
+        G2ConfigMgr,
+        G2Engine,
+        G2EngineFlags,
+        G2ModuleException,
+        G2ModuleGenericException,
+        G2ModuleNotInitialized,
+    )
+
     SENZING_SDK_VERSION_MAJOR = 3
 
 except Exception:
@@ -47,15 +56,22 @@ except Exception:
         from G2Config import G2Config
         from G2ConfigMgr import G2ConfigMgr
         from G2Engine import G2Engine
-        from G2Exception import G2ModuleException, G2ModuleGenericException, G2ModuleNotInitialized
+        from G2Exception import (
+            G2ModuleException,
+            G2ModuleGenericException,
+            G2ModuleNotInitialized,
+        )
 
         # Create a class like what is seen in Senzing Version 3.
 
         class G2EngineFlags(IntFlag):
-            ''' Create an object similar to what is seen in Senzing V2. '''
+            """Create an object similar to what is seen in Senzing V2."""
+
             G2_ENTITY_BRIEF_DEFAULT_FLAGS = G2Engine.G2_ENTITY_BRIEF_DEFAULT_FLAGS
             G2_ENTITY_INCLUDE_ALL_FEATURES = G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES
-            G2_ENTITY_INCLUDE_RECORD_JSON_DATA = G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+            G2_ENTITY_INCLUDE_RECORD_JSON_DATA = (
+                G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+            )
             G2_EXPORT_INCLUDE_ALL_ENTITIES = G2Engine.G2_EXPORT_INCLUDE_ALL_ENTITIES
 
         SENZING_SDK_VERSION_MAJOR = 2
@@ -71,11 +87,11 @@ APP = Flask(__name__)
 
 __all__ = []
 __version__ = "3.0.8"  # See https://www.python.org/dev/peps/pep-0396/
-__date__ = '2019-07-16'
-__updated__ = '2023-09-30'
+__date__ = "2019-07-16"
+__updated__ = "2023-09-30"
 
 SENZING_PRODUCT_ID = "5006"  # See https://github.com/senzing-garage/knowledge-base/blob/main/lists/senzing-product-ids.md
-LOG_FORMAT = '%(asctime)s %(message)s'
+LOG_FORMAT = "%(asctime)s %(message)s"
 
 # Working with bytes.
 
@@ -85,9 +101,26 @@ GIGABYTES = 1024 * MEGABYTES
 
 # Lists from https://www.ietf.org/rfc/rfc1738.txt
 
-SAFE_CHARACTER_LIST = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"'] + list(string.ascii_letters)
-UNSAFE_CHARACTER_LIST = ['"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
-RESERVED_CHARACTER_LIST = [';', ',', '/', '?', ':', '@', '=', '&']
+SAFE_CHARACTER_LIST = ["$", "-", "_", ".", "+", "!", "*", "(", ")", ",", '"'] + list(
+    string.ascii_letters
+)
+UNSAFE_CHARACTER_LIST = [
+    '"',
+    "<",
+    ">",
+    "#",
+    "%",
+    "{",
+    "}",
+    "|",
+    "\\",
+    "^",
+    "~",
+    "[",
+    "]",
+    "`",
+]
+RESERVED_CHARACTER_LIST = [";", ",", "/", "?", ":", "@", "=", "&"]
 
 # The "CONFIGURATION_LOCATOR" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
@@ -97,67 +130,47 @@ CONFIGURATION_LOCATOR = {
     "data_dir": {
         "default": "/opt/senzing/data",
         "env": "SENZING_DATA_DIR",
-        "cli": "data-dir"
+        "cli": "data-dir",
     },
     "data_source": {
         "default": "TEST",
         "env": "SENZING_DATA_SOURCE",
-        "cli": "data-source"
+        "cli": "data-source",
     },
-    "debug": {
-        "default": False,
-        "env": "SENZING_DEBUG",
-        "cli": "debug"
-    },
+    "debug": {"default": False, "env": "SENZING_DEBUG", "cli": "debug"},
     "etc_dir": {
         "default": "/etc/opt/senzing",
         "env": "SENZING_ETC_DIR",
-        "cli": "etc-dir"
+        "cli": "etc-dir",
     },
     "g2_database_url_generic": {
         "default": "sqlite3://na:na@/var/opt/senzing/sqlite/G2C.db",
         "env": "SENZING_DATABASE_URL",
-        "cli": "database-url"
+        "cli": "database-url",
     },
-    "g2_dir": {
-        "default": "/opt/senzing/g2",
-        "env": "SENZING_G2_DIR",
-        "cli": "g2-dir"
-    },
+    "g2_dir": {"default": "/opt/senzing/g2", "env": "SENZING_G2_DIR", "cli": "g2-dir"},
     "g2_internal_database": {
         "default": None,
         "env": "SENZING_INTERNAL_DATABASE",
-        "cli": "internal-database"
+        "cli": "internal-database",
     },
-    "host": {
-        "default": "0.0.0.0",
-        "env": "SENZING_HOST",
-        "cli": "host"
-    },
-    "input_file": {
-        "default": None,
-        "env": "SENZING_INPUT_FILE",
-        "cli": "input-file"
-    },
+    "host": {"default": "0.0.0.0", "env": "SENZING_HOST", "cli": "host"},
+    "input_file": {"default": None, "env": "SENZING_INPUT_FILE", "cli": "input-file"},
     "license_base64_encoded": {
         "default": None,
         "env": "SENZING_LICENSE_BASE64_ENCODED",
-        "cli": "license-base64-encoded"
+        "cli": "license-base64-encoded",
     },
     "output_file": {
         "default": "resolver-output.json",
         "env": "SENZING_OUTPUT_FILE",
-        "cli": "output-file"
+        "cli": "output-file",
     },
-    "port": {
-        "default": 8252,
-        "env": "SENZING_PORT",
-        "cli": "port"
-    },
+    "port": {"default": 8252, "env": "SENZING_PORT", "cli": "port"},
     "sleep_time_in_seconds": {
         "default": 0,
         "env": "SENZING_SLEEP_TIME_IN_SECONDS",
-        "cli": "sleep-time-in-seconds"
+        "cli": "sleep-time-in-seconds",
     },
     "subcommand": {
         "default": None,
@@ -166,18 +179,14 @@ CONFIGURATION_LOCATOR = {
     "var_dir": {
         "default": "/var/opt/senzing",
         "env": "SENZING_VAR_DIR",
-        "cli": "var-dir"
+        "cli": "var-dir",
     },
     "with_features": {
         "default": False,
         "env": "SENZING_WITH_FEATURES",
-        "cli": "with-features"
+        "cli": "with-features",
     },
-    "with_json": {
-        "default": False,
-        "env": "SENZING_WITH_JSON",
-        "cli": "with-json"
-    },
+    "with_json": {"default": False, "env": "SENZING_WITH_JSON", "cli": "with-json"},
 }
 
 # Enumerate keys in 'configuration_locator' that should not be printed to the log.
@@ -196,57 +205,56 @@ G2_CONFIG_SINGLETON = None
 
 
 def get_parser():
-    ''' Parse commandline arguments. '''
+    """Parse commandline arguments."""
 
     subcommands = {
-        'file-input': {
-            "help": 'File based input / output.',
+        "file-input": {
+            "help": "File based input / output.",
             "arguments": {
                 "--input-file": {
                     "dest": "input_file",
                     "metavar": "SENZING_INPUT_FILE",
-                    "help": "File of JSON lines to be read. Default: None"
+                    "help": "File of JSON lines to be read. Default: None",
                 },
                 "--output-file": {
                     "dest": "output_file",
                     "metavar": "SENZING_OUTPUT_FILE",
-                    "help": "File of JSON lines to be read. Default: resolver-output.json"
+                    "help": "File of JSON lines to be read. Default: resolver-output.json",
                 },
-
             },
             "argument_aspects": ["common"],
         },
-        'service': {
-            "help": 'Receive HTTP requests.',
+        "service": {
+            "help": "Receive HTTP requests.",
             "arguments": {
                 "--host": {
                     "dest": "host",
                     "metavar": "SENZING_HOST",
-                    "help": "Host to listen on. Default: 0.0.0.0"
+                    "help": "Host to listen on. Default: 0.0.0.0",
                 },
                 "--port": {
                     "dest": "port",
                     "metavar": "SENZING_PORT",
-                    "help": "Port to listen on. Default: 8252"
+                    "help": "Port to listen on. Default: 8252",
                 },
             },
             "argument_aspects": ["common"],
         },
-        'sleep': {
-            "help": 'Do nothing but sleep. For Docker testing.',
+        "sleep": {
+            "help": "Do nothing but sleep. For Docker testing.",
             "arguments": {
                 "--sleep-time-in-seconds": {
                     "dest": "sleep_time_in_seconds",
                     "metavar": "SENZING_SLEEP_TIME_IN_SECONDS",
-                    "help": "Sleep time in seconds. DEFAULT: 0 (infinite)"
+                    "help": "Sleep time in seconds. DEFAULT: 0 (infinite)",
                 },
             },
         },
-        'version': {
-            "help": 'Print version of program.',
+        "version": {
+            "help": "Print version of program.",
         },
-        'docker-acceptance-test': {
-            "help": 'For Docker acceptance testing.',
+        "docker-acceptance-test": {
+            "help": "For Docker acceptance testing.",
         },
     }
 
@@ -257,47 +265,47 @@ def get_parser():
             "--data-dir": {
                 "dest": "data_dir",
                 "metavar": "SENZING_DATA_DIR",
-                "help": "Location of Senzing's data. Default: /opt/senzing/data"
+                "help": "Location of Senzing's data. Default: /opt/senzing/data",
             },
             "--data-source": {
                 "dest": "data_source",
                 "metavar": "SENZING_DATA_SOURCE",
-                "help": "Data Source."
+                "help": "Data Source.",
             },
             "--database-url": {
                 "dest": "g2_database_url_generic",
                 "metavar": "SENZING_DATABASE_URL",
-                "help": "Information for connecting to database."
+                "help": "Information for connecting to database.",
             },
             "--debug": {
                 "dest": "debug",
                 "action": "store_true",
-                "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+                "help": "Enable debugging. (SENZING_DEBUG) Default: False",
             },
             "--etc-dir": {
                 "dest": "etc_dir",
                 "metavar": "SENZING_ETC_DIR",
-                "help": "Location of Senzing configuration. Default: /etc/opt/senzing"
+                "help": "Location of Senzing configuration. Default: /etc/opt/senzing",
             },
             "--g2-dir": {
                 "dest": "g2_dir",
                 "metavar": "SENZING_G2_DIR",
-                "help": "Location of Senzing's G2. Default: /opt/senzing/g2"
+                "help": "Location of Senzing's G2. Default: /opt/senzing/g2",
             },
             "--var-dir": {
                 "dest": "var_dir",
                 "metavar": "SENZING_VAR_DIR",
-                "help": "Location of Senzing's variable files. Default: /var/opt/senzing"
+                "help": "Location of Senzing's variable files. Default: /var/opt/senzing",
             },
             "--with-features": {
                 "dest": "with_features",
                 "metavar": "SENZING_WITH_FEATURES",
-                "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES flag. Default: false"
+                "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_ALL_FEATURES flag. Default: false",
             },
             "--with-json": {
                 "dest": "with_json",
                 "metavar": "SENZING_WITH_JSON",
-                "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA flag. Default: false"
+                "help": "If 'true', use the G2Engine.G2_ENTITY_INCLUDE_RECORD_JSON_DATA flag. Default: false",
             },
         },
     }
@@ -305,27 +313,33 @@ def get_parser():
     # Augment "subcommands" variable with arguments specified by aspects.
 
     for subcommand_value in subcommands.values():
-        if 'argument_aspects' in subcommand_value:
-            for aspect in subcommand_value['argument_aspects']:
-                if 'arguments' not in subcommand_value:
-                    subcommand_value['arguments'] = {}
+        if "argument_aspects" in subcommand_value:
+            for aspect in subcommand_value["argument_aspects"]:
+                if "arguments" not in subcommand_value:
+                    subcommand_value["arguments"] = {}
                 arguments = argument_aspects.get(aspect, {})
                 for argument, argument_value in arguments.items():
-                    subcommand_value['arguments'][argument] = argument_value
+                    subcommand_value["arguments"][argument] = argument_value
 
     # Parse command line arguments.
 
-    parser = argparse.ArgumentParser(prog="resolver.py", description="Resolve entities. For more information, see https://github.com/senzing-garage/resolver")
-    subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
+    parser = argparse.ArgumentParser(
+        prog="resolver.py",
+        description="Resolve entities. For more information, see https://github.com/senzing-garage/resolver",
+    )
+    subparsers = parser.add_subparsers(
+        dest="subcommand", help="Subcommands (SENZING_SUBCOMMAND):"
+    )
 
     for subcommand_key, subcommand_values in subcommands.items():
-        subcommand_help = subcommand_values.get('help', "")
-        subcommand_arguments = subcommand_values.get('arguments', {})
+        subcommand_help = subcommand_values.get("help", "")
+        subcommand_arguments = subcommand_values.get("arguments", {})
         subparser = subparsers.add_parser(subcommand_key, help=subcommand_help)
         for argument_key, argument_values in subcommand_arguments.items():
             subparser.add_argument(argument_key, **argument_values)
 
     return parser
+
 
 # -----------------------------------------------------------------------------
 # Message handling
@@ -402,39 +416,41 @@ MESSAGE_DICTIONARY = {
 
 
 def message(index, *args):
-    ''' Return an instantiated message. '''
+    """Return an instantiated message."""
     index_string = str(index)
-    template = MESSAGE_DICTIONARY.get(index_string, "No message for index {0}.".format(index_string))
+    template = MESSAGE_DICTIONARY.get(
+        index_string, "No message for index {0}.".format(index_string)
+    )
     return template.format(*args)
 
 
 def message_generic(generic_index, index, *args):
-    ''' Return a formatted message. '''
+    """Return a formatted message."""
     return "{0} {1}".format(message(generic_index, index), message(index, *args))
 
 
 def message_info(index, *args):
-    ''' Return an info message. '''
+    """Return an info message."""
     return message_generic(MESSAGE_INFO, index, *args)
 
 
 def message_warning(index, *args):
-    ''' Return a warning message. '''
+    """Return a warning message."""
     return message_generic(MESSAGE_WARN, index, *args)
 
 
 def message_error(index, *args):
-    ''' Return an error message. '''
+    """Return an error message."""
     return message_generic(MESSAGE_ERROR, index, *args)
 
 
 def message_debug(index, *args):
-    ''' Return a debug message. '''
+    """Return a debug message."""
     return message_generic(MESSAGE_DEBUG, index, *args)
 
 
 def get_exception():
-    ''' Get details about an exception. '''
+    """Get details about an exception."""
     exception_type, exception_object, traceback = sys.exc_info()
     frame = traceback.tb_frame
     line_number = traceback.tb_lineno
@@ -450,13 +466,14 @@ def get_exception():
         "traceback": traceback,
     }
 
+
 # -----------------------------------------------------------------------------
 # Database URL parsing
 # -----------------------------------------------------------------------------
 
 
 def translate(a_map, astring):
-    ''' Translate characters. '''
+    """Translate characters."""
 
     new_string = str(astring)
     for key, value in a_map.items():
@@ -465,7 +482,7 @@ def translate(a_map, astring):
 
 
 def get_unsafe_characters(astring):
-    ''' Return the list of unsafe characters found in astring. '''
+    """Return the list of unsafe characters found in astring."""
 
     result = []
     for unsafe_character in UNSAFE_CHARACTER_LIST:
@@ -475,7 +492,7 @@ def get_unsafe_characters(astring):
 
 
 def get_safe_characters(astring):
-    ''' Return the list of safe characters found in astring. '''
+    """Return the list of safe characters found in astring."""
 
     result = []
     for safe_character in SAFE_CHARACTER_LIST:
@@ -485,7 +502,7 @@ def get_safe_characters(astring):
 
 
 def parse_database_url(original_senzing_database_url):
-    ''' Given a canonical database URL, decompose into URL components. '''
+    """Given a canonical database URL, decompose into URL components."""
 
     result = {}
 
@@ -514,46 +531,53 @@ def parse_database_url(original_senzing_database_url):
         safe_character = safe_characters[safe_characters_index]
         safe_characters_index += 1
         translation_map[safe_character] = unsafe_character
-        senzing_database_url = senzing_database_url.replace(unsafe_character, safe_character)
+        senzing_database_url = senzing_database_url.replace(
+            unsafe_character, safe_character
+        )
 
     # Parse "translated" URL.
 
     parsed = urlparse(senzing_database_url)
-    schema = parsed.path.strip('/')
+    schema = parsed.path.strip("/")
 
     # Construct result.
 
     result = {
-        'scheme': translate(translation_map, parsed.scheme),
-        'netloc': translate(translation_map, parsed.netloc),
-        'path': translate(translation_map, parsed.path),
-        'params': translate(translation_map, parsed.params),
-        'query': translate(translation_map, parsed.query),
-        'fragment': translate(translation_map, parsed.fragment),
-        'username': translate(translation_map, parsed.username),
-        'password': translate(translation_map, parsed.password),
-        'hostname': translate(translation_map, parsed.hostname),
-        'port': translate(translation_map, parsed.port),
-        'schema': translate(translation_map, schema),
+        "scheme": translate(translation_map, parsed.scheme),
+        "netloc": translate(translation_map, parsed.netloc),
+        "path": translate(translation_map, parsed.path),
+        "params": translate(translation_map, parsed.params),
+        "query": translate(translation_map, parsed.query),
+        "fragment": translate(translation_map, parsed.fragment),
+        "username": translate(translation_map, parsed.username),
+        "password": translate(translation_map, parsed.password),
+        "hostname": translate(translation_map, parsed.hostname),
+        "port": translate(translation_map, parsed.port),
+        "schema": translate(translation_map, schema),
     }
 
     # For safety, compare original URL with reconstructed URL.
 
     url_parts = [
-        result.get('scheme'),
-        result.get('netloc'),
-        result.get('path'),
-        result.get('params'),
-        result.get('query'),
-        result.get('fragment'),
+        result.get("scheme"),
+        result.get("netloc"),
+        result.get("path"),
+        result.get("params"),
+        result.get("query"),
+        result.get("fragment"),
     ]
     test_senzing_database_url = urlunparse(url_parts)
     if test_senzing_database_url != original_senzing_database_url:
-        logging.warning(message_warning(891, original_senzing_database_url, test_senzing_database_url))
+        logging.warning(
+            message_warning(
+                891, original_senzing_database_url, test_senzing_database_url
+            )
+        )
 
     # Return result.
 
     return result
+
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -561,24 +585,32 @@ def parse_database_url(original_senzing_database_url):
 
 
 def get_g2_database_url_specific(generic_database_url):
-    ''' Given a canonical database URL, transform to the specific URL. '''
+    """Given a canonical database URL, transform to the specific URL."""
 
     result = ""
     parsed_database_url = parse_database_url(generic_database_url)
-    scheme = parsed_database_url.get('scheme')
+    scheme = parsed_database_url.get("scheme")
 
     # Format database URL for a particular database.
 
-    if scheme in ['mysql']:
-        result = "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}".format(**parsed_database_url)
-    elif scheme in ['postgresql']:
-        result = "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/".format(**parsed_database_url)
-    elif scheme in ['db2']:
-        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
-    elif scheme in ['sqlite3']:
+    if scheme in ["mysql"]:
+        result = "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}".format(
+            **parsed_database_url
+        )
+    elif scheme in ["postgresql"]:
+        result = "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/".format(
+            **parsed_database_url
+        )
+    elif scheme in ["db2"]:
+        result = "{scheme}://{username}:{password}@{schema}".format(
+            **parsed_database_url
+        )
+    elif scheme in ["sqlite3"]:
         result = "{scheme}://{netloc}{path}".format(**parsed_database_url)
-    elif scheme in ['mssql']:
-        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
+    elif scheme in ["mssql"]:
+        result = "{scheme}://{username}:{password}@{schema}".format(
+            **parsed_database_url
+        )
     else:
         logging.error(message_error(695, scheme, generic_database_url))
 
@@ -586,25 +618,25 @@ def get_g2_database_url_specific(generic_database_url):
 
 
 def get_configuration(subcommand, args):
-    ''' Order of precedence: CLI, OS environment variables, INI file, default. '''
+    """Order of precedence: CLI, OS environment variables, INI file, default."""
     result = {}
 
     # Copy default values into configuration dictionary.
 
     for key, value in list(CONFIGURATION_LOCATOR.items()):
-        result[key] = value.get('default', None)
+        result[key] = value.get("default", None)
 
     # "Prime the pump" with command line args. This will be done again as the last step.
 
     for key, value in list(args.__dict__.items()):
-        new_key = key.format(subcommand.replace('-', '_'))
+        new_key = key.format(subcommand.replace("-", "_"))
         if value:
             result[new_key] = value
 
     # Copy OS environment variables into configuration dictionary.
 
     for key, value in list(CONFIGURATION_LOCATOR.items()):
-        os_env_var = value.get('env', None)
+        os_env_var = value.get("env", None)
         if os_env_var:
             os_env_value = os.getenv(os_env_var, None)
             if os_env_value:
@@ -613,47 +645,41 @@ def get_configuration(subcommand, args):
     # Copy 'args' into configuration dictionary.
 
     for key, value in list(args.__dict__.items()):
-        new_key = key.format(subcommand.replace('-', '_'))
+        new_key = key.format(subcommand.replace("-", "_"))
         if value:
             result[new_key] = value
 
     # Add program information.
 
-    result['program_version'] = __version__
-    result['program_updated'] = __updated__
-    result['senzing_sdk_version_major'] = SENZING_SDK_VERSION_MAJOR
+    result["program_version"] = __version__
+    result["program_updated"] = __updated__
+    result["senzing_sdk_version_major"] = SENZING_SDK_VERSION_MAJOR
 
     # Add "run_as" information.
 
-    result['run_as_uid'] = os.getuid()
-    result['run_as_gid'] = os.getgid()
+    result["run_as_uid"] = os.getuid()
+    result["run_as_gid"] = os.getgid()
 
     # Special case: subcommand from command-line
 
     if args.subcommand:
-        result['subcommand'] = args.subcommand
+        result["subcommand"] = args.subcommand
 
     # Special case: Change boolean strings to booleans.
 
-    booleans = [
-        'debug',
-        'with_features',
-        'with_json'
-    ]
+    booleans = ["debug", "with_features", "with_json"]
     for boolean in booleans:
         boolean_value = result.get(boolean)
         if isinstance(boolean_value, str):
             boolean_value_lower_case = boolean_value.lower()
-            if boolean_value_lower_case in ['true', '1', 't', 'y', 'yes']:
+            if boolean_value_lower_case in ["true", "1", "t", "y", "yes"]:
                 result[boolean] = True
             else:
                 result[boolean] = False
 
     # Special case: Change integer strings to integers.
 
-    integers = [
-        'sleep_time_in_seconds'
-    ]
+    integers = ["sleep_time_in_seconds"]
     for integer in integers:
         integer_string = result.get(integer)
         result[integer] = int(integer_string)
@@ -661,12 +687,12 @@ def get_configuration(subcommand, args):
     # Special case: Determine absolute paths.
 
     paths = [
-        'data_dir',
-        'etc_dir',
-        'g2_dir',
-        'input_file',
-        'output_file',
-        'var_dir',
+        "data_dir",
+        "etc_dir",
+        "g2_dir",
+        "input_file",
+        "output_file",
+        "var_dir",
     ]
     for path in paths:
         relative_path = result.get(path)
@@ -675,15 +701,15 @@ def get_configuration(subcommand, args):
 
     # Special case: /opt/senzing/data/3.0.0
 
-    test_data_dir_path = "{0}/3.0.0".format(result.get('data_dir'))
+    test_data_dir_path = "{0}/3.0.0".format(result.get("data_dir"))
     if os.path.exists(test_data_dir_path):
-        result['data_dir'] = test_data_dir_path
+        result["data_dir"] = test_data_dir_path
 
     # Special case:  Tailored database URL
     # If requested, prepare internal database.
 
-    if result.get('g2_internal_database'):
-        g2_internal_database_path = result.get('g2_internal_database')
+    if result.get("g2_internal_database"):
+        g2_internal_database_path = result.get("g2_internal_database")
         g2_internal_database_directory = os.path.dirname(g2_internal_database_path)
 
         try:
@@ -691,25 +717,29 @@ def get_configuration(subcommand, args):
         except FileExistsError:
             pass
 
-        g2_database_path = "{0}/sqlite/G2C.db".format(result.get('var_dir'))
+        g2_database_path = "{0}/sqlite/G2C.db".format(result.get("var_dir"))
         shutil.copyfile(g2_database_path, g2_internal_database_path)
-        result['g2_database_url_specific'] = "sqlite3://na:na@{0}".format(g2_internal_database_path)
+        result["g2_database_url_specific"] = "sqlite3://na:na@{0}".format(
+            g2_internal_database_path
+        )
     else:
-        result['g2_database_url_specific'] = get_g2_database_url_specific(result.get("g2_database_url_generic"))
+        result["g2_database_url_specific"] = get_g2_database_url_specific(
+            result.get("g2_database_url_generic")
+        )
     return result
 
 
 def validate_configuration(config):
-    ''' Check aggregate configuration from commandline options, environment variables, config files, and defaults. '''
+    """Check aggregate configuration from commandline options, environment variables, config files, and defaults."""
 
     user_warning_messages = []
     user_error_messages = []
 
     # Perform subcommand specific checking.
 
-    subcommand = config.get('subcommand')
+    subcommand = config.get("subcommand")
 
-    if subcommand in ['service', 'file-input']:
+    if subcommand in ["service", "file-input"]:
         pass
 
     # Log warning messages.
@@ -734,7 +764,7 @@ def validate_configuration(config):
 
 
 def redact_configuration(config):
-    ''' Return a shallow copy of config with certain keys removed. '''
+    """Return a shallow copy of config with certain keys removed."""
     result = config.copy()
     for key in KEYS_TO_REDACT:
         try:
@@ -743,16 +773,17 @@ def redact_configuration(config):
             pass
     return result
 
+
 # -----------------------------------------------------------------------------
 # Class: G2Client
 # -----------------------------------------------------------------------------
 
 
 class G2Client:
-    '''
+    """
     Create a Facade software design pattern as a client of Senzing.
     Synthesizes the use of G2Engine, G2Config, and G2ConfigurationManager.
-    '''
+    """
 
     def __init__(self, config, g2_engine, g2_configuration_manager, g2_config):
         self.config = config
@@ -766,17 +797,17 @@ class G2Client:
         self.data_sources = self.get_data_sources_list()
 
     def add_data_source(self, data_source):
-        ''' Add a data source to G2 configuration. '''
+        """Add a data source to G2 configuration."""
 
         # Add data sources to configuration.
 
         config_handle = self.get_config_handle()
-        data_source_dictionary = {
-            "DSRC_CODE": data_source
-        }
+        data_source_dictionary = {"DSRC_CODE": data_source}
         data_source_json = json.dumps(data_source_dictionary)
         response_bytearray = bytearray()
-        self.g2_config.addDataSource(config_handle, data_source_json, response_bytearray)
+        self.g2_config.addDataSource(
+            config_handle, data_source_json, response_bytearray
+        )
         logging.info(message_info(111, data_source, response_bytearray.decode()))
 
         # Push configuration to database.
@@ -785,11 +816,11 @@ class G2Client:
         self.persist_configuration(config_handle, configuration_comment)
 
     def is_g2_default_configuration_changed(self):
-        ''' Determine if the configuration in the database differs from the in-memory configuration.'''
+        """Determine if the configuration in the database differs from the in-memory configuration."""
 
         # Update early to avoid "thundering heard problem".
 
-        self.config['last_configuration_check'] = time.time()
+        self.config["last_configuration_check"] = time.time()
 
         # Get active Configuration ID being used by g2_engine.
 
@@ -805,12 +836,14 @@ class G2Client:
 
         result = active_config_id != default_config_id
         if result:
-            logging.info(message_info(292, active_config_id.decode(), default_config_id.decode()))
+            logging.info(
+                message_info(292, active_config_id.decode(), default_config_id.decode())
+            )
 
         return result
 
     def update_active_g2_configuration(self):
-        ''' Update the in-memory engine with the new configuration. '''
+        """Update the in-memory engine with the new configuration."""
 
         # Get most current Configuration ID from G2 database.
 
@@ -822,11 +855,13 @@ class G2Client:
         self.g2_engine.reinit(default_config_id)
 
     def add_record(self, jsonline):
-        ''' Run G2Engine.addRecord(). '''
+        """Run G2Engine.addRecord()."""
 
         json_dictionary = json.loads(jsonline)
-        data_source = str(json_dictionary.get('DATA_SOURCE', self.config.get("data_source")))
-        record_id = json_dictionary.get('RECORD_ID')
+        data_source = str(
+            json_dictionary.get("DATA_SOURCE", self.config.get("data_source"))
+        )
+        record_id = json_dictionary.get("RECORD_ID")
         if record_id is not None:
             record_id = str(record_id)
 
@@ -851,13 +886,13 @@ class G2Client:
         return return_code
 
     def add_record_to_failure_queue(self, jsonline):
-        ''' Handle records that fail to be inserted into Senzing. '''
+        """Handle records that fail to be inserted into Senzing."""
 
         # FIXME: add functionality.
         logging.info(message_info(121, jsonline))
 
     def get_config_handle(self):
-        ''' Get configuration handle from new or existing "default" configuration. '''
+        """Get configuration handle from new or existing "default" configuration."""
 
         # Determine if a default configuration exists.
 
@@ -869,7 +904,9 @@ class G2Client:
         if config_id_bytearray:
             config_id_int = int(config_id_bytearray)
             configuration_bytearray = bytearray()
-            self.g2_configuration_manager.getConfig(config_id_int, configuration_bytearray)
+            self.g2_configuration_manager.getConfig(
+                config_id_int, configuration_bytearray
+            )
             configuration_json = configuration_bytearray.decode()
             config_handle = self.g2_config.load(configuration_json)
         else:
@@ -878,7 +915,7 @@ class G2Client:
         return config_handle
 
     def get_data_sources_list(self):
-        ''' Determine data_sources already defined. '''
+        """Determine data_sources already defined."""
         config_handle = self.get_config_handle()
         datasources_bytearray = bytearray()
         self.g2_config.listDataSources(config_handle, datasources_bytearray)
@@ -886,13 +923,16 @@ class G2Client:
         return [x.get("DSRC_CODE") for x in datasources_dictionary.get("DATA_SOURCES")]
 
     def get_resolved_entities(self, senzing_engine_flags=None):
-        ''' Run G2Engine.exportJSONEngineReport(). '''
+        """Run G2Engine.exportJSONEngineReport()."""
 
         # Get the raw report.
 
         result = []
         if not senzing_engine_flags:
-            senzing_engine_flags = G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+            senzing_engine_flags = (
+                G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES
+                | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+            )
         export_handle = self.g2_engine.exportJSONEntityReport(senzing_engine_flags)
 
         # Loop through results and append to result.
@@ -907,7 +947,7 @@ class G2Client:
         return result
 
     def persist_configuration(self, config_handle, configuration_comment=""):
-        ''' Save configuration to the Senzing G2 database. '''
+        """Save configuration to the Senzing G2 database."""
 
         # Get JSON string with new datasource added.
 
@@ -918,7 +958,9 @@ class G2Client:
         # Add configuration to G2 database SYS_CFG table.
 
         configuration_id_bytearray = bytearray()
-        self.g2_configuration_manager.addConfig(configuration_json, configuration_comment, configuration_id_bytearray)
+        self.g2_configuration_manager.addConfig(
+            configuration_json, configuration_comment, configuration_id_bytearray
+        )
 
         # Set Default configuration.
 
@@ -929,7 +971,7 @@ class G2Client:
         self.g2_engine.reinit(configuration_id_bytearray)
 
     def purge_repository(self):
-        ''' Run G2Engine.purgeRepository(). '''
+        """Run G2Engine.purgeRepository()."""
 
         try:
             self.g2_engine.purgeRepository()
@@ -940,7 +982,7 @@ class G2Client:
             raise err
 
     def send_jsonline_to_g2_engine(self, jsonline):
-        ''' Send the JSONline to G2 engine. '''
+        """Send the JSONline to G2 engine."""
 
         # Add Record to Senzing G2.
 
@@ -957,28 +999,31 @@ class G2Client:
             self.add_record_to_failure_queue(jsonline)
             raise err
 
+
 # -----------------------------------------------------------------------------
 # Class: G2Initializer
 # -----------------------------------------------------------------------------
 
 
 class G2Initializer:
-    '''
+    """
     Add a default Senzing configuration into the Senzing Model.
-    '''
+    """
 
     def __init__(self, g2_configuration_manager, g2_config):
         self.g2_config = g2_config
         self.g2_configuration_manager = g2_configuration_manager
 
     def initialize(self):
-        ''' Initialize the G2 database. '''
+        """Initialize the G2 database."""
 
         # Determine of a default/initial G2 configuration already exists.
 
         default_config_id_bytearray = bytearray()
         try:
-            self.g2_configuration_manager.getDefaultConfigID(default_config_id_bytearray)
+            self.g2_configuration_manager.getDefaultConfigID(
+                default_config_id_bytearray
+            )
         except Exception as err:
             logging.error(message_error(705, default_config_id_bytearray, err))
             raise err
@@ -995,7 +1040,9 @@ class G2Initializer:
         try:
             self.g2_config.save(config_handle, configuration_bytearray)
         except Exception as err:
-            logging.error(message_error(707, config_handle, configuration_bytearray, err))
+            logging.error(
+                message_error(707, config_handle, configuration_bytearray, err)
+            )
             raise err
 
         self.g2_config.close(config_handle)
@@ -1005,9 +1052,19 @@ class G2Initializer:
         config_comment = "Initial configuration."
         new_config_id = bytearray()
         try:
-            self.g2_configuration_manager.addConfig(configuration_bytearray.decode(), config_comment, new_config_id)
+            self.g2_configuration_manager.addConfig(
+                configuration_bytearray.decode(), config_comment, new_config_id
+            )
         except Exception as err:
-            logging.error(message_error(709, configuration_bytearray.decode(), config_comment, new_config_id, err))
+            logging.error(
+                message_error(
+                    709,
+                    configuration_bytearray.decode(),
+                    config_comment,
+                    new_config_id,
+                    err,
+                )
+            )
             raise err
 
         # Set the default configuration ID.
@@ -1018,21 +1075,22 @@ class G2Initializer:
             logging.error(message_error(711, new_config_id, err))
             raise err
 
+
 # -----------------------------------------------------------------------------
 # Utility functions
 # -----------------------------------------------------------------------------
 
 
 def bootstrap_signal_handler(signal_number, frame):
-    ''' Exit on signal error. '''
+    """Exit on signal error."""
     logging.debug(message_debug(901, signal_number, frame))
     sys.exit(0)
 
 
 def create_signal_handler_function(args):
-    ''' Tricky code.  Uses currying technique. Create a function for signal handling.
-        that knows about "args".
-    '''
+    """Tricky code.  Uses currying technique. Create a function for signal handling.
+    that knows about "args".
+    """
 
     def result_function(signal_number, frame):
         logging.info(message_info(298, args))
@@ -1043,9 +1101,9 @@ def create_signal_handler_function(args):
 
 
 def entry_template(config):
-    ''' Format of entry message. '''
+    """Format of entry message."""
     debug = config.get("debug", False)
-    config['start_time'] = time.time()
+    config["start_time"] = time.time()
     if debug:
         final_config = config
     else:
@@ -1055,11 +1113,11 @@ def entry_template(config):
 
 
 def exit_template(config):
-    ''' Format of exit message. '''
+    """Format of exit message."""
     debug = config.get("debug", False)
     stop_time = time.time()
-    config['stop_time'] = stop_time
-    config['elapsed_time'] = stop_time - config.get('start_time', stop_time)
+    config["stop_time"] = stop_time
+    config["elapsed_time"] = stop_time - config.get("start_time", stop_time)
     if debug:
         final_config = config
     else:
@@ -1069,15 +1127,16 @@ def exit_template(config):
 
 
 def exit_error(index, *args):
-    ''' Log error message and exit program. '''
+    """Log error message and exit program."""
     logging.error(message_error(index, *args))
     logging.error(message_error(698))
     sys.exit(1)
 
 
 def exit_silently():
-    ''' Exit program. '''
+    """Exit program."""
     sys.exit(0)
+
 
 # -----------------------------------------------------------------------------
 # Senzing services.
@@ -1085,7 +1144,7 @@ def exit_silently():
 
 
 def get_g2_configuration_dictionary(config):
-    ''' Construct a dictionary in the form of the old ini files. '''
+    """Construct a dictionary in the form of the old ini files."""
     result = {
         "PIPELINE": {
             "CONFIGPATH": config.get("etc_dir"),
@@ -1094,7 +1153,7 @@ def get_g2_configuration_dictionary(config):
         },
         "SQL": {
             "CONNECTION": config.get("g2_database_url_specific"),
-        }
+        },
     }
     license_base64_encoded = config.get("license_base64_encoded")
     if license_base64_encoded:
@@ -1103,13 +1162,14 @@ def get_g2_configuration_dictionary(config):
 
 
 def get_g2_configuration_json(config):
-    ''' Return a JSON string with Senzing configuration. '''
+    """Return a JSON string with Senzing configuration."""
     result = ""
-    if config.get('engine_configuration_json'):
-        result = config.get('engine_configuration_json')
+    if config.get("engine_configuration_json"):
+        result = config.get("engine_configuration_json")
     else:
         result = json.dumps(get_g2_configuration_dictionary(config))
     return result
+
 
 # -----------------------------------------------------------------------------
 # Senzing services.
@@ -1117,7 +1177,7 @@ def get_g2_configuration_json(config):
 
 
 def get_g2_config(config, g2_config_name="resolver-G2-config"):
-    ''' Get the G2Config resource. '''
+    """Get the G2Config resource."""
     global G2_CONFIG_SINGLETON
 
     if G2_CONFIG_SINGLETON:
@@ -1129,14 +1189,14 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
 
         # Backport methods from earlier Senzing versions.
 
-        if config.get('senzing_sdk_version_major') == 2:
+        if config.get("senzing_sdk_version_major") == 2:
             result.addDataSource = result.addDataSourceV2
             result.init = result.initV2
             result.listDataSources = result.listDataSourcesV2
 
         # Initialize G2ConfigMgr.
 
-        result.init(g2_config_name, g2_configuration_json, config.get('debug', False))
+        result.init(g2_config_name, g2_configuration_json, config.get("debug", False))
     except G2ModuleException as err:
         exit_error(897, g2_configuration_json, err)
 
@@ -1144,8 +1204,10 @@ def get_g2_config(config, g2_config_name="resolver-G2-config"):
     return result
 
 
-def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver-G2-configuration-manager"):
-    ''' Get the G2ConfigMgr resource. '''
+def get_g2_configuration_manager(
+    config, g2_configuration_manager_name="resolver-G2-configuration-manager"
+):
+    """Get the G2ConfigMgr resource."""
     global G2_CONFIGURATION_MANAGER_SINGLETON
 
     if G2_CONFIGURATION_MANAGER_SINGLETON:
@@ -1157,12 +1219,16 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver
 
         # Backport methods from earlier Senzing versions.
 
-        if config.get('senzing_sdk_version_major') == 2:
+        if config.get("senzing_sdk_version_major") == 2:
             result.init = result.initV2
 
         # Initialize G2ConfigMgr.
 
-        result.init(g2_configuration_manager_name, g2_configuration_json, config.get('debug', False))
+        result.init(
+            g2_configuration_manager_name,
+            g2_configuration_json,
+            config.get("debug", False),
+        )
     except G2ModuleException as err:
         exit_error(896, g2_configuration_json, err)
 
@@ -1171,7 +1237,7 @@ def get_g2_configuration_manager(config, g2_configuration_manager_name="resolver
 
 
 def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
-    ''' Get the G2Engine resource. '''
+    """Get the G2Engine resource."""
     global G2_ENGINE_SINGLETON
 
     if G2_ENGINE_SINGLETON:
@@ -1183,18 +1249,19 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
 
         # Backport methods from earlier Senzing versions.
 
-        if config.get('senzing_sdk_version_major') == 2:
+        if config.get("senzing_sdk_version_major") == 2:
             result.init = result.initV2
             result.reinit = result.reinitV2
 
         # Initialize G2Engine.
 
-        result.init(g2_engine_name, g2_configuration_json, config.get('debug', False))
+        result.init(g2_engine_name, g2_configuration_json, config.get("debug", False))
     except G2ModuleException as err:
         exit_error(898, g2_configuration_json, err)
 
     G2_ENGINE_SINGLETON = result
     return result
+
 
 # -----------------------------------------------------------------------------
 # Utility functions
@@ -1202,18 +1269,18 @@ def get_g2_engine(config, g2_engine_name="resolver-G2-engine"):
 
 
 def get_config():
-    ''' Singleton pattern for config. '''
+    """Singleton pattern for config."""
     return GLOBAL_CONFIG
 
 
 def common_prolog(config):
-    ''' Common steps for most do_* functions. '''
+    """Common steps for most do_* functions."""
     validate_configuration(config)
     logging.info(entry_template(config))
 
 
 def handle_post_resolver(iterator, senzing_engine_flags=None):
-    ''' Add records to Senzing G2.  Pull resolved entities from G2. '''
+    """Add records to Senzing G2.  Pull resolved entities from G2."""
 
     # Create G2 configuration objects.
 
@@ -1258,32 +1325,33 @@ def handle_post_resolver(iterator, senzing_engine_flags=None):
 
 
 def strtobool(value):
-    """ Inspired by /usr/lib/python3.8/distutils/util.py """
+    """Inspired by /usr/lib/python3.8/distutils/util.py"""
 
     result = False
     lower_value = value.lower()
-    if lower_value in ('y', 'yes', 't', 'true', 'on', '1'):
+    if lower_value in ("y", "yes", "t", "true", "on", "1"):
         result = True
-    elif lower_value in ('n', 'no', 'f', 'false', 'off', '0'):
+    elif lower_value in ("n", "no", "f", "false", "off", "0"):
         result = False
     else:
         raise ValueError("invalid truth value %r" % (value,))
     return result
+
 
 # -----------------------------------------------------------------------------
 # Flask @app.routes
 # -----------------------------------------------------------------------------
 
 
-@APP.route("/resolve", methods=['POST'])
+@APP.route("/resolve", methods=["POST"])
 def http_post_resolve():
-    """ Handle POST /resolve """
+    """Handle POST /resolve"""
 
     # Initialize HTTP response variables.
 
     response_pretty = ""
     response_status = status.HTTP_200_OK
-    mimetype = 'application/json'
+    mimetype = "application/json"
 
     # Get POST payload.
 
@@ -1291,11 +1359,18 @@ def http_post_resolve():
 
     # Calculate Senzing Flags from query parameters.
 
-    senzing_engine_flags = G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
-    if strtobool(flask_request.args.get('withJson', 'false')):
-        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
-    if strtobool(flask_request.args.get('withFeatures', 'false')):
-        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_ALL_FEATURES
+    senzing_engine_flags = (
+        G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES
+        | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    )
+    if strtobool(flask_request.args.get("withJson", "false")):
+        senzing_engine_flags = (
+            senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+        )
+    if strtobool(flask_request.args.get("withFeatures", "false")):
+        senzing_engine_flags = (
+            senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_ALL_FEATURES
+        )
 
     # Create HTTP response.
 
@@ -1304,13 +1379,11 @@ def http_post_resolve():
         response_pretty = json.dumps(response, sort_keys=True)
     except Exception as err:
         response_status = status.HTTP_400_BAD_REQUEST
-        response_dictionary = {
-            "status": "error",
-            "message": "{0}".format(err)
-        }
+        response_dictionary = {"status": "error", "message": "{0}".format(err)}
         response_pretty = json.dumps(response_dictionary, sort_keys=True)
 
     return Response(response=response_pretty, status=response_status, mimetype=mimetype)
+
 
 # -----------------------------------------------------------------------------
 # do_* functions
@@ -1319,7 +1392,7 @@ def http_post_resolve():
 
 
 def do_docker_acceptance_test(subcommand, args):
-    ''' For use with Docker acceptance testing. '''
+    """For use with Docker acceptance testing."""
 
     # Get context from CLI, environment variables, and ini files.
 
@@ -1335,7 +1408,7 @@ def do_docker_acceptance_test(subcommand, args):
 
 
 def do_file_input(subcommand, args):
-    ''' Read input from a file.  Output to a file. '''
+    """Read input from a file.  Output to a file."""
 
     # Get context from CLI, environment variables, and ini files.
 
@@ -1344,20 +1417,27 @@ def do_file_input(subcommand, args):
 
     # Calculate Senzing Flags.
 
-    senzing_engine_flags = G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
-    if config.get('with_json', False):
-        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
-    if config.get('with_features', False):
-        senzing_engine_flags = senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_ALL_FEATURES
+    senzing_engine_flags = (
+        G2EngineFlags.G2_EXPORT_INCLUDE_ALL_ENTITIES
+        | G2EngineFlags.G2_ENTITY_BRIEF_DEFAULT_FLAGS
+    )
+    if config.get("with_json", False):
+        senzing_engine_flags = (
+            senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_RECORD_JSON_DATA
+        )
+    if config.get("with_features", False):
+        senzing_engine_flags = (
+            senzing_engine_flags | G2EngineFlags.G2_ENTITY_INCLUDE_ALL_FEATURES
+        )
 
     # Create iterator over JSON Lines and ingest data.
 
-    with open(config.get('input_file')) as input_iterator:
+    with open(config.get("input_file")) as input_iterator:
         result = handle_post_resolver(input_iterator, senzing_engine_flags)
 
     # Create output.
 
-    with open(config.get('output_file'), "w") as output_file:
+    with open(config.get("output_file"), "w") as output_file:
         json.dump(result, output_file, sort_keys=True, indent=4)
 
     # Epilog.
@@ -1366,16 +1446,16 @@ def do_file_input(subcommand, args):
 
 
 def do_service(subcommand, args):
-    ''' Run a Flask application to handle HTTP calls. '''
+    """Run a Flask application to handle HTTP calls."""
 
     # Get context from CLI, environment variables, and ini files.
 
     config = get_configuration(subcommand, args)
     common_prolog(config)
 
-    host = config.get('host')
-    port = config.get('port')
-    debug = config.get('debug')
+    host = config.get("host")
+    port = config.get("port")
+    debug = config.get("debug")
 
     # Prime the pump.
 
@@ -1393,7 +1473,7 @@ def do_service(subcommand, args):
 
 
 def do_sleep(subcommand, args):
-    ''' Sleep.  Used for debugging. '''
+    """Sleep.  Used for debugging."""
 
     # Get context from CLI, environment variables, and ini files.
 
@@ -1405,7 +1485,7 @@ def do_sleep(subcommand, args):
 
     # Pull values from configuration.
 
-    sleep_time_in_seconds = config.get('sleep_time_in_seconds')
+    sleep_time_in_seconds = config.get("sleep_time_in_seconds")
 
     # Sleep.
 
@@ -1425,10 +1505,11 @@ def do_sleep(subcommand, args):
 
 
 def do_version(subcommand, args):
-    ''' Log version information. '''
+    """Log version information."""
 
     logging.info(message_info(294, __version__, __updated__))
     logging.debug(message_debug(902, subcommand, args))
+
 
 # -----------------------------------------------------------------------------
 # Main
@@ -1446,7 +1527,7 @@ if __name__ == "__main__":
         "fatal": logging.FATAL,
         "warning": logging.WARNING,
         "error": logging.ERROR,
-        "critical": logging.CRITICAL
+        "critical": logging.CRITICAL,
     }
 
     LOG_LEVEL_PARAMETER = os.getenv("SENZING_LOG_LEVEL", "info").lower()
@@ -1488,7 +1569,7 @@ if __name__ == "__main__":
 
     # Transform subcommand from CLI parameter to function name string.
 
-    SUBCOMMAND_FUNCTION_NAME = "do_{0}".format(SUBCOMMAND.replace('-', '_'))
+    SUBCOMMAND_FUNCTION_NAME = "do_{0}".format(SUBCOMMAND.replace("-", "_"))
 
     # Test to see if function exists in the code.
 
