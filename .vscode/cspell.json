@@ -1,0 +1,55 @@
+{
+  // Version of the setting file.  Always 0.2
+  "version": "0.2",
+  // language - current active spelling language
+  "language": "en",
+  // words - list of words to be always considered correct
+  "words": [
+      "alnum",
+      "analysing",
+      "astring",
+      "Bitnami",
+      "buildx",
+      "CCLA",
+      "clidriver",
+      "CODEOWNER",
+      "CONFIGPATH",
+      "configurator",
+      "cpus",
+      "devel",
+      "dockerhub",
+      "DSRC",
+      "envsubst",
+      "getgid",
+      "getuid",
+      "ICLA",
+      "jsonline",
+      "libaio",
+      "LICENSESTRINGBASE",
+      "mypy",
+      "pydev",
+      "pydevproject",
+      "pylint",
+      "pylint",
+      "PYTHONPATH",
+      "PYTHONUNBUFFERED",
+      "RABBITMQ",
+      "reinit",
+      "RESOURCEPATH",
+      "rootfs",
+      "Senzing",
+      "senzingapi",
+      "senzingdata",
+      "shellcheck",
+      "stackoverflow",
+      "SUPPORTPATH",
+      "toplevel",
+      "venv"
+    ],
+  "ignorePaths": [
+    ".git/**",
+    ".gitignore",
+    ".mypy_cache/**",
+    "test/test-data-1.json"
+  ]
+}

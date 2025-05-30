@@ -106,5 +106,10 @@ venv.bak/
 
 helm-values/
 kubernetes/
-.history/
+
+# Visual Studio code
+.vscode/*
+!.vscode/cspell.json
+*.code-workspace
+.history
 
