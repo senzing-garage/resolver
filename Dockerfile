@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=senzing/senzingapi-runtime:3.10.3
+ARG BASE_IMAGE=senzing/senzingapi-runtime:3.10.3@sha256:232bb4241e85066a7af46e4d05dfa67bbd2be1565f7b51f31950f5fb0b481ef5
 
 # -----------------------------------------------------------------------------
 # Stage: builder
