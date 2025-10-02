@@ -15,7 +15,7 @@ USER root
 # Install packages via apt-get.
 
 RUN apt-get update \
-  && apt-get -y install \
+  && apt-get -y --no-install-recommends install \
   curl \
   libaio1 \
   python3 \
@@ -62,7 +62,7 @@ USER root
 # Install packages via apt.
 
 RUN apt-get update \
-  && apt-get -y install \
+  && apt-get -y --no-install-recommends install \
   libaio1 \
   libxml2 \
   python3 \
