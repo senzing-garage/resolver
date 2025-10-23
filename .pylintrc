@@ -5,6 +5,7 @@ disable=
     fixme,
     global-statement,
     import-error,
+    invalid-name,
     line-too-long,
     no-self-use,
     too-few-public-methods,

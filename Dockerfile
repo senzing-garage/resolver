@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=senzing/senzingapi-runtime:3.12.8@sha256:3663a1971e564af4d12ecdb0c90a4f46418b77dc229ec6c9f692efc59d1c67ae
+ARG BASE_IMAGE=senzing/senzingapi-runtime:3.13.0@sha256:edca155d3601238fab622a7dd86471046832328d21f71f7bb2ae5463157f6e10
 
 # -----------------------------------------------------------------------------
 # Stage: builder
@@ -17,7 +17,7 @@ USER root
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
   curl \
-  libaio1 \
+  libaio1t64 \
   python3 \
   python3-dev \
   python3-pip \
@@ -63,7 +63,7 @@ USER root
 
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
-  libaio1 \
+  libaio1t64 \
   libxml2 \
   python3 \
   python3-venv \
