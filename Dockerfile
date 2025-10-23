@@ -63,7 +63,7 @@ USER root
 
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
-  libaio1 \
+  libaio1t64 \
   libxml2 \
   python3 \
   python3-venv \
