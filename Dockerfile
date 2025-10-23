@@ -17,7 +17,7 @@ USER root
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
   curl \
-  libaio1 \
+  libaio1t64 \
   python3 \
   python3-dev \
   python3-pip \
