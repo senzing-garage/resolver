@@ -1,0 +1,21 @@
+name: Docker verify REFRESHED_AT Updated
+
+# Required status check: Verify Dockerfiles REFRESHED_AT Updated / Dockerfile Check Status
+# The other status checks beginning with "Verify Dockerfiles REFRESHED_AT Updated / ..." are not required.
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  verify-dockerfiles:
+    name: Verify Dockerfiles REFRESHED_AT Updated
+    permissions:
+      contents: read
+    uses: senzing-factory/build-resources/.github/workflows/verify-dockerfile-refreshed-at-updated.yaml@v3

@@ -1,6 +1,4 @@
-version: '3'
 services:
-
   resolver:
     image: senzing/resolver:${SENZING_DOCKER_IMAGE_VERSION_RESOLVER:-latest}
     networks:

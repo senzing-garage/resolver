@@ -1,10 +1,13 @@
-name: docker build container
+name: Docker build container
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -13,15 +16,16 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: get repo name
+      - name: Get repository name
         id: repo-basename
         run: |
           echo "repo=$(basename ${{ github.repository }})" >> "$GITHUB_OUTPUT"
         shell: bash
 
-      - name: build docker image
+      - name: Build docker image
         uses: senzing-factory/github-action-docker-buildx-build@v2
         with:
           image-repository: senzing/${{ steps.repo-basename.outputs.repo }}

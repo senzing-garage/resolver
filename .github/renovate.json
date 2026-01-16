@@ -6,6 +6,12 @@
     ":disableDependencyDashboard",
     "docker:pinDigests"
   ],
-  "schedule": ["on sunday"],
-  "minimumReleaseAge": "21 days"
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "minimumReleaseAge": "21 days"
+    }
+  ],
+  "prCreation": "not-pending",
+  "schedule": ["on sunday"]
 }

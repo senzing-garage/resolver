@@ -113,3 +113,6 @@ kubernetes/
 !.vscode/settings.json
 *.code-workspace
 .history
+
+.settings
+.claude/settings.local.json
