@@ -1,4 +1,4 @@
-# template-python
+# resolver
 
 Placeholder for [GitHub pages].
 

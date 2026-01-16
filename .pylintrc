@@ -15,7 +15,7 @@ disable=
     too-many-statements,
     unspecified-encoding,
 good-names=
-    template-python
+    resolver
 ignore=
     __init__.py,
 notes=

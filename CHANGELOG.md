@@ -196,7 +196,7 @@ This project adheres to [Semantic Versioning].
 
 ### Changed in 1.1.3
 
-- Return HTTP 400 upon error.  HTTP response contains error message.
+- Return HTTP 400 upon error. HTTP response contains error message.
 - Separate `data_source` and `entity_type` processing
 
 ## [1.1.2] - 2019-12-30
@@ -233,7 +233,7 @@ This project adheres to [Semantic Versioning].
 - Subcommands:
   - `resolver.py service`
   - `resolver.py file-input`
-- Note: a "batch mode" datasource/entity-type configurator was attempted,  but was replaced with "on the fly" configuration.
+- Note: a "batch mode" datasource/entity-type configurator was attempted, but was replaced with "on the fly" configuration.
   Reason: File-based iterators could not be reset, so two iterators would be needed -- potentially bloating memory.
   The use of a single iterator was preferred as this is more in line with "stream based" thinking.
 - **Note:** Uses the Senzing_API.tgz TarBall method of installation.
