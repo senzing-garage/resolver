@@ -30,12 +30,13 @@ RUN apt-get update \
 RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
+COPY . /git-repository
+WORKDIR /git-repository
+
 # Install packages via PIP.
 
-COPY requirements.txt .
-RUN pip3 install --upgrade pip \
-  && pip3 install -r requirements.txt \
-  && rm requirements.txt
+RUN python3 -m pip install --upgrade pip \
+ && python3 -m pip install .
 
 # -----------------------------------------------------------------------------
 # Stage: Final
