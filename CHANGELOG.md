@@ -2,9 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-[markdownlint](https://dlaa.me/markdownlint/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The changelog format is based on [Keep a Changelog] and [CommonMark].
+This project adheres to [Semantic Versioning].
 
 ## [3.0.10] - 2024-06-24
 
@@ -238,3 +237,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Reason: File-based iterators could not be reset, so two iterators would be needed -- potentially bloating memory.
   The use of a single iterator was preferred as this is more in line with "stream based" thinking.
 - **Note:** Uses the Senzing_API.tgz TarBall method of installation.
+
+[CommonMark]: https://commonmark.org/
+[Keep a Changelog]: https://keepachangelog.com/
+[Semantic Versioning]: https://semver.org/
