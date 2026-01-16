@@ -1,5 +1,8 @@
 # resolver
 
-Placeholder for [GitHub pages](https://pages.github.com/).
+Placeholder for [GitHub pages].
 
-See [https://senzing.github.io/resolver](https://senzing.github.io/resolver).
+See [GitHub page].
+
+[GitHub page]: https://garage.senzing.com/resolver
+[GitHub pages]: https://pages.github.com/
